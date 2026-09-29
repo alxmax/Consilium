@@ -28,7 +28,7 @@ Every line in this section is binding.
 
 ## Verify intent
 
-- Should `modes/trias.md`'s "the default flips A→C automatically once that gate crosses its threshold" be enforced by code? Today nothing reads this script's verdict at dispatch time.
+- None - resolved 2026-09-27: the verdict is advisory. `modes/trias.md` now says switching the Trias default from A to C is a maintainer's edit made once this script returns `SHIP_C`; no code reads the verdict at dispatch time.
 
 ## Cases
 

@@ -53,7 +53,12 @@ def _unquote_git_path(path: str) -> str:
     if len(path) >= 2 and path.startswith('"') and path.endswith('"'):
         inner = path[1:-1]
         try:
-            return inner.encode("latin-1").decode("unicode_escape").encode("latin-1").decode("utf-8")
+            return (
+                inner.encode("latin-1")
+                .decode("unicode_escape")
+                .encode("latin-1")
+                .decode("utf-8")
+            )
         except (UnicodeDecodeError, UnicodeEncodeError):
             return path
     return path
@@ -62,9 +67,18 @@ def _unquote_git_path(path: str) -> str:
 def _run_numstat(args: list[str]) -> str:
     try:
         result = subprocess.run(
-            # core.quotepath=false: emit raw UTF-8 paths instead of octal-escaped
-            # ones; encoding="utf-8": decode them correctly (cp1252 mangles on Windows).
-            ["git", "-c", "core.quotepath=false", "diff", "--numstat", "--no-renames", *args],
+            # core.quotepath=false: emit raw UTF-8 paths instead of
+            # octal-escaped ones; encoding="utf-8": decode them correctly
+            # (cp1252 mangles on Windows).
+            [
+                "git",
+                "-c",
+                "core.quotepath=false",
+                "diff",
+                "--numstat",
+                "--no-renames",
+                *args,
+            ],
             check=True,
             capture_output=True,
             text=True,
@@ -102,14 +116,27 @@ def parse_numstat(text: str) -> tuple[dict, list[str]]:
                 removed += int(r)
             except ValueError:
                 pass
-    summary = {"files_changed": files, "lines_added": added, "lines_removed": removed}
+    summary = {
+        "files_changed": files,
+        "lines_added": added,
+        "lines_removed": removed,
+    }
     return summary, paths
 
 
 def _commit_count(path: str, days: int) -> int:
     try:
         result = subprocess.run(
-            ["git", "-c", "core.quotepath=false", "log", f"--since={days}.days", "--pretty=format:%H", "--", path],
+            [
+                "git",
+                "-c",
+                "core.quotepath=false",
+                "log",
+                f"--since={days}.days",
+                "--pretty=format:%H",
+                "--",
+                path,
+            ],
             check=True,
             capture_output=True,
             text=True,

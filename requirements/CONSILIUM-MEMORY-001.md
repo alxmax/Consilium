@@ -5,7 +5,6 @@ status: confirmed
 level: code
 layer: feature
 owner: alxmax
-test_exempt: "file I/O and integration layer with trivial pure stubs"
 depends_on: [CONSILIUM-FEEDBACK-001, CONSILIUM-UTILS-001]
 risk: 1
 satisfies: [ARCH-CONSILIUM-LEARNING-001]
@@ -49,7 +48,3 @@ Every line in this section is binding.
 **Notes** — Input: `--tier` one of `short | medium | long | all` (default `all`); `--n` maximum entries per tier (default 10); `--query` optional substring filter; `--feedback-file` / `--runs-dir` override paths. Reads `.consilium/runs/*.json` for the medium tier and `.consilium/FEEDBACK.html` for the long tier. Contract derived from code, 2026-06-04.
 
 **Current implementation** — `scripts/memory.py`.
-
-## Why test_exempt
-
-`memory.py` is a thin integration layer over two data sources already tested elsewhere: the medium tier reads `runs/*.json` files (format tested by `test_build_report.py`), and the long tier delegates to `feedback.py` (format tested by `test_feedback_html.py` and `test_priors.py`). The `read_short()` stub is hardcoded and trivially correct. A unit test for `memory.py` would create a fixture `.consilium/` tree and assert counts — adding test-infrastructure cost without catching bugs that the upstream tests would already surface.

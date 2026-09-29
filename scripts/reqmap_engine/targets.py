@@ -1,5 +1,6 @@
 # implements: ARCH-MAP-007
-"""Optional planning sidecar — lanes, bars, milestone due dates, release cadence.
+"""Optional planning sidecar — lanes, bars, milestone due dates, release
+cadence.
 
 Reads `requirements/_planning.json` first, then legacy `_targets.json`."""
 import datetime
@@ -57,27 +58,32 @@ def _parse_bar(raw):
 
 
 # ---------- release cadence ----------
-WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
-PERIODS = {"week": "week", "weekly": "week", "month": "month", "monthly": "month"}
-# One default per period, because "on" means a different thing in each: a weekday for a
-# week, a day-of-month (or "last") for a month. A single default would be wrong for one
-# of them, and silently so.
+WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday",
+            "saturday", "sunday")
+PERIODS = {"week": "week", "weekly": "week", "month": "month",
+           "monthly": "month"}
+# One default per period, because "on" means a different thing in each: a
+# weekday for a week, a day-of-month (or "last") for a month. A single
+# default would be wrong for one of them, and silently so.
 PERIOD_DEFAULT_ON = {"week": "friday", "month": "last"}
 CADENCE_DEFAULTS = {"every": "week", "on": "friday", "lane": "Release"}
-# A plan can span years; one marker per week over a decade is 520 vertical lines and an
-# unreadable chart. The cap is a rendering limit, not a planning opinion — it truncates
-# the tail and the count says so, rather than silently thinning the series.
+# A plan can span years; one marker per week over a decade is 520 vertical
+# lines and an unreadable chart. The cap is a rendering limit, not a planning
+# opinion — it truncates the tail and the count says so, rather than
+# silently thinning the series.
 CADENCE_MAX = 120
 
 
 def _cadence_month_on(on):
-    """The day of the month a `cadence` block asks for, or None to keep the default.
+    """The day of the month a `cadence` block asks for, or None to keep
+    the default.
 
-    "last" is the default because a month's end is what a reader means by "end of
-    month", and it is the only choice that lands in every month: a plan pinned to the
-    30th silently skips February. Three accepted spellings were an `elif` chain inside
-    `_parse_cadence`, which is one nesting level per branch; as early returns they are
-    a list of what the key accepts."""
+    "last" is the default because a month's end is what a reader means
+    by "end of month", and it is the only choice that lands in every
+    month: a plan pinned to the 30th silently skips February. Three
+    accepted spellings were an `elif` chain inside `_parse_cadence`,
+    which is one nesting level per branch; as early returns they are a
+    list of what the key accepts."""
     if isinstance(on, str) and on.strip().lower() == "last":
         return "last"
     if isinstance(on, int) and 1 <= on <= 28:
@@ -90,9 +96,10 @@ def _cadence_month_on(on):
 def _parse_cadence(raw):
     """Normalise the optional `cadence` block, or None when absent/unusable.
 
-    `week` and `month` exist; anything else yields None rather than a series computed on
-    a guess. A plan that asked for a fortnight and silently got a week would be wrong on
-    every other marker, which is worse than no marker at all."""
+    `week` and `month` exist; anything else yields None rather than a
+    series computed on a guess. A plan that asked for a fortnight and
+    silently got a week would be wrong on every other marker, which is
+    worse than no marker at all."""
     if raw is True:
         raw = {}
     if not isinstance(raw, dict):
@@ -108,7 +115,8 @@ def _parse_cadence(raw):
     out["every"] = period
     out["on"] = PERIOD_DEFAULT_ON[period]
     on = raw.get("on")
-    if isinstance(on, str) and period == "week" and on.strip().lower() in WEEKDAYS:
+    if isinstance(on, str) and period == "week" \
+            and on.strip().lower() in WEEKDAYS:
         out["on"] = on.strip().lower()
     elif period == "month":
         day = _cadence_month_on(on)
@@ -125,15 +133,18 @@ def _parse_cadence(raw):
 
 
 def _plan_span(out):
-    """(first, last) ISO dates the plan already covers, from its bars and milestone
-    dues. When it covers nothing the span runs from today to `default_horizon()`.
+    """(first, last) ISO dates the plan already covers, from its bars
+    and milestone dues. When it covers nothing the span runs from today
+    to `default_horizon()`.
 
-    That reverses an earlier "a cadence needs something to run alongside, and inventing
-    a span from today would put markers on an empty chart". The case it was written for
-    is the case that turned out to matter: a repo that has planned nothing yet is
-    exactly the one that needs a calendar to plan ON. An empty chart with months on it
-    is a canvas; an empty chart with no months is a dead end, and `init` now seeds a
-    `_planning.json` precisely so a new repo starts with one (REQ-PLANHORIZON-1010)."""
+    That reverses an earlier "a cadence needs something to run
+    alongside, and inventing a span from today would put markers on an
+    empty chart". The case it was written for is the case that turned
+    out to matter: a repo that has planned nothing yet is exactly the
+    one that needs a calendar to plan ON. An empty chart with months on
+    it is a canvas; an empty chart with no months is a dead end, and
+    `init` now seeds a `_planning.json` precisely so a new repo starts
+    with one (REQ-PLANHORIZON-1010)."""
     dates = []
     for bar in out.get("bars", []):
         dates.append(bar["start"])
@@ -147,21 +158,23 @@ def _plan_span(out):
 
 
 def _month_end(year, month):
-    """The last day of that month, without a calendar import: day 1 of the next month,
-    minus one."""
-    nxt = datetime.date(year + (month == 12), 1 if month == 12 else month + 1, 1)
+    """The last day of that month, without a calendar import: day 1 of
+    the next month, minus one."""
+    nxt = datetime.date(
+        year + (month == 12), 1 if month == 12 else month + 1, 1)
     return nxt - datetime.timedelta(days=1)
 
 
 def default_horizon(today=None):
     # implements: ARCH-ROADMAP-038  # implements: REQ-PLANHORIZON-1010
-    """How far a cadence runs when its author named no `until`: the end of this year,
-    or three months out, whichever is later.
+    """How far a cadence runs when its author named no `until`: the end
+    of this year, or three months out, whichever is later.
 
-    The year end alone is a plan that shrinks as the year does — in December it would
-    show one month, which is the point at which a reader needs the next quarter most.
-    Three months alone never shows the year. Taking the later of the two means the chart
-    reaches the end of the year for most of it and rolls into the next one near the
+    The year end alone is a plan that shrinks as the year does — in
+    December it would show one month, which is the point at which a
+    reader needs the next quarter most. Three months alone never shows
+    the year. Taking the later of the two means the chart reaches the
+    end of the year for most of it and rolls into the next one near the
     close: asked in December 2026 it answers February 2027."""
     d = today or datetime.date.today()
     year_end = datetime.date(d.year, 12, 31)
@@ -172,14 +185,17 @@ def default_horizon(today=None):
 
 
 def _release_dates(cadence, first, last):
-    """The cadence's dates from `first` through `last`, inclusive, as ISO strings.
+    """The cadence's dates from `first` through `last`, inclusive, as
+    ISO strings.
 
-    Computed HERE and emitted, not recomputed in the viewer: a second definition in
-    JavaScript is how the CLI and the chart come to disagree about when a release lands."""
+    Computed HERE and emitted, not recomputed in the viewer: a second
+    definition in JavaScript is how the CLI and the chart come to
+    disagree about when a release lands."""
     start = cadence.get("from") or first
-    # `last` is the final dated thing in the plan, which in a fresh repo is nothing at
-    # all. Falling back to the shared horizon means a cadence draws a calendar before
-    # anything is scheduled on it — which is what a new repo has.
+    # `last` is the final dated thing in the plan, which in a fresh
+    # repo is nothing at all. Falling back to the shared horizon means
+    # a cadence draws a calendar before anything is scheduled on it —
+    # which is what a new repo has.
     end = cadence.get("until") or last or default_horizon()
     if not start or not end or start > end:
         return []
@@ -193,7 +209,8 @@ def _release_dates(cadence, first, last):
         year, month = day.year, day.month
         while len(dates) < CADENCE_MAX:
             on = cadence["on"]
-            when = _month_end(year, month) if on == "last" else datetime.date(year, month, on)
+            when = (_month_end(year, month) if on == "last"
+                    else datetime.date(year, month, on))
             if when > stop:
                 break
             if when >= day:
@@ -214,6 +231,13 @@ def _read_planning_file(path):
             return json.load(f)
     except (OSError, json.JSONDecodeError, TypeError, ValueError):
         return None
+
+
+def has_plan(reqs_dir):  # implements: REQ-PLANINPUT-1086
+    """True when the requirements directory holds a planning file: the
+    one test that decides whether the planning checks load at all."""
+    return any(os.path.isfile(os.path.join(reqs_dir or ".", name))
+               for name in PLANNING_FILES)
 
 
 def load_targets(reqs_dir):
@@ -245,7 +269,8 @@ def load_targets(reqs_dir):
 
     lanes = raw.get("lanes")
     if isinstance(lanes, list):
-        clean_lanes = [s.strip() for s in lanes if isinstance(s, str) and s.strip()]
+        clean_lanes = [s.strip() for s in lanes
+                       if isinstance(s, str) and s.strip()]
         if clean_lanes:
             out["lanes"] = clean_lanes
 

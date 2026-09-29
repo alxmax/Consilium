@@ -82,10 +82,10 @@ MODE_PREFIXES = {
 # Per-mode model pin. Modes whose name implies a specific model lock to it,
 # regardless of the --model flag default. Pass --model explicitly to override.
 MODE_MODELS = {
-    "sonnet_bare": "claude-sonnet-5",
+    "sonnet_bare": "claude-sonnet-5-5",
 }
 
-# Per-mode budget overrides (USD). Default budget ($3) is uniform across modes
+# Per-mode budget overrides (USD). Default budget ($5) is uniform across modes
 # now; leave this dict empty unless a specific mode genuinely needs more.
 MODE_BUDGETS = {}
 
@@ -893,13 +893,13 @@ def main():
                     help="e.g. code/01_circuit_breaker, reasoning/01_transport_choice, reasoning/02_rule_of_three")
     ap.add_argument("--clean",  action="store_true",
                     help="Wipe this task's workspace before running")
-    ap.add_argument("--model",  default="claude-sonnet-5",
-                    help="Model id or alias (default: claude-sonnet-5)")
+    ap.add_argument("--model",  default="claude-sonnet-5-5",
+                    help="Model id or alias (default: claude-sonnet-5-5)")
     ap.add_argument("--effort", default="high",
                     choices=["low", "medium", "high", "xhigh", "max"],
                     help="Effort level (default: high)")
-    ap.add_argument("--budget", type=float, default=3.0,
-                    help="--max-budget-usd cap in USD (default: 3.0)")
+    ap.add_argument("--budget", type=float, default=5.0,
+                    help="--max-budget-usd cap in USD (default: 5.0)")
     ap.add_argument("--no-verify", action="store_true",
                     help="Skip automatic verification step after the run")
     ap.add_argument("--rep", type=int, default=None, metavar="N",

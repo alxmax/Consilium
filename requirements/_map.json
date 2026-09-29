@@ -1,5 +1,5 @@
 {
-  "engine_version": "2026-09-21.1",
+  "engine_version": "2026-09-28.2",
   "repo": "alxmax/Consilium_Demo",
   "nodes": [
     {
@@ -21,23 +21,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a report whose chosen approach is `high` magnitude and `partial` reversibility, when `infer_pipeline.py` reads it, then the returned steps are implement, compile, review, test.",
-        "**CASE-2** — Given a Coder and a Test Writer plan, when their paths are compared, then no path appears in both.",
-        "**CASE-3** — Given a report and a unified diff, when `render_impl_preview.py` runs, then it writes one self-contained HTML page."
-      ],
       "accept": "- **CASE-1** — Given a report whose chosen approach is `high` magnitude and `partial` reversibility, when `infer_pipeline.py` reads it, then the returned steps are implement, compile, review, test.\n- **CASE-2** — Given a Coder and a Test Writer plan, when their paths are compared, then no path appears in both.\n- **CASE-3** — Given a report and a unified diff, when `render_impl_preview.py` runs, then it writes one self-contained HTML page.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-IMPLEMENT-PIPELINE-001",
-        "CONSILIUM-IMPLEMENT-CODER-001",
-        "CONSILIUM-IMPLEMENT-TEST-WRITER-001",
-        "CONSILIUM-IMPLEMENT-SUBAGENT-001",
-        "CONSILIUM-INFER-PIPELINE-001",
-        "CONSILIUM-RENDER-IMPL-PREVIEW-001"
-      ],
       "depends_on": [
         "CONSILIUM-IMPLEMENT-PIPELINE-001",
         "CONSILIUM-IMPLEMENT-CODER-001",
@@ -93,25 +80,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a report, when `log_feedback.py` appends it and `feedback.py` parses the file, then the parsed row carries the report's verdict.",
-        "**CASE-2** — Given a run file with no FEEDBACK row, when `audit_feedback.py` runs, then the run is listed as an orphan.",
-        "**CASE-3** — Given a logged row whose outcome is later known, when `mark_outcome.py` corrects it, then `feedback.py` parses the corrected outcome and the row count is unchanged."
-      ],
       "accept": "- **CASE-1** — Given a report, when `log_feedback.py` appends it and `feedback.py` parses the file, then the parsed row carries the report's verdict.\n- **CASE-2** — Given a run file with no FEEDBACK row, when `audit_feedback.py` runs, then the run is listed as an orphan.\n- **CASE-3** — Given a logged row whose outcome is later known, when `mark_outcome.py` corrects it, then `feedback.py` parses the corrected outcome and the row count is unchanged.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-FEEDBACK-001",
-        "CONSILIUM-LOG-FEEDBACK-001",
-        "CONSILIUM-MARK-OUTCOME-001",
-        "CONSILIUM-MEMORY-001",
-        "CONSILIUM-PRIORS-001",
-        "CONSILIUM-AUDIT-FEEDBACK-001",
-        "CONSILIUM-RENDER-FEEDBACK-HTML-001",
-        "CONSILIUM-CONFIDENCE-CALIBRATION-001"
-      ],
       "depends_on": [
         "CONSILIUM-FEEDBACK-001",
         "CONSILIUM-LOG-FEEDBACK-001",
@@ -172,25 +144,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given no mode flag, when `/consilium` runs, then the report's `telemetry.mode` is `sequential`.",
-        "**CASE-2** — Given a Sequential run whose confidence is 0.65, when the run completes, then a Skeptic challenge is recorded on the chosen approach.",
-        "**CASE-3** — Given a Trias run, when the vote is 2-1, then the confidence matches `VOTE_PATTERN_CONFIDENCE['2-1']`."
-      ],
       "accept": "- **CASE-1** — Given no mode flag, when `/consilium` runs, then the report's `telemetry.mode` is `sequential`.\n- **CASE-2** — Given a Sequential run whose confidence is 0.65, when the run completes, then a Skeptic challenge is recorded on the chosen approach.\n- **CASE-3** — Given a Trias run, when the vote is 2-1, then the confidence matches `VOTE_PATTERN_CONFIDENCE['2-1']`.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-MODE-SEQUENTIAL-001",
-        "CONSILIUM-MODE-DIALECTIC-001",
-        "CONSILIUM-MODE-TRIAS-001",
-        "CONSILIUM-MODE-SKEPTIC-ON-CHOSEN-001",
-        "CONSILIUM-MODE-LENS-001",
-        "CONSILIUM-SUBAGENT-001",
-        "CONSILIUM-TRIAS-MODEL-SCHEMA-001",
-        "CONSILIUM-VOTE-DEGENERACY-001"
-      ],
       "depends_on": [
         "CONSILIUM-MODE-SEQUENTIAL-001",
         "CONSILIUM-MODE-DIALECTIC-001",
@@ -249,23 +206,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a new `scripts/test_*.py` not listed in `ci.yml`, when `check_doc_drift.py` runs, then it exits 1.",
-        "**CASE-2** — Given a clean checkout, when `driver.py smoke` runs, then it ends with `OK - all green`.",
-        "**CASE-3** — Given `plugin.json` and `marketplace.json` at different versions, when `check_versions.py` runs, then it exits 1."
-      ],
       "accept": "- **CASE-1** — Given a new `scripts/test_*.py` not listed in `ci.yml`, when `check_doc_drift.py` runs, then it exits 1.\n- **CASE-2** — Given a clean checkout, when `driver.py smoke` runs, then it ends with `OK - all green`.\n- **CASE-3** — Given `plugin.json` and `marketplace.json` at different versions, when `check_versions.py` runs, then it exits 1.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-CHECK-DOC-DRIFT-001",
-        "CONSILIUM-CHECK-DOC-DRIFT-EXPLAINER-001",
-        "CONSILIUM-CHECK-PUBLIC-LEAK-001",
-        "CONSILIUM-CHECK-VERSIONS-001",
-        "CONSILIUM-RUN-EVALS-001",
-        "SKILL-RUN-CONSILIUM-001"
-      ],
       "depends_on": [
         "CONSILIUM-CHECK-DOC-DRIFT-001",
         "CONSILIUM-CHECK-DOC-DRIFT-EXPLAINER-001",
@@ -321,27 +265,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given voice outputs from a Sequential run, when they flow through aggregator, confidence and build_report, then the result passes `validate_report.py`.",
-        "**CASE-2** — Given a report missing `pipeline_executed`, when `validate_report.py` reads it, then it exits non-zero.",
-        "**CASE-3** — Given a diff that the scope gate marks as needing consent, when `/consilium` runs, then no voice is dispatched before consent is given."
-      ],
       "accept": "- **CASE-1** — Given voice outputs from a Sequential run, when they flow through aggregator, confidence and build_report, then the result passes `validate_report.py`.\n- **CASE-2** — Given a report missing `pipeline_executed`, when `validate_report.py` reads it, then it exits non-zero.\n- **CASE-3** — Given a diff that the scope gate marks as needing consent, when `/consilium` runs, then no voice is dispatched before consent is given.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-AGGREGATOR-001",
-        "CONSILIUM-CONFIDENCE-001",
-        "CONSILIUM-BUILD-REPORT-001",
-        "CONSILIUM-VALIDATE-REPORT-001",
-        "CONSILIUM-VALIDATE-SKEPTIC-001",
-        "CONSILIUM-STRIP-CONTEXT-001",
-        "CONSILIUM-SCOPE-GATE-001",
-        "CONSILIUM-VOCABULARY-MAP-001",
-        "CONSILIUM-VERSION-001",
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-AGGREGATOR-001",
         "CONSILIUM-CONFIDENCE-001",
@@ -404,25 +331,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given any mode, when a deliberation runs, then Generator, Conservator and Control each emit their JSON before aggregation.",
-        "**CASE-2** — Given a chosen candidate, when the Skeptic runs, then its output passes `validate_skeptic.py` and names no new candidate.",
-        "**CASE-3** — Given a Trias run, when the Verifier personality deliberates, then its voices receive the Verifier lens text ahead of their core prompts."
-      ],
       "accept": "- **CASE-1** — Given any mode, when a deliberation runs, then Generator, Conservator and Control each emit their JSON before aggregation.\n- **CASE-2** — Given a chosen candidate, when the Skeptic runs, then its output passes `validate_skeptic.py` and names no new candidate.\n- **CASE-3** — Given a Trias run, when the Verifier personality deliberates, then its voices receive the Verifier lens text ahead of their core prompts.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-VOICE-GENERATOR-001",
-        "CONSILIUM-VOICE-CONTROL-001",
-        "CONSILIUM-VOICE-CONSERVATOR-001",
-        "CONSILIUM-VOICE-SKEPTIC-001",
-        "CONSILIUM-LENS-ESSENTIALIST-001",
-        "CONSILIUM-LENS-VERIFIER-001",
-        "CONSILIUM-LENS-SENTINEL-001",
-        "CONSILIUM-PERSONALITIES-001"
-      ],
       "depends_on": [
         "CONSILIUM-VOICE-GENERATOR-001",
         "CONSILIUM-VOICE-CONTROL-001",
@@ -489,20 +401,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a candidates list where every candidate's Conservator score exceeds `veto_threshold` and `auto_relax=True`, when `conservative_override` runs, then the output contains `chosen: null` and a non-empty `retry_suggested` block.",
-        "**CASE-2** — Given two candidates with identical generator and control scores but different Conservator risk, when `conservative_override` ranks them, then the candidate with lower risk ranks first.",
-        "**CASE-3** — Given `vote_pattern='2-1'` with three personalities where two of them choose the same candidate, when `team_vote` runs, then `chosen` equals the majority candidate and `dissent` is non-empty.",
-        "**CASE-4** — Given sequential input where `control_out['glossary_fail']` is `True`, when the `sequential` scheme runs, then the output has `result: BLOCK` and `reason: glossary_fail`, regardless of other signals.",
-        "**CASE-5** — Given three or more simultaneous triggers, when the `sequential` scheme runs, then the output has `result: ESCALATE` with a `triggers` list of length >= 3."
-      ],
       "accept": "- **CASE-1** — Given a candidates list where every candidate's Conservator score exceeds `veto_threshold` and `auto_relax=True`, when `conservative_override` runs, then the output contains `chosen: null` and a non-empty `retry_suggested` block.\n- **CASE-2** — Given two candidates with identical generator and control scores but different Conservator risk, when `conservative_override` ranks them, then the candidate with lower risk ranks first.\n- **CASE-3** — Given `vote_pattern='2-1'` with three personalities where two of them choose the same candidate, when `team_vote` runs, then `chosen` equals the majority candidate and `dissent` is non-empty.\n- **CASE-4** — Given sequential input where `control_out['glossary_fail']` is `True`, when the `sequential` scheme runs, then the output has `result: BLOCK` and `reason: glossary_fail`, regardless of other signals.\n- **CASE-5** — Given three or more simultaneous triggers, when the `sequential` scheme runs, then the output has `result: ESCALATE` with a `triggers` list of length >= 3.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-UTILS-001"
       ],
@@ -537,7 +439,7 @@
     {
       "id": "CONSILIUM-AUDIT-COUNTER-001",
       "layer": "feature",
-      "level": null,
+      "level": "code",
       "status": "deprecated",
       "area": "CONSILIUM",
       "title": "Silent parallel audit counter",
@@ -558,19 +460,10 @@
       "current_impl": [
         "scripts/audit_counter.py"
       ],
-      "acc": [
-        "Given a fresh state, after 20 `--increment` calls, `--check` returns `should_audit: true`.",
-        "Given `should_audit: true` and `--record-divergence 1` twice (plus 3 zeros), frequency stays at 20 (needs ≥2 in window); given two more divergences, frequency flips to 5.",
-        "Given `CLAUDE_HEADLESS=1`, `--check` returns `should_audit: false` regardless of count.",
-        "Given `--status`, output contains `sequential_count`, `frequency`, `audit_count`, and `recent_divergences`."
-      ],
       "accept": "- Given a fresh state, after 20 `--increment` calls, `--check` returns `should_audit: true`.\n- Given `should_audit: true` and `--record-divergence 1` twice (plus 3 zeros), frequency stays at 20 (needs ≥2 in window); given two more divergences, frequency flips to 5.\n- Given `CLAUDE_HEADLESS=1`, `--check` returns `should_audit: false` regardless of count.\n- Given `--status`, output contains `sequential_count`, `frequency`, `audit_count`, and `recent_divergences`.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-UTILS-001"
       ],
@@ -605,19 +498,10 @@
       "current_impl": [
         "scripts/audit_feedback.py"
       ],
-      "acc": [
-        "Given a run file with no FEEDBACK row, `audit_feedback.py` lists it; `--backfill` appends a PEND row; re-run lists nothing (idempotent).",
-        "Given a run file with an existing row, `--backfill` does not duplicate it.",
-        "Given `--dry-run`, no write occurs to FEEDBACK.html."
-      ],
       "accept": "- Given a run file with no FEEDBACK row, `audit_feedback.py` lists it; `--backfill` appends a PEND row; re-run lists nothing (idempotent).\n- Given a run file with an existing row, `--backfill` does not duplicate it.\n- Given `--dry-run`, no write occurs to FEEDBACK.html.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-FEEDBACK-001",
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-FEEDBACK-001",
         "CONSILIUM-UTILS-001"
@@ -632,7 +516,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/audit_feedback.py:29"
+          "loc": "scripts/audit_feedback.py:30"
         }
       ],
       "test_exempt": "integration-only — depends on live FEEDBACK.html + runs/; acceptance-tested via --dry-run and manual backfill",
@@ -668,20 +552,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a well-formed full bundle, when `build_report.py` runs, then the output contains `pipeline_executed: true` and a `deliberation_log` array with entries for the `generator`, `control`, `conservator`, and `aggregate` steps.",
-        "**CASE-2** — Given a skipped bundle (`skipped: true`) with a valid `skip_reason`, when `build_report.py` runs, then the output contains `chosen_approach: skipped`, `pipeline_executed` absent or false, and `deliberation_log: []`.",
-        "**CASE-3** — Given a bundle where the chosen candidate's control verdict has `valid=false` with issues, when `build_report.py` runs, then `voice_scores.control` is below 1.0 and the alternatives list a `why_not` string derived from those issues.",
-        "**CASE-4** — Given any valid bundle, when `build_report.py` runs, then the telemetry block contains a non-empty `consilium_version` and a `consilium_ref` that is either the committed HEAD sha or `\"\"` on a dirty/unknown tree (the version-module contract — see CONSILIUM-VERSION-001), both stamped by the version module.",
-        "**CASE-5** — Given a bundle missing `success_criterion`, when `build_report.py` runs, then it exits with code 1 and prints an error to stderr without writing any JSON to stdout."
-      ],
       "accept": "- **CASE-1** — Given a well-formed full bundle, when `build_report.py` runs, then the output contains `pipeline_executed: true` and a `deliberation_log` array with entries for the `generator`, `control`, `conservator`, and `aggregate` steps.\n- **CASE-2** — Given a skipped bundle (`skipped: true`) with a valid `skip_reason`, when `build_report.py` runs, then the output contains `chosen_approach: skipped`, `pipeline_executed` absent or false, and `deliberation_log: []`.\n- **CASE-3** — Given a bundle where the chosen candidate's control verdict has `valid=false` with issues, when `build_report.py` runs, then `voice_scores.control` is below 1.0 and the alternatives list a `why_not` string derived from those issues.\n- **CASE-4** — Given any valid bundle, when `build_report.py` runs, then the telemetry block contains a non-empty `consilium_version` and a `consilium_ref` that is either the committed HEAD sha or `\"\"` on a dirty/unknown tree (the version-module contract — see CONSILIUM-VERSION-001), both stamped by the version module.\n- **CASE-5** — Given a bundle missing `success_criterion`, when `build_report.py` runs, then it exits with code 1 and prints an error to stderr without writing any JSON to stdout.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-UTILS-001"
       ],
@@ -695,7 +569,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/build_report.py:42"
+          "loc": "scripts/build_report.py:46"
         },
         {
           "role": "tested-by",
@@ -760,18 +634,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given all invariant patterns hold and `confidence.py`'s `VOTE_PATTERN_CONFIDENCE` matches `trias.jsx`'s `TRIAS_OUTCOMES` for patterns `3-0`/`2-1`/`2-0`, when `check_doc_drift.py` runs, then it exits 0 and prints the OK message.",
-        "**CASE-2** — Given the scale_down wording in `modes/sequential.md` regresses to \"Skip Generator AND Control\", when `check_doc_drift.py` runs, then the `sequential_scale_down_skips_control` invariant fails and the script exits 1.",
-        "**CASE-3** — Given `confidence.py`'s `VOTE_PATTERN_CONFIDENCE['2-1']` is changed to a value that differs from the `conf` field of the `2-1` row in `trias.jsx`'s `TRIAS_OUTCOMES`, when `check_doc_drift.py` runs, then the trias confidence parity check reports a failure.",
-        "**CASE-4** — Given a new `scripts/test_*.py` file added without a corresponding entry in `ci.yml`, when `check_doc_drift.py` runs, then the `test_suite_coverage` check fails and the script exits 1.",
-        "**CASE-5** — Given a required file listed in an invariant's `file` key is missing from disk, when `check_doc_drift.py` runs, then it exits 2 immediately."
-      ],
       "accept": "- **CASE-1** — Given all invariant patterns hold and `confidence.py`'s `VOTE_PATTERN_CONFIDENCE` matches `trias.jsx`'s `TRIAS_OUTCOMES` for patterns `3-0`/`2-1`/`2-0`, when `check_doc_drift.py` runs, then it exits 0 and prints the OK message.\n- **CASE-2** — Given the scale_down wording in `modes/sequential.md` regresses to \"Skip Generator AND Control\", when `check_doc_drift.py` runs, then the `sequential_scale_down_skips_control` invariant fails and the script exits 1.\n- **CASE-3** — Given `confidence.py`'s `VOTE_PATTERN_CONFIDENCE['2-1']` is changed to a value that differs from the `conf` field of the `2-1` row in `trias.jsx`'s `TRIAS_OUTCOMES`, when `check_doc_drift.py` runs, then the trias confidence parity check reports a failure.\n- **CASE-4** — Given a new `scripts/test_*.py` file added without a corresponding entry in `ci.yml`, when `check_doc_drift.py` runs, then the `test_suite_coverage` check fails and the script exits 1.\n- **CASE-5** — Given a required file listed in an invariant's `file` key is missing from disk, when `check_doc_drift.py` runs, then it exits 2 immediately.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-REPO-GATES-001"
@@ -783,7 +649,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/check_doc_drift.py:25"
+          "loc": "scripts/check_doc_drift.py:26"
         },
         {
           "role": "tested-by",
@@ -817,17 +683,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a named `ci.yml` step invoking a script with no `CI_CHECKS` card and no `ALLOWED_OUT_OF_SCOPE_CI_STEPS` entry, when `check_ci_checks_completeness` runs, then it reports a failure naming the step and the script.",
-        "**CASE-2** — Given two `ci.yml` steps invoking the same script under different flags and one card naming that script, when `check_ci_checks_completeness` runs, then it reports no failure.",
-        "**CASE-3** — Given `trias.jsx`'s `LENSES`, `modes.jsx`'s personalities array or `make_full_architecture.py`'s `personalities_row` regressed to a retired name (e.g. `Pioneer`), when `check_trias_personality_name_parity` runs, then it reports a failure naming the offending file.",
-        "**CASE-4** — Given `extras.jsx`'s `GATE_ITEMS` missing the sub-agent-count or the cost-multiplier string, when `check_implement_pipeline_spec_alignment` runs, then it reports the matching failure(s). Given `modes/implement_pipeline.md` missing either frontmatter field, the script exits 2."
-      ],
       "accept": "- **CASE-1** — Given a named `ci.yml` step invoking a script with no `CI_CHECKS` card and no `ALLOWED_OUT_OF_SCOPE_CI_STEPS` entry, when `check_ci_checks_completeness` runs, then it reports a failure naming the step and the script.\n- **CASE-2** — Given two `ci.yml` steps invoking the same script under different flags and one card naming that script, when `check_ci_checks_completeness` runs, then it reports no failure.\n- **CASE-3** — Given `trias.jsx`'s `LENSES`, `modes.jsx`'s personalities array or `make_full_architecture.py`'s `personalities_row` regressed to a retired name (e.g. `Pioneer`), when `check_trias_personality_name_parity` runs, then it reports a failure naming the offending file.\n- **CASE-4** — Given `extras.jsx`'s `GATE_ITEMS` missing the sub-agent-count or the cost-multiplier string, when `check_implement_pipeline_spec_alignment` runs, then it reports the matching failure(s). Given `modes/implement_pipeline.md` missing either frontmatter field, the script exits 2.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-REPO-GATES-001"
@@ -839,15 +698,15 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/check_doc_drift.py:289"
+          "loc": "scripts/check_doc_drift.py:454"
         },
         {
           "role": "implements",
-          "loc": "scripts/check_doc_drift.py:653"
+          "loc": "scripts/check_doc_drift.py:880"
         },
         {
           "role": "implements",
-          "loc": "scripts/check_doc_drift.py:833"
+          "loc": "scripts/check_doc_drift.py:1125"
         },
         {
           "role": "tested-by",
@@ -887,18 +746,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a repo with no private-repo (non-Demo) or local-path references, when `check_public_leak.py` runs, then it exits 0 and prints `clean`.",
-        "**CASE-2** — Given a tracked file containing a non-Demo private-repo reference, when `check_public_leak.py` runs, then it exits 1 with the file and line number printed to stderr.",
-        "**CASE-3** — Given a tracked file containing an absolute local developer path, when `check_public_leak.py` runs, then it exits 1 with the offending location reported.",
-        "**CASE-4** — Given binary and image files (`.png`, `.woff`) that match the patterns byte-for-byte, when `check_public_leak.py` runs, then those files are skipped.",
-        "**CASE-5** — Given the guard script itself (`check_public_leak.py`), when it scans the repo, then it excludes itself from the scan and never self-reports."
-      ],
       "accept": "- **CASE-1** — Given a repo with no private-repo (non-Demo) or local-path references, when `check_public_leak.py` runs, then it exits 0 and prints `clean`.\n- **CASE-2** — Given a tracked file containing a non-Demo private-repo reference, when `check_public_leak.py` runs, then it exits 1 with the file and line number printed to stderr.\n- **CASE-3** — Given a tracked file containing an absolute local developer path, when `check_public_leak.py` runs, then it exits 1 with the offending location reported.\n- **CASE-4** — Given binary and image files (`.png`, `.woff`) that match the patterns byte-for-byte, when `check_public_leak.py` runs, then those files are skipped.\n- **CASE-5** — Given the guard script itself (`check_public_leak.py`), when it scans the repo, then it excludes itself from the scan and never self-reports.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-REPO-GATES-001"
@@ -910,14 +761,14 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/check_public_leak.py:15"
+          "loc": "scripts/check_public_leak.py:16"
         },
         {
           "role": "tested-by",
           "loc": "scripts/test_public_leak.py:12"
         }
       ],
-      "test_exempt": "subprocess git ls-files and filesystem scan — integration-only",
+      "test_exempt": null,
       "milestone": "v1.2",
       "priority": "",
       "risks": []
@@ -949,20 +800,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given aligned manifests (plugin, marketplace, and engine all valid), when `check_versions.py` runs, then it exits 0 (tested in `scripts/test_check_versions.py`).",
-        "**CASE-2** — Given a `marketplace.json` top-level or per-plugin-entry version mismatch, when `check_versions.py` runs, then it exits 1.",
-        "**CASE-3** — Given a missing `plugin.json` `version` field, when `check_versions.py` runs, then it exits 2.",
-        "**CASE-4** — Given a non-dict `plugins[]` entry, when `check_versions.py` runs, then it exits 1 without raising.",
-        "**CASE-5** — Given a `MAP_ENGINE_VERSION` docstring mention before the real assignment, when `check_versions.py` runs, then that mention is ignored by the anchored regex.",
-        "**CASE-6** — Given same-day revision suffixes (`.1`, `.2`, ...), when `check_versions.py` validates them, then they pass; `.0` and non-numeric suffixes do not.",
-        "**CASE-7** — Given `--fix` run against a drifted `marketplace.json`, when it propagates `plugin.json`'s version into both `marketplace.json` locations, then a subsequent unflagged run passes."
-      ],
       "accept": "- **CASE-1** — Given aligned manifests (plugin, marketplace, and engine all valid), when `check_versions.py` runs, then it exits 0 (tested in `scripts/test_check_versions.py`).\n- **CASE-2** — Given a `marketplace.json` top-level or per-plugin-entry version mismatch, when `check_versions.py` runs, then it exits 1.\n- **CASE-3** — Given a missing `plugin.json` `version` field, when `check_versions.py` runs, then it exits 2.\n- **CASE-4** — Given a non-dict `plugins[]` entry, when `check_versions.py` runs, then it exits 1 without raising.\n- **CASE-5** — Given a `MAP_ENGINE_VERSION` docstring mention before the real assignment, when `check_versions.py` runs, then that mention is ignored by the anchored regex.\n- **CASE-6** — Given same-day revision suffixes (`.1`, `.2`, ...), when `check_versions.py` validates them, then they pass; `.0` and non-numeric suffixes do not.\n- **CASE-7** — Given `--fix` run against a drifted `marketplace.json`, when it propagates `plugin.json`'s version into both `marketplace.json` locations, then a subsequent unflagged run passes.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-REPO-GATES-001"
@@ -974,7 +815,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/check_versions.py:25"
+          "loc": "scripts/check_versions.py:30"
         },
         {
           "role": "tested-by",
@@ -1021,20 +862,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a chosen candidate with `generator=0.8`, `control=0.9`, `conservator=0.1` (high utility, low risk, high agreement) and no runner-up, when `confidence.py` runs, then the output confidence is close to 0.99 (agreement near 1.0, separation defaults to 1.0).",
-        "**CASE-2** — Given `chosen: null` in the input, when `confidence.py` runs, then the output is `{confidence: null, reason: \"...\"}` and the script exits 0.",
-        "**CASE-3** — Given `vote_pattern='2-1'` with a dissent list containing the Sentinel personality, when `confidence.py` runs, then the output confidence equals `VOTE_PATTERN_CONFIDENCE['2-1']` minus the `SENTINEL_DISSENT_PENALTY` (0.10), rounded to 3 decimal places.",
-        "**CASE-4** — Given `vote_pattern='3-0'`, when `check_mode_floor` runs with `mode='trias'`, then it returns `below_floor=false` regardless of the numeric floor, because `3-0` is in the decisive exempt set.",
-        "**CASE-5** — Given a candidates list where one candidate is missing the `scores` key, when `confidence.py` runs, then it exits 1 and prints a descriptive error to stderr before producing any output."
-      ],
       "accept": "- **CASE-1** — Given a chosen candidate with `generator=0.8`, `control=0.9`, `conservator=0.1` (high utility, low risk, high agreement) and no runner-up, when `confidence.py` runs, then the output confidence is close to 0.99 (agreement near 1.0, separation defaults to 1.0).\n- **CASE-2** — Given `chosen: null` in the input, when `confidence.py` runs, then the output is `{confidence: null, reason: \"...\"}` and the script exits 0.\n- **CASE-3** — Given `vote_pattern='2-1'` with a dissent list containing the Sentinel personality, when `confidence.py` runs, then the output confidence equals `VOTE_PATTERN_CONFIDENCE['2-1']` minus the `SENTINEL_DISSENT_PENALTY` (0.10), rounded to 3 decimal places.\n- **CASE-4** — Given `vote_pattern='3-0'`, when `check_mode_floor` runs with `mode='trias'`, then it returns `below_floor=false` regardless of the numeric floor, because `3-0` is in the decisive exempt set.\n- **CASE-5** — Given a candidates list where one candidate is missing the `scores` key, when `confidence.py` runs, then it exits 1 and prints a descriptive error to stderr before producing any output.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-UTILS-001"
       ],
@@ -1083,23 +914,14 @@
         "The script prints a per-bin table, or JSON under `--json`, and never writes a file."
       ],
       "verify": [
-        "Should `modes/trias.md`'s \"the default flips A→C automatically once that gate crosses its threshold\" be enforced by code? Today nothing reads this script's verdict at dispatch time."
+        "None - resolved 2026-09-27: the verdict is advisory. `modes/trias.md` now says switching the Trias default from A to C is a maintainer's edit made once this script returns `SHIP_C`; no code reads the verdict at dispatch time."
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given entries mixing resolved, pending and untagged rows, when `calibration_records` runs, then only the resolved rows with a `conf=` value are returned.",
-        "**CASE-2** — Given records where the high band is clearly more successful than the low band, when `decide` runs, then the verdict is `SHIP_C`.",
-        "**CASE-3** — Given records where both bands succeed at the same rate, when `decide` runs, then the verdict is `FALLBACK_A`.",
-        "**CASE-4** — Given fewer resolved records than `min_resolved`, or no failures at all, when `decide` runs, then the verdict is `INSUFFICIENT_DATA`."
-      ],
       "accept": "- **CASE-1** — Given entries mixing resolved, pending and untagged rows, when `calibration_records` runs, then only the resolved rows with a `conf=` value are returned.\n- **CASE-2** — Given records where the high band is clearly more successful than the low band, when `decide` runs, then the verdict is `SHIP_C`.\n- **CASE-3** — Given records where both bands succeed at the same rate, when `decide` runs, then the verdict is `FALLBACK_A`.\n- **CASE-4** — Given fewer resolved records than `min_resolved`, or no failures at all, when `decide` runs, then the verdict is `INSUFFICIENT_DATA`.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-FEEDBACK-001"
-      ],
       "depends_on": [
         "CONSILIUM-FEEDBACK-001"
       ],
@@ -1113,7 +935,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/confidence_calibration.py:28"
+          "loc": "scripts/confidence_calibration.py:29"
         },
         {
           "role": "tested-by",
@@ -1123,12 +945,7 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": [
-        {
-          "signal": "unverified-intent",
-          "advice": "Has open `## Verify intent` question(s): run `reqmap.py sync`, resolve each in `requirements/_findings.md`, then fold the answer into the Contract or delete the bullet."
-        }
-      ]
+      "risks": []
     },
     {
       "id": "CONSILIUM-FEEDBACK-001",
@@ -1153,20 +970,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given `.consilium/FEEDBACK.html` does not exist, when `parse_feedback` is called, then it returns an empty list without error.",
-        "**CASE-2** — Given FEEDBACK.html containing all three row layouts (8-cell Trias, 7-cell previous, 6-cell legacy) and attribute-based `data-field` rows, when `parse_feedback` runs, then it correctly parses all of them.",
-        "**CASE-3** — Given a row whose `outcome` field is not one of `OK`, `BAD`, `OVR`, `PEND`, `PEND_HEADLESS`, when `parse_feedback` runs, then the row is silently skipped.",
-        "**CASE-4** — Given `--recent N` is passed, when the report is generated, then only the last N entries are included in the report stats.",
-        "**CASE-5** — Given `--runs` is passed, when the report is generated, then it includes a per-aggregation-scheme breakdown from `.consilium/runs/*.json`, tolerating both legacy `aggregation.scheme` and current `deliberation_log[step=aggregate].scheme` shapes."
-      ],
       "accept": "- **CASE-1** — Given `.consilium/FEEDBACK.html` does not exist, when `parse_feedback` is called, then it returns an empty list without error.\n- **CASE-2** — Given FEEDBACK.html containing all three row layouts (8-cell Trias, 7-cell previous, 6-cell legacy) and attribute-based `data-field` rows, when `parse_feedback` runs, then it correctly parses all of them.\n- **CASE-3** — Given a row whose `outcome` field is not one of `OK`, `BAD`, `OVR`, `PEND`, `PEND_HEADLESS`, when `parse_feedback` runs, then the row is silently skipped.\n- **CASE-4** — Given `--recent N` is passed, when the report is generated, then only the last N entries are included in the report stats.\n- **CASE-5** — Given `--runs` is passed, when the report is generated, then it includes a per-aggregation-scheme breakdown from `.consilium/runs/*.json`, tolerating both legacy `aggregation.scheme` and current `deliberation_log[step=aggregate].scheme` shapes.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-UTILS-001"
       ],
@@ -1187,9 +994,13 @@
         {
           "role": "implements",
           "loc": "scripts/feedback.py:12"
+        },
+        {
+          "role": "tested-by",
+          "loc": "scripts/test_feedback_html.py:7"
         }
       ],
-      "test_exempt": "file I/O wrapper with no isolated pure-function surface",
+      "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
       "risks": []
@@ -1214,20 +1025,13 @@
       ],
       "notes": [],
       "current_impl": [
-        "prompts/implement/coder.md"
-      ],
-      "acc": [
-        "AC-1 — Given a well-formed chosen_approach and success_criterion When  the Coder completes Then  output parses as JSON with non-empty files_written, non-empty maps_to_criterion, and blocked = false",
-        "AC-2 — Given a chosen_approach with an incomplete sketch (insufficient to implement without guessing) When  the Coder processes the input Then  blocked = true and blocked_reason is a non-null, non-empty string; no files are written",
-        "AC-3 — Given a task that would require touching a path outside files_touched When  the Coder detects the scope escape Then  the out-of-scope path appears in scope_escapes[], the Coder stops before writing it, and the path does not appear in files_written"
+        "prompts/implement/coder.md",
+        "scripts/validate_implement_output.py"
       ],
       "accept": "AC-1\n  Given a well-formed chosen_approach and success_criterion\n  When  the Coder completes\n  Then  output parses as JSON with non-empty files_written, non-empty maps_to_criterion, and blocked = false\n\nAC-2\n  Given a chosen_approach with an incomplete sketch (insufficient to implement without guessing)\n  When  the Coder processes the input\n  Then  blocked = true and blocked_reason is a non-null, non-empty string; no files are written\n\nAC-3\n  Given a task that would require touching a path outside files_touched\n  When  the Coder detects the scope escape\n  Then  the out-of-scope path appears in scope_escapes[], the Coder stops before writing it, and the path does not appear in files_written",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-IMPLEMENT-PIPELINE-001"
-      ],
       "depends_on": [
         "CONSILIUM-IMPLEMENT-PIPELINE-001"
       ],
@@ -1246,12 +1050,22 @@
         {
           "role": "tested-by",
           "loc": "scripts/test_implement_pipeline.py:7"
+        },
+        {
+          "role": "tested-by",
+          "loc": "scripts/test_validate_implement_output.py:7"
+        },
+        {
+          "role": "implements",
+          "loc": "scripts/validate_implement_output.py:31"
         }
       ],
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clauses": 3,
+      "covered": 3
     },
     {
       "id": "CONSILIUM-IMPLEMENT-PIPELINE-001",
@@ -1282,20 +1096,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a report with a non-empty `chosen_approach`, when `build_plan` runs, then it returns a dict with `spec`, `sequence`, `roles`, `rules` keys, each role lists whether its prompt file exists, and `spec.chosen_approach` is the full generator candidate object with `chosen_resolved: true` when resolvable from `deliberation_log`, else the bare id with `chosen_resolved: false`.",
-        "**CASE-2** — Given `chosen_approach` is `do_nothing` or `skipped`, when the script runs, then it prints a message and exits 1.",
-        "**CASE-3** — Given `--verify-gate` mode, when the script runs, then `gate_passed` is `true` only if the real suite passes (exit 0) and the stubbed suite fails (exit non-0).",
-        "**CASE-4** — Given `--verify-gate` mode, when the test command raises or the stubbed run crashes, then `verify_red_green` always restores the original target file content.",
-        "**CASE-5** — Given `--verify-gate` without `--test-cmd` or `--target`, when the script runs, then it exits 2 with an error message to stderr."
-      ],
       "accept": "- **CASE-1** — Given a report with a non-empty `chosen_approach`, when `build_plan` runs, then it returns a dict with `spec`, `sequence`, `roles`, `rules` keys, each role lists whether its prompt file exists, and `spec.chosen_approach` is the full generator candidate object with `chosen_resolved: true` when resolvable from `deliberation_log`, else the bare id with `chosen_resolved: false`.\n- **CASE-2** — Given `chosen_approach` is `do_nothing` or `skipped`, when the script runs, then it prints a message and exits 1.\n- **CASE-3** — Given `--verify-gate` mode, when the script runs, then `gate_passed` is `true` only if the real suite passes (exit 0) and the stubbed suite fails (exit non-0).\n- **CASE-4** — Given `--verify-gate` mode, when the test command raises or the stubbed run crashes, then `verify_red_green` always restores the original target file content.\n- **CASE-5** — Given `--verify-gate` without `--test-cmd` or `--target`, when the script runs, then it exits 2 with an error message to stderr.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-UTILS-001"
       ],
@@ -1313,11 +1117,11 @@
       "members": [
         {
           "role": "implements",
-          "loc": "modes/implement_pipeline.md:86"
+          "loc": "modes/implement_pipeline.md:89"
         },
         {
           "role": "implements",
-          "loc": "scripts/implement_pipeline.py:34"
+          "loc": "scripts/implement_pipeline.py:43"
         },
         {
           "role": "tested-by",
@@ -1354,19 +1158,10 @@
       "current_impl": [
         "agents/consilium-implement-subagent.md"
       ],
-      "acc": [
-        "AC-1 — Given a GO report with non-empty chosen_approach and success_criterion When  the subagent runs Then  the final message parses as JSON matching the output contract, files_written exist on disk, test_files_written are test_* only, and no runs/<file>.json was created",
-        "AC-2 — Given a GO report where chosen_approach is do_nothing or skipped When  the subagent processes the input Then  it exits early (dry-run indicates skip) without writing any files",
-        "AC-3 — Given a Coder or Test Writer that returns malformed JSON When  the retry fires and also fails Then  the subagent returns the error JSON and does not proceed to the gate or manifest assembly"
-      ],
       "accept": "AC-1\n  Given a GO report with non-empty chosen_approach and success_criterion\n  When  the subagent runs\n  Then  the final message parses as JSON matching the output contract, files_written exist on disk, test_files_written are test_* only, and no runs/<file>.json was created\n\nAC-2\n  Given a GO report where chosen_approach is do_nothing or skipped\n  When  the subagent processes the input\n  Then  it exits early (dry-run indicates skip) without writing any files\n\nAC-3\n  Given a Coder or Test Writer that returns malformed JSON\n  When  the retry fires and also fails\n  Then  the subagent returns the error JSON and does not proceed to the gate or manifest assembly",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-IMPLEMENT-PIPELINE-001",
-        "CONSILIUM-SUBAGENT-001"
-      ],
       "depends_on": [
         "CONSILIUM-IMPLEMENT-PIPELINE-001",
         "CONSILIUM-SUBAGENT-001"
@@ -1381,7 +1176,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "agents/consilium-implement-subagent.md:165"
+          "loc": "agents/consilium-implement-subagent.md:167"
         }
       ],
       "test_exempt": "agent spec document — behavioral contract validated by Step 7 auto-dispatch integration and implement-subagent smoke tests",
@@ -1408,20 +1203,13 @@
       ],
       "notes": [],
       "current_impl": [
-        "prompts/implement/test_writer.md"
+        "prompts/implement/test_writer.md",
+        "scripts/validate_implement_output.py"
       ],
-      "acc": [
-        "AC-1 — Given a well-formed success_criterion and files_written from the Coder When  the Test Writer completes Then  output parses as JSON, test_files_written is non-empty (every path starts with test_), and every test in tests[] has fails_on_empty_impl = true",
-        "AC-2 — Given a test emitted by the Test Writer When  the implement-subagent runs the Red→Green gate Then  the test is RED against a stub implementation and GREEN against the real one; any test that is green under the stub appears in gate_rejected",
-        "AC-3 — Given a behavior that cannot be covered by automated tests When  the Test Writer identifies it Then  it appears in uncoverable[] with a reason and no test is emitted for it"
-      ],
-      "accept": "AC-1\n  Given a well-formed success_criterion and files_written from the Coder\n  When  the Test Writer completes\n  Then  output parses as JSON, test_files_written is non-empty (every path starts with test_), and every test in tests[] has fails_on_empty_impl = true\n\nAC-2\n  Given a test emitted by the Test Writer\n  When  the implement-subagent runs the Red→Green gate\n  Then  the test is RED against a stub implementation and GREEN against the real one; any test that is green under the stub appears in gate_rejected\n\nAC-3\n  Given a behavior that cannot be covered by automated tests\n  When  the Test Writer identifies it\n  Then  it appears in uncoverable[] with a reason and no test is emitted for it",
+      "accept": "AC-1\n  Given a well-formed success_criterion and files_written from the Coder\n  When  the Test Writer completes\n  Then  output parses as JSON, test_files_written is non-empty (every path starts with test_), and every test in tests[] has fails_on_empty_impl = true\n\nAC-2\n  Given a test emitted by the Test Writer\n  When  the implement-subagent runs the Red→Green gate\n  Then  the test is RED against a stub implementation and GREEN against the real one; any test that is green under the stub appears in gate_rejected\n\nAC-3  <!-- verifiable by: inspection -->\n  Given a behavior that cannot be covered by automated tests\n  When  the Test Writer identifies it\n  Then  it appears in uncoverable[] with a reason and no test is emitted for it",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-IMPLEMENT-PIPELINE-001"
-      ],
       "depends_on": [
         "CONSILIUM-IMPLEMENT-PIPELINE-001"
       ],
@@ -1440,12 +1228,22 @@
         {
           "role": "tested-by",
           "loc": "scripts/test_implement_pipeline.py:8"
+        },
+        {
+          "role": "tested-by",
+          "loc": "scripts/test_validate_implement_output.py:8"
+        },
+        {
+          "role": "implements",
+          "loc": "scripts/validate_implement_output.py:32"
         }
       ],
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clauses": 2,
+      "covered": 2
     },
     {
       "id": "CONSILIUM-INFER-PIPELINE-001",
@@ -1471,21 +1269,10 @@
       "current_impl": [
         "scripts/infer_pipeline.py"
       ],
-      "acc": [
-        "Given a report with `magnitude=moderate, reversibility=irreversible`, inferred steps are `[implement, compile, review, test]`.",
-        "Given `chosen_approach=do_nothing`, exits 1.",
-        "Given `--dry-run`, prints steps and exits 0 without writing any file.",
-        "Given invalid JSON input, exits 2.",
-        "`recommend_implement_mode` returns `\"pipeline\"` for `moderate×irreversible`; `\"single_shot\"` for `trivial×complete`."
-      ],
       "accept": "- Given a report with `magnitude=moderate, reversibility=irreversible`, inferred steps are `[implement, compile, review, test]`.\n- Given `chosen_approach=do_nothing`, exits 1.\n- Given `--dry-run`, prints steps and exits 0 without writing any file.\n- Given invalid JSON input, exits 2.\n- `recommend_implement_mode` returns `\"pipeline\"` for `moderate×irreversible`; `\"single_shot\"` for `trivial×complete`.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-IMPLEMENT-PIPELINE-001",
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-IMPLEMENT-PIPELINE-001",
         "CONSILIUM-UTILS-001"
@@ -1500,7 +1287,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/infer_pipeline.py:29"
+          "loc": "scripts/infer_pipeline.py:31"
         },
         {
           "role": "tested-by",
@@ -1534,18 +1321,10 @@
       "current_impl": [
         "prompts/voices/essentialist_lens.md"
       ],
-      "acc": [
-        "AC-1 — Given  a set of candidates evaluated under Trias, one minimal/deletion-based and one additive, otherwise comparable When   the Essentialist lens is prepended to a core voice Then   the voice's chosen or most-favored candidate is the minimal/deletion-based option",
-        "AC-2 — Given  the Essentialist lens applied to the Generator voice When   the Generator produces its candidate spread Then   the spread still contains 3-5 candidates including a do_nothing/minimal option, with larger candidates present but ranked lower",
-        "AC-3 — Given  two candidates with identical Conservator component scores, where one candidate deletes more code than the other When   the Essentialist lens is prepended to the Conservator voice Then   both candidates receive the same `net_concern`: the lens changes only magnitude calibration and `meta_recommendation`, and the formula is not deflated"
-      ],
       "accept": "AC-1\n  Given  a set of candidates evaluated under Trias, one minimal/deletion-based and one additive, otherwise comparable\n  When   the Essentialist lens is prepended to a core voice\n  Then   the voice's chosen or most-favored candidate is the minimal/deletion-based option\n\nAC-2\n  Given  the Essentialist lens applied to the Generator voice\n  When   the Generator produces its candidate spread\n  Then   the spread still contains 3-5 candidates including a do_nothing/minimal option, with larger candidates present but ranked lower\n\nAC-3\n  Given  two candidates with identical Conservator component scores, where one candidate deletes more code than the other\n  When   the Essentialist lens is prepended to the Conservator voice\n  Then   both candidates receive the same `net_concern`: the lens changes only magnitude calibration and `meta_recommendation`, and the formula is not deflated",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-PERSONALITIES-001"
-      ],
       "depends_on": [
         "CONSILIUM-PERSONALITIES-001"
       ],
@@ -1591,18 +1370,10 @@
       "current_impl": [
         "prompts/voices/sentinel_lens.md"
       ],
-      "acc": [
-        "AC-1 — Given  two otherwise comparable candidates, one carrying a plausible silent-failure mode and one failing loudly When   the Sentinel lens is prepended to a core voice Then   the voice ranks the loud-failure candidate above the silent-failure one, and the silent-failure mode is surfaced explicitly",
-        "AC-2 — Given  the Sentinel lens applied to the Generator voice When   the Generator produces its candidate spread Then   the spread still contains 3-5 candidates including higher-upside options, each with its adverse scenario recorded in the risks/trade-off fields",
-        "AC-3 — Given  two candidates with identical Conservator component scores, where one candidate is described with a vivid adverse-scenario narrative When   the Sentinel lens is prepended to the Conservator voice Then   both candidates receive the same `net_concern`: the lens changes only magnitude calibration and `meta_recommendation`, and the formula is not inflated"
-      ],
       "accept": "AC-1\n  Given  two otherwise comparable candidates, one carrying a plausible silent-failure mode and one failing loudly\n  When   the Sentinel lens is prepended to a core voice\n  Then   the voice ranks the loud-failure candidate above the silent-failure one, and the silent-failure mode is surfaced explicitly\n\nAC-2\n  Given  the Sentinel lens applied to the Generator voice\n  When   the Generator produces its candidate spread\n  Then   the spread still contains 3-5 candidates including higher-upside options, each with its adverse scenario recorded in the risks/trade-off fields\n\nAC-3\n  Given  two candidates with identical Conservator component scores, where one candidate is described with a vivid adverse-scenario narrative\n  When   the Sentinel lens is prepended to the Conservator voice\n  Then   both candidates receive the same `net_concern`: the lens changes only magnitude calibration and `meta_recommendation`, and the formula is not inflated",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-PERSONALITIES-001"
-      ],
       "depends_on": [
         "CONSILIUM-PERSONALITIES-001"
       ],
@@ -1647,18 +1418,10 @@
       "current_impl": [
         "prompts/voices/verifier_lens.md"
       ],
-      "acc": [
-        "AC-1 — Given  two otherwise comparable candidates, one with a checkable success criterion and one whose benefit is stated in vague terms When   the Verifier lens is prepended to a core voice Then   the voice's chosen or most-favored candidate is the one with the checkable criterion",
-        "AC-2 — Given  the Verifier lens applied to the Control voice and a chosen candidate carrying an unverifiable claim When   Control produces its verdict Then   the verdict is still issued, with the unverifiable claim surfaced as a named condition or confidence reduction rather than an automatic BLOCK",
-        "AC-3 — Given  two candidates with identical Conservator component scores, where one candidate's claims are more precisely phrased than the other's When   the Verifier lens is prepended to the Conservator voice Then   both candidates receive the same `net_concern`: the lens changes only magnitude calibration and `meta_recommendation`, and the formula is not shifted"
-      ],
       "accept": "AC-1\n  Given  two otherwise comparable candidates, one with a checkable success criterion and one whose benefit is stated in vague terms\n  When   the Verifier lens is prepended to a core voice\n  Then   the voice's chosen or most-favored candidate is the one with the checkable criterion\n\nAC-2\n  Given  the Verifier lens applied to the Control voice and a chosen candidate carrying an unverifiable claim\n  When   Control produces its verdict\n  Then   the verdict is still issued, with the unverifiable claim surfaced as a named condition or confidence reduction rather than an automatic BLOCK\n\nAC-3\n  Given  two candidates with identical Conservator component scores, where one candidate's claims are more precisely phrased than the other's\n  When   the Verifier lens is prepended to the Conservator voice\n  Then   both candidates receive the same `net_concern`: the lens changes only magnitude calibration and `meta_recommendation`, and the formula is not shifted",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-PERSONALITIES-001"
-      ],
       "depends_on": [
         "CONSILIUM-PERSONALITIES-001"
       ],
@@ -1712,23 +1475,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a report with a valid `success_criterion` and `chosen_approach`, when `log_feedback.py` runs, then it produces a new `<tr>` row in FEEDBACK.html with the correct date, truncated context, and derived note.",
-        "**CASE-2** — Given the same report is appended twice with the same `--run-path` and the same `--outcome`, when the second call runs, then it exits 3 and does not add a duplicate row.",
-        "**CASE-3** — Given the same report is appended twice with the same `--run-path` but a different outcome (e.g. PEND then OK), when the second call runs, then it upgrades the existing row in place and exits 0.",
-        "**CASE-4** — Given `--outcome OK` with a report whose `confidence` is below 0.70, when the script runs without `--force-override`, then it exits 1 with an error message.",
-        "**CASE-4b** — Given `--outcome OK` without `--confirmed`, when the script runs, then it exits 1 and writes nothing.",
-        "**CASE-5** — Given `--outcome OVR` without `--override-target`, when the script runs, then it exits 2 with an error message to stderr."
-      ],
       "accept": "- **CASE-1** — Given a report with a valid `success_criterion` and `chosen_approach`, when `log_feedback.py` runs, then it produces a new `<tr>` row in FEEDBACK.html with the correct date, truncated context, and derived note.\n- **CASE-2** — Given the same report is appended twice with the same `--run-path` and the same `--outcome`, when the second call runs, then it exits 3 and does not add a duplicate row.\n- **CASE-3** — Given the same report is appended twice with the same `--run-path` but a different outcome (e.g. PEND then OK), when the second call runs, then it upgrades the existing row in place and exits 0.\n- **CASE-4** — Given `--outcome OK` with a report whose `confidence` is below 0.70, when the script runs without `--force-override`, then it exits 1 with an error message.\n- **CASE-4b** — Given `--outcome OK` without `--confirmed`, when the script runs, then it exits 1 and writes nothing.\n- **CASE-5** — Given `--outcome OVR` without `--override-target`, when the script runs, then it exits 2 with an error message to stderr.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-FEEDBACK-001",
-        "CONSILIUM-RENDER-FEEDBACK-HTML-001",
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-FEEDBACK-001",
         "CONSILIUM-RENDER-FEEDBACK-HTML-001",
@@ -1744,7 +1494,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/log_feedback.py:44"
+          "loc": "scripts/log_feedback.py:47"
         },
         {
           "role": "tested-by",
@@ -1786,22 +1536,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a valid `--run-path` pointing to a logged run, when `mark_outcome.py` runs, then the corresponding FEEDBACK.html row's outcome field is updated to the specified value and the note gains `[confirmed]` (or `outcome_reason=...` if `--reason` is provided).",
-        "**CASE-2** — Given `--dry-run`, when the script runs, then no file is written and stdout reports the matched rows with their pending transition.",
-        "**CASE-3** — Given `--outcome PEND_HEADLESS` without `--benchmark`, when the script runs, then it exits 1 with a descriptive error and does not modify FEEDBACK.html.",
-        "**CASE-4** — Given neither `--run-path` nor both `--date` and `--chosen` are supplied, when the script runs, then it exits 1 with a usage error.",
-        "**CASE-5** — Given a query that matches no rows, when the script runs, then it exits 1 and prints the last 5 rows to stderr as disambiguation candidates."
-      ],
       "accept": "- **CASE-1** — Given a valid `--run-path` pointing to a logged run, when `mark_outcome.py` runs, then the corresponding FEEDBACK.html row's outcome field is updated to the specified value and the note gains `[confirmed]` (or `outcome_reason=...` if `--reason` is provided).\n- **CASE-2** — Given `--dry-run`, when the script runs, then no file is written and stdout reports the matched rows with their pending transition.\n- **CASE-3** — Given `--outcome PEND_HEADLESS` without `--benchmark`, when the script runs, then it exits 1 with a descriptive error and does not modify FEEDBACK.html.\n- **CASE-4** — Given neither `--run-path` nor both `--date` and `--chosen` are supplied, when the script runs, then it exits 1 with a usage error.\n- **CASE-5** — Given a query that matches no rows, when the script runs, then it exits 1 and prints the last 5 rows to stderr as disambiguation candidates.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-FEEDBACK-001",
-        "CONSILIUM-RENDER-FEEDBACK-HTML-001",
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-FEEDBACK-001",
         "CONSILIUM-RENDER-FEEDBACK-HTML-001",
@@ -1817,10 +1555,14 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/mark_outcome.py:33"
+          "loc": "scripts/mark_outcome.py:36"
+        },
+        {
+          "role": "tested-by",
+          "loc": "scripts/test_feedback_html.py:8"
         }
       ],
-      "test_exempt": "importlib module loading and FEEDBACK.html mutation — integration-only",
+      "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
       "risks": []
@@ -1852,21 +1594,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given `--tier medium`, when `memory.py` runs, then it returns a JSON object whose `entries` array contains at most `--n` items, each with `run`, `date`, `success_criterion`, `chosen`, and `confidence` fields drawn from `runs/*.json` files.",
-        "**CASE-2** — Given `--tier long --query <term>`, when `memory.py` runs, then it returns only rows whose `context`, `chosen`, or `note` contains the query term (case-insensitive), each entry including a `confirmed` boolean reflecting presence of `[confirmed]` in the note.",
-        "**CASE-3** — Given `--tier short`, when `memory.py` runs, then it returns a stub dict with `entries: []` and a descriptive `note` explaining session-local scope.",
-        "**CASE-4** — Given `--tier all`, when `memory.py` runs, then it returns a dict with exactly three keys (`short`, `medium`, `long`), each containing valid tier output.",
-        "**CASE-5** — Given `--feedback-file` and `--runs-dir` are passed, when `memory.py` runs, then it overrides the default `.consilium/` paths so the script can operate on arbitrary copies of the data."
-      ],
       "accept": "- **CASE-1** — Given `--tier medium`, when `memory.py` runs, then it returns a JSON object whose `entries` array contains at most `--n` items, each with `run`, `date`, `success_criterion`, `chosen`, and `confidence` fields drawn from `runs/*.json` files.\n- **CASE-2** — Given `--tier long --query <term>`, when `memory.py` runs, then it returns only rows whose `context`, `chosen`, or `note` contains the query term (case-insensitive), each entry including a `confirmed` boolean reflecting presence of `[confirmed]` in the note.\n- **CASE-3** — Given `--tier short`, when `memory.py` runs, then it returns a stub dict with `entries: []` and a descriptive `note` explaining session-local scope.\n- **CASE-4** — Given `--tier all`, when `memory.py` runs, then it returns a dict with exactly three keys (`short`, `medium`, `long`), each containing valid tier output.\n- **CASE-5** — Given `--feedback-file` and `--runs-dir` are passed, when `memory.py` runs, then it overrides the default `.consilium/` paths so the script can operate on arbitrary copies of the data.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-FEEDBACK-001",
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-FEEDBACK-001",
         "CONSILIUM-UTILS-001"
@@ -1882,9 +1613,13 @@
         {
           "role": "implements",
           "loc": "scripts/memory.py:35"
+        },
+        {
+          "role": "tested-by",
+          "loc": "scripts/test_feedback_html.py:9"
         }
       ],
-      "test_exempt": "file I/O and integration layer with trivial pure stubs",
+      "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
       "risks": []
@@ -1917,19 +1652,10 @@
       "current_impl": [
         "modes/dialectic.md"
       ],
-      "acc": [
-        "AC-1 — Given a deliberation request in dialectic mode with language/framework/files_touched provided When  the mode runs Then  Sequential completes with code-context fields present, followed by exactly 1 Skeptic sub-agent dispatch, and the report records `mode: \"dialectic\"`",
-        "AC-2 — Given a deliberation where Sequential short-circuits via `scale_down` When  the mode runs Then  the Skeptic sub-agent is still dispatched on the trivial-direct chosen",
-        "AC-3 — Given a Skeptic output with `can_object: true`, `concrete_concerns` ≥ 2, and `--skeptic-can-override` is NOT active When  the mode finalizes the report Then  `chosen` is unchanged from the Sequential result, `skeptic_caught_constraint: true` is set, and the objection is visible as advisory"
-      ],
       "accept": "AC-1\n  Given a deliberation request in dialectic mode with language/framework/files_touched provided\n  When  the mode runs\n  Then  Sequential completes with code-context fields present, followed by exactly 1 Skeptic sub-agent dispatch, and the report records `mode: \"dialectic\"`\n\nAC-2\n  Given a deliberation where Sequential short-circuits via `scale_down`\n  When  the mode runs\n  Then  the Skeptic sub-agent is still dispatched on the trivial-direct chosen\n\nAC-3\n  Given a Skeptic output with `can_object: true`, `concrete_concerns` ≥ 2, and `--skeptic-can-override` is NOT active\n  When  the mode finalizes the report\n  Then  `chosen` is unchanged from the Sequential result, `skeptic_caught_constraint: true` is set, and the objection is visible as advisory",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-MODE-SEQUENTIAL-001",
-        "CONSILIUM-VOICE-SKEPTIC-001"
-      ],
       "depends_on": [
         "CONSILIUM-MODE-SEQUENTIAL-001",
         "CONSILIUM-VOICE-SKEPTIC-001"
@@ -1981,22 +1707,10 @@
         "scripts/validate_report.py",
         "scripts/test_lens_bias.py"
       ],
-      "acc": [
-        "AC-1 — Given  a Dialectic report whose telemetry.lens_applied has decider == skeptic (e.g. both \"verifier\") When   validate_report._validate_telemetry runs Then   it returns a problem stating decider and skeptic must differ",
-        "AC-2 — Given  prompts/voices/verifier_lens.md When   scripts/test_lens_bias.py runs Then   it asserts the \"skeptic carve-out\" keyword is present (the Verifier lens is coherent when tinted onto the Skeptic voice)",
-        "AC-3 — Given  a telemetry.lens_applied naming a lens that is not a known personality (e.g. \"essentailist\") When   validate_report._validate_telemetry runs Then   it returns a problem naming the valid personality lenses"
-      ],
       "accept": "AC-1\n  Given  a Dialectic report whose telemetry.lens_applied has decider == skeptic (e.g. both \"verifier\")\n  When   validate_report._validate_telemetry runs\n  Then   it returns a problem stating decider and skeptic must differ\n\nAC-2\n  Given  prompts/voices/verifier_lens.md\n  When   scripts/test_lens_bias.py runs\n  Then   it asserts the \"skeptic carve-out\" keyword is present (the Verifier lens is coherent when tinted onto the Skeptic voice)\n\nAC-3\n  Given  a telemetry.lens_applied naming a lens that is not a known personality (e.g. \"essentailist\")\n  When   validate_report._validate_telemetry runs\n  Then   it returns a problem naming the valid personality lenses",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-LENS-ESSENTIALIST-001",
-        "CONSILIUM-LENS-VERIFIER-001",
-        "CONSILIUM-MODE-SEQUENTIAL-001",
-        "CONSILIUM-MODE-DIALECTIC-001",
-        "CONSILIUM-VALIDATE-REPORT-001"
-      ],
       "depends_on": [
         "CONSILIUM-LENS-ESSENTIALIST-001",
         "CONSILIUM-LENS-VERIFIER-001",
@@ -2026,17 +1740,19 @@
         },
         {
           "role": "tested-by",
-          "loc": "scripts/test_lens_bias.py:208"
+          "loc": "scripts/test_lens_bias.py:230"
         },
         {
           "role": "implements",
-          "loc": "scripts/validate_report.py:654"
+          "loc": "scripts/validate_report.py:808"
         }
       ],
       "test_exempt": null,
       "milestone": "v1.8",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clauses": 3,
+      "covered": 3
     },
     {
       "id": "CONSILIUM-MODE-SEQUENTIAL-001",
@@ -2066,23 +1782,10 @@
       "current_impl": [
         "modes/sequential.md"
       ],
-      "acc": [
-        "AC-1 — Given a deliberation request with no explicit mode flag and no critical/irreversible trigger When  the mode runs Then  exactly three voices are invoked in the order Generator → Conservator → Control in a single context window, no sub-agents are dispatched, and the report carries a `confidence` value and a routing outcome from the veto cascade",
-        "AC-2 — Given a deliberation request where Conservator (running second) emits `meta_recommendation: scale_down` When  the mode runs Then  Control is skipped (Generator has already run), the report contains `chosen_approach: \"trivial-direct\"`, `confidence: 0.85`, and `pipeline_executed: false`",
-        "AC-3 — Given a deliberation request where Control emits `glossary_fail: true` When  the aggregator runs Then  the routing outcome is BLOCK (glossary_fail) and the user is asked to reformulate with operational terms before any chosen approach is emitted",
-        "AC-4 — Given a completed Sequential deliberation where `confidence < 0.6` When  the orchestrator checks confidence at Step 5b Then  no automatic re-run fires; the Step 5d retry and the Step 6 override prompt (which suggests `--mode dialectic` / `--skeptic-on-chosen`) are the only low-confidence responses",
-        "AC-5 — Given a deliberation request whose diff touches a sensitive/irreversible path (scope_gate `consent_required: true`) When  the mode runs in an interactive (non-headless) context Then  the orchestrator requests explicit user consent BEFORE dispatching Generator; no voice output exists in context when consent is requested (the consent gate is pre-dispatch, not post-generation)"
-      ],
       "accept": "AC-1\n  Given a deliberation request with no explicit mode flag and no critical/irreversible trigger\n  When  the mode runs\n  Then  exactly three voices are invoked in the order Generator → Conservator → Control in a single context window, no sub-agents are dispatched, and the report carries a `confidence` value and a routing outcome from the veto cascade\n\nAC-2\n  Given a deliberation request where Conservator (running second) emits `meta_recommendation: scale_down`\n  When  the mode runs\n  Then  Control is skipped (Generator has already run), the report contains `chosen_approach: \"trivial-direct\"`, `confidence: 0.85`, and `pipeline_executed: false`\n\nAC-3\n  Given a deliberation request where Control emits `glossary_fail: true`\n  When  the aggregator runs\n  Then  the routing outcome is BLOCK (glossary_fail) and the user is asked to reformulate with operational terms before any chosen approach is emitted\n\nAC-4\n  Given a completed Sequential deliberation where `confidence < 0.6`\n  When  the orchestrator checks confidence at Step 5b\n  Then  no automatic re-run fires; the Step 5d retry and the Step 6 override prompt (which suggests `--mode dialectic` / `--skeptic-on-chosen`) are the only low-confidence responses\n\nAC-5\n  Given a deliberation request whose diff touches a sensitive/irreversible path (scope_gate `consent_required: true`)\n  When  the mode runs in an interactive (non-headless) context\n  Then  the orchestrator requests explicit user consent BEFORE dispatching Generator; no voice output exists in context when consent is requested (the consent gate is pre-dispatch, not post-generation)",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-VOICE-GENERATOR-001",
-        "CONSILIUM-VOICE-CONTROL-001",
-        "CONSILIUM-VOICE-CONSERVATOR-001",
-        "CONSILIUM-AGGREGATOR-001"
-      ],
       "depends_on": [
         "CONSILIUM-VOICE-GENERATOR-001",
         "CONSILIUM-VOICE-CONTROL-001",
@@ -2137,18 +1840,10 @@
       "current_impl": [
         "modes/skeptic_on_chosen.md"
       ],
-      "acc": [
-        "AC-1 — Given a deliberation in Sequential mode where the base mode produces `confidence: 0.65` When  the flag auto-triggers Then  exactly 1 Skeptic sub-agent is dispatched with only `chosen`, `success_criterion`, and `verification` in its input; the report records `skeptic_caught_constraint: true|false` and `chosen` remains the Sequential result (advisory)",
-        "AC-2 — Given a deliberation where the Skeptic produces `can_object: true` with no `concrete_concerns` and no `quoted_scenario` When  the flag validates the Skeptic output Then  the objection is rejected as a schema fail, the original chosen is shipped unchanged, and the rejection is recorded in `deliberation_log`",
-        "AC-3 — Given a deliberation with `--skeptic-can-override` active and the Skeptic produces `addressable: requires_redesign` When  the flag applies override semantics Then  the orchestrator presents the report's alternatives to the user and asks whether to change the choice, rather than shipping the original chosen"
-      ],
       "accept": "AC-1\n  Given a deliberation in Sequential mode where the base mode produces `confidence: 0.65`\n  When  the flag auto-triggers\n  Then  exactly 1 Skeptic sub-agent is dispatched with only `chosen`, `success_criterion`, and `verification` in its input; the report records `skeptic_caught_constraint: true|false` and `chosen` remains the Sequential result (advisory)\n\nAC-2\n  Given a deliberation where the Skeptic produces `can_object: true` with no `concrete_concerns` and no `quoted_scenario`\n  When  the flag validates the Skeptic output\n  Then  the objection is rejected as a schema fail, the original chosen is shipped unchanged, and the rejection is recorded in `deliberation_log`\n\nAC-3\n  Given a deliberation with `--skeptic-can-override` active and the Skeptic produces `addressable: requires_redesign`\n  When  the flag applies override semantics\n  Then  the orchestrator presents the report's alternatives to the user and asks whether to change the choice, rather than shipping the original chosen",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-VOICE-SKEPTIC-001"
-      ],
       "depends_on": [
         "CONSILIUM-VOICE-SKEPTIC-001"
       ],
@@ -2210,23 +1905,10 @@
       "current_impl": [
         "modes/trias.md"
       ],
-      "acc": [
-        "AC-1 — Given a deliberation request in trias mode with `magnitude: critical` (blocklist hit) When  the mode runs Then  3 personality sub-agents are dispatched in parallel (Essentialist, Verifier, Sentinel), each producing a `chosen_approach`; the 3 chosens are aggregated via `team_vote` with no pre-vote Skeptic; then exactly one post-vote Skeptic (`skeptic_on_chosen`) challenges the winning candidate; and the report contains `vote_pattern`, `confidence`, `personalities[]` with each personality's `chose`, plus `skeptic_challenges_count` and `post_vote_skeptic_used`",
-        "AC-2 — Given a deliberation request in trias mode with `magnitude: high` and lazy routing enabled When  the mode runs Then  the mode downgrades to Dialectic, emits a `trias_lazy_routed: true` notification with `routed_to: \"dialectic\"`, and no Trias sub-agents are dispatched",
-        "AC-3 — Given a full Trias run where all 3 personalities return different `chosen_approach` values (1-1-1 vote) When  the B2 cascade fires Then  Round 2 re-dispatches 3 sub-agents with peer context; if still 1-1-1, a Skeptic tiebreaker is dispatched; if unresolved, the report is marked PEND with `cascade_incomplete: true`"
-      ],
       "accept": "AC-1\n  Given a deliberation request in trias mode with `magnitude: critical` (blocklist hit)\n  When  the mode runs\n  Then  3 personality sub-agents are dispatched in parallel (Essentialist, Verifier, Sentinel), each producing a `chosen_approach`; the 3 chosens are aggregated via `team_vote` with no pre-vote Skeptic; then exactly one post-vote Skeptic (`skeptic_on_chosen`) challenges the winning candidate; and the report contains `vote_pattern`, `confidence`, `personalities[]` with each personality's `chose`, plus `skeptic_challenges_count` and `post_vote_skeptic_used`\n\nAC-2\n  Given a deliberation request in trias mode with `magnitude: high` and lazy routing enabled\n  When  the mode runs\n  Then  the mode downgrades to Dialectic, emits a `trias_lazy_routed: true` notification with `routed_to: \"dialectic\"`, and no Trias sub-agents are dispatched\n\nAC-3\n  Given a full Trias run where all 3 personalities return different `chosen_approach` values (1-1-1 vote)\n  When  the B2 cascade fires\n  Then  Round 2 re-dispatches 3 sub-agents with peer context; if still 1-1-1, a Skeptic tiebreaker is dispatched; if unresolved, the report is marked PEND with `cascade_incomplete: true`",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-MODE-SEQUENTIAL-001",
-        "CONSILIUM-MODE-SKEPTIC-ON-CHOSEN-001",
-        "CONSILIUM-LENS-ESSENTIALIST-001",
-        "CONSILIUM-LENS-VERIFIER-001",
-        "CONSILIUM-LENS-SENTINEL-001",
-        "CONSILIUM-PERSONALITIES-001"
-      ],
       "depends_on": [
         "CONSILIUM-MODE-SEQUENTIAL-001",
         "CONSILIUM-MODE-SKEPTIC-ON-CHOSEN-001",
@@ -2247,6 +1929,10 @@
         {
           "role": "implements",
           "loc": "modes/trias.md:196"
+        },
+        {
+          "role": "tested-by",
+          "loc": "scripts/test_trias_skeptic_lever.py:11"
         }
       ],
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
@@ -2280,18 +1966,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given no CLI arguments, when `personalities.py` runs, then it emits a JSON array of exactly 3 objects, each containing `name`, `weights` (keys `generator`, `control`, `conservator` summing to 1.0), and `lens` (a path string).",
-        "**CASE-2** — Given `--name essentialist`, when `personalities.py` runs, then it emits a single JSON object matching the Essentialist entry, and the returned dict is a deep copy whose mutations do not affect subsequent calls.",
-        "**CASE-3** — Given a positional integer argument, when `personalities.py` runs, then it exits with code 2 and prints a migration message referencing the three valid personality names.",
-        "**CASE-4** — Given `get_by_name('unknown')`, when it is called, then it raises `KeyError` with a message listing valid names.",
-        "**CASE-5** — Given the three personalities' weights, when checked, then `generator + control + conservator == 1.0` for each (within floating-point tolerance)."
-      ],
       "accept": "- **CASE-1** — Given no CLI arguments, when `personalities.py` runs, then it emits a JSON array of exactly 3 objects, each containing `name`, `weights` (keys `generator`, `control`, `conservator` summing to 1.0), and `lens` (a path string).\n- **CASE-2** — Given `--name essentialist`, when `personalities.py` runs, then it emits a single JSON object matching the Essentialist entry, and the returned dict is a deep copy whose mutations do not affect subsequent calls.\n- **CASE-3** — Given a positional integer argument, when `personalities.py` runs, then it exits with code 2 and prints a migration message referencing the three valid personality names.\n- **CASE-4** — Given `get_by_name('unknown')`, when it is called, then it raises `KeyError` with a message listing valid names.\n- **CASE-5** — Given the three personalities' weights, when checked, then `generator + control + conservator == 1.0` for each (within floating-point tolerance).",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-VOICES-001",
@@ -2309,7 +1987,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/personalities.py:19"
+          "loc": "scripts/personalities.py:20"
         },
         {
           "role": "tested-by",
@@ -2349,20 +2027,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a valid `FEEDBACK.html` and `runs/` directory, when `python scripts/priors.py` runs, then it completes without error.",
-        "**CASE-2** — Given the `--no-runs` flag, when `priors.py` runs, then `missing_feedback_runs` is suppressed from the output.",
-        "**CASE-3** — Given FEEDBACK entries with outcome PEND older than `STALE_PEND_DAYS`, when `priors.py` runs, then those entries appear in `stale_pendings`.",
-        "**CASE-4** — Given `runs/` files with no matching FEEDBACK row, when `priors.py` runs, then those files appear in `missing_feedback_runs`."
-      ],
       "accept": "- **CASE-1** — Given a valid `FEEDBACK.html` and `runs/` directory, when `python scripts/priors.py` runs, then it completes without error.\n- **CASE-2** — Given the `--no-runs` flag, when `priors.py` runs, then `missing_feedback_runs` is suppressed from the output.\n- **CASE-3** — Given FEEDBACK entries with outcome PEND older than `STALE_PEND_DAYS`, when `priors.py` runs, then those entries appear in `stale_pendings`.\n- **CASE-4** — Given `runs/` files with no matching FEEDBACK row, when `priors.py` runs, then those files appear in `missing_feedback_runs`.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-FEEDBACK-001",
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-FEEDBACK-001",
         "CONSILIUM-UTILS-001"
@@ -2422,20 +2090,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a list of Entry records, when `render()` runs, then it returns a string beginning with `<!doctype html>` containing one `<tr class=\"entry\">` row and one `<tr class=\"drill\">` row per Entry.",
-        "**CASE-2** — Given an Entry whose `run_path` points to an existing `runs/*.json` file with telemetry data, when the page renders, then the tokens cell shows the measured sum of `tokens_in + tokens_out` across all voices, formatted compactly (e.g. `14k`).",
-        "**CASE-3** — Given an Entry whose `run_path` points to a run file with a `vetoed` list in the aggregate step, when the Conservator drill-down panel renders, then it shows a VETOED badge only for candidates whose id appears in that list, never for a candidate exceeding a hard-coded risk threshold.",
-        "**CASE-4** — Given an Entry with no linked run file (`run_path` is `None`), when the drill-down cell renders, then it contains the legacy stub message and no Generator/Control/Conservator panels.",
-        "**CASE-5** — Given the rendered HTML output, when it is inspected, then it contains no `<link>`, `<script src>`, or `<img src>` tags referencing external URLs."
-      ],
       "accept": "- **CASE-1** — Given a list of Entry records, when `render()` runs, then it returns a string beginning with `<!doctype html>` containing one `<tr class=\"entry\">` row and one `<tr class=\"drill\">` row per Entry.\n- **CASE-2** — Given an Entry whose `run_path` points to an existing `runs/*.json` file with telemetry data, when the page renders, then the tokens cell shows the measured sum of `tokens_in + tokens_out` across all voices, formatted compactly (e.g. `14k`).\n- **CASE-3** — Given an Entry whose `run_path` points to a run file with a `vetoed` list in the aggregate step, when the Conservator drill-down panel renders, then it shows a VETOED badge only for candidates whose id appears in that list, never for a candidate exceeding a hard-coded risk threshold.\n- **CASE-4** — Given an Entry with no linked run file (`run_path` is `None`), when the drill-down cell renders, then it contains the legacy stub message and no Generator/Control/Conservator panels.\n- **CASE-5** — Given the rendered HTML output, when it is inspected, then it contains no `<link>`, `<script src>`, or `<img src>` tags referencing external URLs.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-UTILS-001"
       ],
@@ -2451,7 +2109,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/render_feedback_html.py:11"
+          "loc": "scripts/render_feedback_html.py:12"
         },
         {
           "role": "tested-by",
@@ -2497,20 +2155,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a report plus a two-file unified diff, when the page renders, then it contains the success criterion, the chosen id, and one section per `diff --git` header (`scripts/test_render_impl_preview.py`).",
-        "**CASE-2** — Given a diff containing `</script><script>alert(1)</script>` and `<img onerror=...>`, when the page renders, then the raw sequences are absent and the escaped forms are present.",
-        "**CASE-3** — Given no `--diff-file`, when the page renders, then it contains the placeholder and no diff blocks, and the CLI exits 0.",
-        "**CASE-4** — Given a report missing `chosen_approach`, malformed JSON input, or an absent report path, when the CLI runs, then it exits 1 naming the field on stderr, exits 2, or exits 1, respectively.",
-        "**CASE-5** — Given the rendered page, when it is inspected, then it contains the `theme-toggle` button element."
-      ],
       "accept": "- **CASE-1** — Given a report plus a two-file unified diff, when the page renders, then it contains the success criterion, the chosen id, and one section per `diff --git` header (`scripts/test_render_impl_preview.py`).\n- **CASE-2** — Given a diff containing `</script><script>alert(1)</script>` and `<img onerror=...>`, when the page renders, then the raw sequences are absent and the escaped forms are present.\n- **CASE-3** — Given no `--diff-file`, when the page renders, then it contains the placeholder and no diff blocks, and the CLI exits 0.\n- **CASE-4** — Given a report missing `chosen_approach`, malformed JSON input, or an absent report path, when the CLI runs, then it exits 1 naming the field on stderr, exits 2, or exits 1, respectively.\n- **CASE-5** — Given the rendered page, when it is inspected, then it contains the `theme-toggle` button element.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-UTILS-001"
       ],
@@ -2524,7 +2172,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/render_impl_preview.py:28"
+          "loc": "scripts/render_impl_preview.py:31"
         },
         {
           "role": "tested-by",
@@ -2563,18 +2211,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given the committed `evals/scenarios.json`, when `python scripts/run_evals.py` runs, then it exits 0 with every scenario reporting PASS.",
-        "**CASE-2** — Given a scenario with `expect_exit=0` but no `pipeline_executed` in `stdin_json`, when the pre-flight linter runs, then it exits 2 with a descriptive corpus error before any scenario runs.",
-        "**CASE-3** — Given a scenario with a bypass-chosen `chosen_approach` and `pipeline_executed=true`, when the pre-flight linter runs, then it exits 2.",
-        "**CASE-4** — Given the `--filter` flag, when it is applied, then execution is restricted to matching scenario names; an empty match set exits 2 with `no scenarios matched`.",
-        "**CASE-5** — Given a scenario that fails its `expect_stdout_subset` check, when it runs, then a human-readable mismatch message prints to stderr and the harness exits 1."
-      ],
       "accept": "- **CASE-1** — Given the committed `evals/scenarios.json`, when `python scripts/run_evals.py` runs, then it exits 0 with every scenario reporting PASS.\n- **CASE-2** — Given a scenario with `expect_exit=0` but no `pipeline_executed` in `stdin_json`, when the pre-flight linter runs, then it exits 2 with a descriptive corpus error before any scenario runs.\n- **CASE-3** — Given a scenario with a bypass-chosen `chosen_approach` and `pipeline_executed=true`, when the pre-flight linter runs, then it exits 2.\n- **CASE-4** — Given the `--filter` flag, when it is applied, then execution is restricted to matching scenario names; an empty match set exits 2 with `no scenarios matched`.\n- **CASE-5** — Given a scenario that fails its `expect_stdout_subset` check, when it runs, then a human-readable mismatch message prints to stderr and the harness exits 1.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-REPO-GATES-001"
@@ -2627,19 +2267,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a single-file, single-line change with no blocklist hits and default config, when the gate runs, then it returns `should_skip=true` and `magnitude='low'`.",
-        "**CASE-2** — Given a path matching a blocklist pattern, when the gate runs, then it returns `should_skip=false`, `magnitude='critical'`, and `mode_ceiling='trias'` regardless of file/line counts.",
-        "**CASE-3** — Given `CONSILIUM_FORCE_FULL=1`, when the gate runs, then it returns `should_skip=false` and `magnitude='critical'` without reading the diff.",
-        "**CASE-4** — Given `--signals-stdin` with a pre-computed payload, when the gate runs, then it bypasses git and classifies magnitude purely from the payload values.",
-        "**CASE-5** — Given a probe failure (e.g. not a git repo), when the gate runs, then it returns `should_skip=false` with the error text in the `reason` field and exits 0.",
-        "**CASE-6** — Given a blocklist (sensitive/irreversible) path, an ordinary non-sensitive change, and a probe failure, when the gate evaluates `consent_required`, then it returns `true`, `false`, and `true` respectively — the probe failure fails safe, the opposite direction from `should_skip` (`scripts/test_consent_gate.py`)."
-      ],
       "accept": "- **CASE-1** — Given a single-file, single-line change with no blocklist hits and default config, when the gate runs, then it returns `should_skip=true` and `magnitude='low'`.\n- **CASE-2** — Given a path matching a blocklist pattern, when the gate runs, then it returns `should_skip=false`, `magnitude='critical'`, and `mode_ceiling='trias'` regardless of file/line counts.\n- **CASE-3** — Given `CONSILIUM_FORCE_FULL=1`, when the gate runs, then it returns `should_skip=false` and `magnitude='critical'` without reading the diff.\n- **CASE-4** — Given `--signals-stdin` with a pre-computed payload, when the gate runs, then it bypasses git and classifies magnitude purely from the payload values.\n- **CASE-5** — Given a probe failure (e.g. not a git repo), when the gate runs, then it returns `should_skip=false` with the error text in the `reason` field and exits 0.\n- **CASE-6** — Given a blocklist (sensitive/irreversible) path, an ordinary non-sensitive change, and a probe failure, when the gate evaluates `consent_required`, then it returns `true`, `false`, and `true` respectively — the probe failure fails safe, the opposite direction from `should_skip` (`scripts/test_consent_gate.py`).",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-REPORT-001"
@@ -2651,11 +2282,11 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/probe_change.py:187"
+          "loc": "scripts/probe_change.py:214"
         },
         {
           "role": "implements",
-          "loc": "scripts/scope_gate.py:70"
+          "loc": "scripts/scope_gate.py:75"
         },
         {
           "role": "tested-by",
@@ -2701,20 +2332,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a Generator output JSON, when `--for control` runs, then the `rationale` field is stripped from all candidates and only `id`, `summary`, and `sketch` remain.",
-        "**CASE-2** — Given a candidate whose matching Control verdict has `valid=false` or has no matching Control verdict, when `--for conservator` runs, then that candidate is dropped (excluded, not an error).",
-        "**CASE-3** — Given a Control verdict with `issues` and `notes` fields, when `--for conservator` runs, then those fields are excluded from the output.",
-        "**CASE-4** — Given text shorter than 60000 characters, when `--truncate-text 15000` runs, then the text is returned unchanged with no marker.",
-        "**CASE-5** — Given text exceeding 60000 characters, when `--truncate-text 15000` runs, then the text is truncated at 60000 characters and the marker `\"\\n\\n[... context truncated to ~{tokens} tokens for Trias sub-agent ...]\"` (`_TRUNCATION_MARKER`, defined in `strip_context.py`, not shared with other scripts) is appended."
-      ],
       "accept": "- **CASE-1** — Given a Generator output JSON, when `--for control` runs, then the `rationale` field is stripped from all candidates and only `id`, `summary`, and `sketch` remain.\n- **CASE-2** — Given a candidate whose matching Control verdict has `valid=false` or has no matching Control verdict, when `--for conservator` runs, then that candidate is dropped (excluded, not an error).\n- **CASE-3** — Given a Control verdict with `issues` and `notes` fields, when `--for conservator` runs, then those fields are excluded from the output.\n- **CASE-4** — Given text shorter than 60000 characters, when `--truncate-text 15000` runs, then the text is returned unchanged with no marker.\n- **CASE-5** — Given text exceeding 60000 characters, when `--truncate-text 15000` runs, then the text is truncated at 60000 characters and the marker `\"\\n\\n[... context truncated to ~{tokens} tokens for Trias sub-agent ...]\"` (`_TRUNCATION_MARKER`, defined in `strip_context.py`, not shared with other scripts) is appended.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-UTILS-001"
       ],
@@ -2728,7 +2349,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/strip_context.py:46"
+          "loc": "scripts/strip_context.py:47"
         },
         {
           "role": "tested-by",
@@ -2762,18 +2383,10 @@
       "current_impl": [
         "agents/consilium-subagent.md"
       ],
-      "acc": [
-        "AC-1 — Given a dispatch prompt with a diff and a success_criterion When  the subagent runs Then  the final message parses as valid JSON, `python scripts/validate_report.py < <output>` exits 0, and exactly one new file appears under `.consilium/runs/`",
-        "AC-2 — Given a dispatch with `mode: dialectic` hint in the prompt When  the subagent processes the input Then  it logs the mode hint as ignored in `subagent_notes` and completes as Sequential",
-        "AC-3 — Given a low-confidence deliberation (3+ close candidates) When  the subagent completes Then  it does not stall — completes within a bounded turn count with outcome=PEND in FEEDBACK.html"
-      ],
       "accept": "AC-1\n  Given a dispatch prompt with a diff and a success_criterion\n  When  the subagent runs\n  Then  the final message parses as valid JSON, `python scripts/validate_report.py < <output>` exits 0, and exactly one new file appears under `.consilium/runs/`\n\nAC-2\n  Given a dispatch with `mode: dialectic` hint in the prompt\n  When  the subagent processes the input\n  Then  it logs the mode hint as ignored in `subagent_notes` and completes as Sequential\n\nAC-3\n  Given a low-confidence deliberation (3+ close candidates)\n  When  the subagent completes\n  Then  it does not stall — completes within a bounded turn count with outcome=PEND in FEEDBACK.html",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-MODE-SEQUENTIAL-001"
-      ],
       "depends_on": [
         "CONSILIUM-MODE-SEQUENTIAL-001"
       ],
@@ -2815,20 +2428,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "All three personalities emit a `model` field (test_model_fields_present).",
-        "All assignments are sonnet (test_model_assignments, test_all_models_sonnet).",
-        "No personality carries `schema_less` (test_no_schema_less_any_personality).",
-        "CLI emits valid JSON array with `model` field on each entry (test_cli_output_valid_json)."
-      ],
       "accept": "- All three personalities emit a `model` field (test_model_fields_present).\n- All assignments are sonnet (test_model_assignments, test_all_models_sonnet).\n- No personality carries `schema_less` (test_no_schema_less_any_personality).\n- CLI emits valid JSON array with `model` field on each entry (test_cli_output_valid_json).",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-PERSONALITIES-001",
-        "CONSILIUM-MODE-TRIAS-001"
-      ],
       "depends_on": [
         "CONSILIUM-PERSONALITIES-001",
         "CONSILIUM-MODE-TRIAS-001"
@@ -2843,7 +2446,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/personalities.py:20"
+          "loc": "scripts/personalities.py:21"
         },
         {
           "role": "tested-by",
@@ -2884,18 +2487,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a script imports `DATA_DIR`, `RUNS_DIR`, or `FEEDBACK_PATH` from any working directory, when the constants resolve, then they point to `.consilium/`, `.consilium/runs/`, and `.consilium/FEEDBACK.html` under the repo root (derived from `Path(__file__).resolve().parent.parent`, two levels above `scripts/utils.py`).",
-        "**CASE-2** — Given `atomic_write_text` is interrupted mid-write, when the write fails, then the original file is left intact and no truncated or stale `.tmp` file persists.",
-        "**CASE-3** — Given `CLAUDE_HEADLESS` is unset or holds any value other than `'1'` (including `'true'` or `'0'`), when `is_headless` runs, then it returns `False`; given it equals `'1'`, then it returns `True`.",
-        "**CASE-4** — Given empty stdin or invalid JSON, when `load_json_stdin` runs, then it prints a diagnostic message to stderr and exits code 2.",
-        "**CASE-5** — Given a severity of `low`, `medium`, a missing severity, or `high`, when `issue_penalty` runs, then it returns `0.05`, `0.15`, `0.15`, or `0.30` respectively."
-      ],
       "accept": "- **CASE-1** — Given a script imports `DATA_DIR`, `RUNS_DIR`, or `FEEDBACK_PATH` from any working directory, when the constants resolve, then they point to `.consilium/`, `.consilium/runs/`, and `.consilium/FEEDBACK.html` under the repo root (derived from `Path(__file__).resolve().parent.parent`, two levels above `scripts/utils.py`).\n- **CASE-2** — Given `atomic_write_text` is interrupted mid-write, when the write fails, then the original file is left intact and no truncated or stale `.tmp` file persists.\n- **CASE-3** — Given `CLAUDE_HEADLESS` is unset or holds any value other than `'1'` (including `'true'` or `'0'`), when `is_headless` runs, then it returns `False`; given it equals `'1'`, then it returns `True`.\n- **CASE-4** — Given empty stdin or invalid JSON, when `load_json_stdin` runs, then it prints a diagnostic message to stderr and exits code 2.\n- **CASE-5** — Given a severity of `low`, `medium`, a missing severity, or `high`, when `issue_penalty` runs, then it returns `0.05`, `0.15`, `0.15`, or `0.30` respectively.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-REPORT-001",
@@ -2966,21 +2561,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a valid report from `.consilium/runs/*.json`, when `validate_report.py` runs, then it exits 0.",
-        "**CASE-2** — Given a report missing `success_criterion`, when `validate_report.py` runs, then it exits 1 with a message naming the field.",
-        "**CASE-3** — Given `skipped: true` without `skip_reason`, when `validate_report.py` runs, then it exits 1.",
-        "**CASE-4** — Given a non-skipped report missing `telemetry.mode`, when `validate_report.py` runs, then it exits 1.",
-        "**CASE-5** — Given malformed JSON input, when `validate_report.py` runs, then it exits 2."
-      ],
       "accept": "- **CASE-1** — Given a valid report from `.consilium/runs/*.json`, when `validate_report.py` runs, then it exits 0.\n- **CASE-2** — Given a report missing `success_criterion`, when `validate_report.py` runs, then it exits 1 with a message naming the field.\n- **CASE-3** — Given `skipped: true` without `skip_reason`, when `validate_report.py` runs, then it exits 1.\n- **CASE-4** — Given a non-skipped report missing `telemetry.mode`, when `validate_report.py` runs, then it exits 1.\n- **CASE-5** — Given malformed JSON input, when `validate_report.py` runs, then it exits 2.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-PERSONALITIES-001",
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-PERSONALITIES-001",
         "CONSILIUM-UTILS-001"
@@ -3001,7 +2585,7 @@
         },
         {
           "role": "implements",
-          "loc": "scripts/validate_report.py:52"
+          "loc": "scripts/validate_report.py:55"
         }
       ],
       "test_exempt": null,
@@ -3035,23 +2619,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given `can_object=false` with a null `objection`, when `validate_skeptic.py` runs, then it exits 0.",
-        "**CASE-2** — Given `can_object=true` with 2 or more `concrete_concerns`, when `validate_skeptic.py` runs, then it exits 0.",
-        "**CASE-3** — Given `can_object=true` with only a non-empty `quoted_scenario`, when `validate_skeptic.py` runs, then it exits 0.",
-        "**CASE-4** — Given `can_object=true` with 0 `concrete_concerns` and a null `quoted_scenario`, when `validate_skeptic.py` runs, then it exits 1 (evidence gate).",
-        "**CASE-5** — Given `failure_mode=goal_fit` without `\"success_criterion\"` referenced in any concern, when `validate_skeptic.py` runs, then it exits 1.",
-        "**CASE-6** — Given an unknown `failure_mode` value, when `validate_skeptic.py` runs, then it exits 1.",
-        "**CASE-7** — Given malformed JSON input, when `validate_skeptic.py` runs, then it exits 2."
-      ],
       "accept": "- **CASE-1** — Given `can_object=false` with a null `objection`, when `validate_skeptic.py` runs, then it exits 0.\n- **CASE-2** — Given `can_object=true` with 2 or more `concrete_concerns`, when `validate_skeptic.py` runs, then it exits 0.\n- **CASE-3** — Given `can_object=true` with only a non-empty `quoted_scenario`, when `validate_skeptic.py` runs, then it exits 0.\n- **CASE-4** — Given `can_object=true` with 0 `concrete_concerns` and a null `quoted_scenario`, when `validate_skeptic.py` runs, then it exits 1 (evidence gate).\n- **CASE-5** — Given `failure_mode=goal_fit` without `\"success_criterion\"` referenced in any concern, when `validate_skeptic.py` runs, then it exits 1.\n- **CASE-6** — Given an unknown `failure_mode` value, when `validate_skeptic.py` runs, then it exits 1.\n- **CASE-7** — Given malformed JSON input, when `validate_skeptic.py` runs, then it exits 2.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-VOICE-SKEPTIC-001",
-        "CONSILIUM-UTILS-001"
-      ],
       "depends_on": [
         "CONSILIUM-VOICE-SKEPTIC-001",
         "CONSILIUM-UTILS-001"
@@ -3070,7 +2641,7 @@
         },
         {
           "role": "implements",
-          "loc": "scripts/validate_skeptic.py:41"
+          "loc": "scripts/validate_skeptic.py:49"
         }
       ],
       "test_exempt": null,
@@ -3102,17 +2673,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given `_git` stubbed to fail, when `consilium_version()`, `consilium_ref()`, `ref_resolves(\"abc\")`, and `prompts_changed_since(\"abc\")` run, then they return `\"unknown\"`, `\"\"`, `False`, and `0` respectively (`scripts/test_version.py`).",
-        "**CASE-2** — Given a dirty-tree stub, when `consilium_ref()` runs, then it returns `\"\"`; given a clean-tree stub, then it returns the HEAD sha.",
-        "**CASE-3** — Given `ref_resolves(\"\")` and `ref_resolves(\"unknown\")`, when they run, then both return `False` without a git call.",
-        "**CASE-4** — Given a real repo, when `consilium_version()` runs, then it returns a non-empty string."
-      ],
       "accept": "- **CASE-1** — Given `_git` stubbed to fail, when `consilium_version()`, `consilium_ref()`, `ref_resolves(\"abc\")`, and `prompts_changed_since(\"abc\")` run, then they return `\"unknown\"`, `\"\"`, `False`, and `0` respectively (`scripts/test_version.py`).\n- **CASE-2** — Given a dirty-tree stub, when `consilium_ref()` runs, then it returns `\"\"`; given a clean-tree stub, then it returns the HEAD sha.\n- **CASE-3** — Given `ref_resolves(\"\")` and `ref_resolves(\"unknown\")`, when they run, then both return `False` without a git call.\n- **CASE-4** — Given a real repo, when `consilium_version()` runs, then it returns a non-empty string.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-REPORT-001"
@@ -3128,7 +2692,7 @@
         },
         {
           "role": "implements",
-          "loc": "scripts/version.py:126"
+          "loc": "scripts/version.py:141"
         }
       ],
       "test_exempt": null,
@@ -3161,18 +2725,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given `translate('reversibility', 'complete')`, when it runs, then it returns the Romanian string `usor de anulat`.",
-        "**CASE-2** — Given `translate('verdict', 'GO')`, when it runs, then it returns `aprobat de majoritate`.",
-        "**CASE-3** — Given `compute_tokens_budget('critical', 'irreversible')`, when it runs, then it returns `{'generator': 4000, 'control': 4000}`.",
-        "**CASE-4** — Given `compute_tokens_budget` with `meta='scale_down'`, when it runs, then it always returns `{'generator': 300, 'control': 300}` regardless of magnitude or reversibility.",
-        "**CASE-5** — Given `translate` for an unknown category or value, when it runs, then it returns `str(value)` without raising."
-      ],
-      "accept": "- **CASE-1** — Given `translate('reversibility', 'complete')`, when it runs, then it returns the Romanian string `usor de anulat`.\n- **CASE-2** — Given `translate('verdict', 'GO')`, when it runs, then it returns `aprobat de majoritate`.\n- **CASE-3** — Given `compute_tokens_budget('critical', 'irreversible')`, when it runs, then it returns `{'generator': 4000, 'control': 4000}`.\n- **CASE-4** — Given `compute_tokens_budget` with `meta='scale_down'`, when it runs, then it always returns `{'generator': 300, 'control': 300}` regardless of magnitude or reversibility.\n- **CASE-5** — Given `translate` for an unknown category or value, when it runs, then it returns `str(value)` without raising.",
+      "accept": "- **CASE-1** — Given `translate('reversibility', 'complete')`, when it runs, then it returns the Romanian string `ușor de anulat`.\n- **CASE-2** — Given `translate('verdict', 'GO')`, when it runs, then it returns `aprobat de majoritate`.\n- **CASE-3** — Given `compute_tokens_budget('critical', 'irreversible')`, when it runs, then it returns `{'generator': 4000, 'control': 4000}`.\n- **CASE-4** — Given `compute_tokens_budget` with `meta='scale_down'`, when it runs, then it always returns `{'generator': 300, 'control': 300}` regardless of magnitude or reversibility.\n- **CASE-5** — Given `translate` for an unknown category or value, when it runs, then it returns `str(value)` without raising.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-REPORT-001"
@@ -3188,7 +2744,7 @@
         },
         {
           "role": "implements",
-          "loc": "scripts/vocabulary_map.py:10"
+          "loc": "scripts/vocabulary_map.py:11"
         }
       ],
       "test_exempt": null,
@@ -3222,16 +2778,10 @@
       "current_impl": [
         "prompts/voices/conservator.md"
       ],
-      "acc": [
-        "AC-1 — Given a proposed change where `reversibility = irreversible` and no explicit user consent appears in the input When  the Conservator voice runs Then  the candidate's score entry has `irreversibility_flag: true`, and the aggregator-facing signal causes a BLOCK before finalizing (backstop behind the pre-dispatch consent gate)",
-        "AC-2 — Given a candidate scored with `net_concern >= 0.3` and a structurally possible rollback When  the Conservator voice runs Then  the candidate's score entry contains a `rollback_recipe` array with 2–5 non-abstract, human-executable steps; `irreversible` is absent or `false`",
-        "AC-3 — Given a candidate scored with `meta_recommendation: \"scale_down\"` When  the Conservator voice runs Then  `tokens_budget.generator` and `tokens_budget.control` are both 300, regardless of the magnitude×reversibility table value"
-      ],
       "accept": "AC-1\n  Given a proposed change where `reversibility = irreversible` and no explicit user consent appears in the input\n  When  the Conservator voice runs\n  Then  the candidate's score entry has `irreversibility_flag: true`, and the aggregator-facing signal causes a BLOCK before finalizing (backstop behind the pre-dispatch consent gate)\n\nAC-2\n  Given a candidate scored with `net_concern >= 0.3` and a structurally possible rollback\n  When  the Conservator voice runs\n  Then  the candidate's score entry contains a `rollback_recipe` array with 2–5 non-abstract, human-executable steps; `irreversible` is absent or `false`\n\nAC-3\n  Given a candidate scored with `meta_recommendation: \"scale_down\"`\n  When  the Conservator voice runs\n  Then  `tokens_budget.generator` and `tokens_budget.control` are both 300, regardless of the magnitude×reversibility table value",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-VOICES-001",
@@ -3280,16 +2830,10 @@
       "current_impl": [
         "prompts/voices/control.md"
       ],
-      "acc": [
-        "AC-1 — Given a Generator candidate whose `sketch` does not address the stated `success_criterion` When  the Control voice runs Then  the verdict for that candidate has `valid: false`, `issues` contains exactly one entry with `category: \"logic\"`, and no `tests_to_write` entries are present for that candidate",
-        "AC-2 — Given a deliberation where a key term cannot be operationally defined within 3 attempts When  the Control voice runs Then  the output has `glossary_fail: true`, `glossary_attempts` is an array of exactly 3 entries, and no other mandatory processing is skipped (verdicts are still emitted)",
-        "AC-3 — Given a valid, non-`do_nothing` candidate that passes all checks When  the Control voice runs Then  the verdict has `valid: true`, `confidence_in_verdict` is one of `high|medium|low`, and `tests_to_write` contains at least 1 entry with both `name` and `assert` fields populated"
-      ],
       "accept": "AC-1\n  Given a Generator candidate whose `sketch` does not address the stated `success_criterion`\n  When  the Control voice runs\n  Then  the verdict for that candidate has `valid: false`, `issues` contains exactly one entry with `category: \"logic\"`, and no `tests_to_write` entries are present for that candidate\n\nAC-2\n  Given a deliberation where a key term cannot be operationally defined within 3 attempts\n  When  the Control voice runs\n  Then  the output has `glossary_fail: true`, `glossary_attempts` is an array of exactly 3 entries, and no other mandatory processing is skipped (verdicts are still emitted)\n\nAC-3\n  Given a valid, non-`do_nothing` candidate that passes all checks\n  When  the Control voice runs\n  Then  the verdict has `valid: true`, `confidence_in_verdict` is one of `high|medium|low`, and `tests_to_write` contains at least 1 entry with both `name` and `assert` fields populated",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-VOICES-001",
@@ -3339,16 +2883,10 @@
       "current_impl": [
         "prompts/voices/generator.md"
       ],
-      "acc": [
-        "AC-1 — Given a proposed change that touches shared/core code When  the Generator voice runs Then  the output `candidates` array contains exactly one entry whose `id` starts with `adversarial_`, OR `adversarial_skipped` is present with a non-empty reason string",
-        "AC-2 — Given a proposed change where no fallback can be articulated When  the Generator voice runs Then  the output contains `abstain.triggered: true` and `abstain.reason` is `\"goal_undefined\"` or a description of the domain-data gap; the `candidates` array may still be present",
-        "AC-3 — Given a proposed change whose input carries 3+ risk terms (or whose stated fallback implies > 10% capital loss) while reading as routine When  the Generator voice runs Then  the output contains `challenge_upward.triggered: true` with a non-null `reason` string"
-      ],
       "accept": "AC-1\n  Given a proposed change that touches shared/core code\n  When  the Generator voice runs\n  Then  the output `candidates` array contains exactly one entry whose `id` starts with `adversarial_`, OR `adversarial_skipped` is present with a non-empty reason string\n\nAC-2\n  Given a proposed change where no fallback can be articulated\n  When  the Generator voice runs\n  Then  the output contains `abstain.triggered: true` and `abstain.reason` is `\"goal_undefined\"` or a description of the domain-data gap; the `candidates` array may still be present\n\nAC-3\n  Given a proposed change whose input carries 3+ risk terms (or whose stated fallback implies > 10% capital loss) while reading as routine\n  When  the Generator voice runs\n  Then  the output contains `challenge_upward.triggered: true` with a non-null `reason` string",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-VOICES-001",
@@ -3395,16 +2933,10 @@
       "current_impl": [
         "prompts/voices/skeptic.md"
       ],
-      "acc": [
-        "AC-1 — Given the Skeptic receives a chosen candidate and can identify 2 specific, named concerns grounded in `success_criterion` or stated context When  the Skeptic voice runs Then  the output has `can_object: true`, `objection.concrete_concerns` contains at least 2 entries, and `objection.failure_mode` is one of the four enumerated labels",
-        "AC-2 — Given the Skeptic receives a chosen candidate with no concrete verifiable flaw When  the Skeptic voice runs Then  the output has `can_object: false`, `objection` is null, and `notes` contains a non-empty sentence explaining the absence of objection",
-        "AC-3 — Given the chosen candidate is technically correct but the problem is resolvable in under 10 seconds by a human without deliberation tooling When  the Skeptic voice runs Then  the output has `failure_mode: \"meta_scope_mismatch\"`, `addressable: \"unaddressable\"`, and `concrete_concerns` contains at least 2 entries describing the cost/benefit inversion"
-      ],
       "accept": "AC-1\n  Given the Skeptic receives a chosen candidate and can identify 2 specific, named concerns grounded in `success_criterion` or stated context\n  When  the Skeptic voice runs\n  Then  the output has `can_object: true`, `objection.concrete_concerns` contains at least 2 entries, and `objection.failure_mode` is one of the four enumerated labels\n\nAC-2\n  Given the Skeptic receives a chosen candidate with no concrete verifiable flaw\n  When  the Skeptic voice runs\n  Then  the output has `can_object: false`, `objection` is null, and `notes` contains a non-empty sentence explaining the absence of objection\n\nAC-3\n  Given the chosen candidate is technically correct but the problem is resolvable in under 10 seconds by a human without deliberation tooling\n  When  the Skeptic voice runs\n  Then  the output has `failure_mode: \"meta_scope_mismatch\"`, `addressable: \"unaddressable\"`, and `concrete_concerns` contains at least 2 entries describing the cost/benefit inversion",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-VOICES-001",
@@ -3451,18 +2983,10 @@
       "current_impl": [
         "scripts/vote_degeneracy.py"
       ],
-      "acc": [
-        "Given 20+ Trias runs all with 3-0, `vote_degenerate: true` is returned.",
-        "Given 20+ Trias runs with 50% 3-0, `vote_degenerate: false`.",
-        "Given fewer than min-n Trias runs, result is `\"insufficient\"`.",
-        "Given `--json`, output parses as valid JSON with `vote_degenerate`, `three_zero_rate`, `n` fields.",
-        "Non-Trias runs are excluded even if they reference `vote_pattern` in their body."
-      ],
       "accept": "- Given 20+ Trias runs all with 3-0, `vote_degenerate: true` is returned.\n- Given 20+ Trias runs with 50% 3-0, `vote_degenerate: false`.\n- Given fewer than min-n Trias runs, result is `\"insufficient\"`.\n- Given `--json`, output parses as valid JSON with `vote_degenerate`, `three_zero_rate`, `n` fields.\n- Non-Trias runs are excluded even if they reference `vote_pattern` in their body.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [
         "ARCH-CONSILIUM-MODES-001"
@@ -3478,7 +3002,7 @@
         },
         {
           "role": "implements",
-          "loc": "scripts/vote_degeneracy.py:32"
+          "loc": "scripts/vote_degeneracy.py:34"
         }
       ],
       "test_exempt": null,
@@ -3511,22 +3035,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given the current repo state, when `python .claude/skills/run-consilium/driver.py smoke` runs, then it exits 0 with all suites PASS.",
-        "**CASE-2** — Given the current repo state, when `python .claude/skills/run-consilium/driver.py pipeline` runs, then it prints valid JSON for each of the four pipeline stages and exits 0.",
-        "**CASE-3** — Given Chrome or Edge is available, when `python .claude/skills/run-consilium/driver.py shot` runs, then it writes a non-empty PNG to `.consilium/shots/architecture.png`.",
-        "**CASE-4** — Given a failing test suite, when `smoke` runs, then it prints the failure tail (up to 12 lines) and exits non-zero.",
-        "**CASE-5** — Given non-ASCII output from a child process, when the driver runs, then the injected `PYTHONUTF8=1` prevents a codec error on Windows."
-      ],
       "accept": "- **CASE-1** — Given the current repo state, when `python .claude/skills/run-consilium/driver.py smoke` runs, then it exits 0 with all suites PASS.\n- **CASE-2** — Given the current repo state, when `python .claude/skills/run-consilium/driver.py pipeline` runs, then it prints valid JSON for each of the four pipeline stages and exits 0.\n- **CASE-3** — Given Chrome or Edge is available, when `python .claude/skills/run-consilium/driver.py shot` runs, then it writes a non-empty PNG to `.consilium/shots/architecture.png`.\n- **CASE-4** — Given a failing test suite, when `smoke` runs, then it prints the failure tail (up to 12 lines) and exits non-zero.\n- **CASE-5** — Given non-ASCII output from a child process, when the driver runs, then the injected `PYTHONUTF8=1` prevents a codec error on Windows.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [
-        "CONSILIUM-VALIDATE-REPORT-001",
-        "CONSILIUM-AGGREGATOR-001",
-        "CONSILIUM-CONFIDENCE-001"
-      ],
       "depends_on": [
         "CONSILIUM-VALIDATE-REPORT-001",
         "CONSILIUM-AGGREGATOR-001",
@@ -3542,7 +3054,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": ".claude/skills/run-consilium/driver.py:19"
+          "loc": ".claude/skills/run-consilium/driver.py:26"
         }
       ],
       "test_exempt": "integration harness — acceptance validated by run-consilium smoke + pipeline commands, not unit tests",
@@ -3568,16 +3080,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a GO report, when the implementation pipeline runs, then it returns a manifest listing the files written and a Control verdict.",
-        "**CASE-2** — Given a test the Test Writer emitted, when it runs against the Coder's stub, then it fails first, then passes once the implementation lands.",
-        "**CASE-3** — Given a report whose `chosen_approach` is `do_nothing` or whose `verification` is empty, when Step 7 is reached, then an error is shown and no implementation sub-agent is dispatched."
-      ],
       "accept": "- **CASE-1** — Given a GO report, when the implementation pipeline runs, then it returns a manifest listing the files written and a Control verdict.\n- **CASE-2** — Given a test the Test Writer emitted, when it runs against the Coder's stub, then it fails first, then passes once the implementation lands.\n- **CASE-3** — Given a report whose `chosen_approach` is `do_nothing` or whose `verification` is empty, when Step 7 is reached, then an error is shown and no implementation sub-agent is dispatched.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [],
       "satisfies": [],
@@ -3609,16 +3115,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a mode doc edited to contradict `confidence.py`, when `check_doc_drift.py` runs, then it exits 1 and names the violated invariant.",
-        "**CASE-2** — Given a tracked file containing a local path, when `check_public_leak.py` runs, then it exits non-zero.",
-        "**CASE-3** — Given a clean checkout of `main`, when `driver.py smoke` runs, then it reports every CI gate it mirrors as passing."
-      ],
       "accept": "- **CASE-1** — Given a mode doc edited to contradict `confidence.py`, when `check_doc_drift.py` runs, then it exits 1 and names the violated invariant.\n- **CASE-2** — Given a tracked file containing a local path, when `check_public_leak.py` runs, then it exits non-zero.\n- **CASE-3** — Given a clean checkout of `main`, when `driver.py smoke` runs, then it reports every CI gate it mirrors as passing.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [],
       "satisfies": [],
@@ -3650,16 +3150,10 @@
       ],
       "notes": [],
       "current_impl": [],
-      "acc": [
-        "**CASE-1** — Given a non-trivial diff, when `/consilium` runs in any mode, then one report lands in `.consilium/runs/` and `validate_report.py` exits 0 on it.",
-        "**CASE-2** — Given a report whose telemetry is malformed, when `validate_report.py` reads it, then it exits non-zero and the verdict is not presented as validated.",
-        "**CASE-3** — Given a diff under the scope gate's size limits, when `/consilium` runs, then the report records a bypass and no voice is dispatched."
-      ],
       "accept": "- **CASE-1** — Given a non-trivial diff, when `/consilium` runs in any mode, then one report lands in `.consilium/runs/` and `validate_report.py` exits 0 on it.\n- **CASE-2** — Given a report whose telemetry is malformed, when `validate_report.py` reads it, then it exits non-zero and the verdict is not presented as validated.\n- **CASE-3** — Given a diff under the scope gate's size limits, when `/consilium` runs, then the report records a bypass and no voice is dispatched.",
       "input": "",
       "output": "",
       "desc": "",
-      "deps": [],
       "depends_on": [],
       "used_by": [],
       "satisfies": [],
@@ -4400,20 +3894,44 @@
     },
     {
       "month": "2026-09",
-      "count": 6,
+      "count": 10,
       "first": "2026-09-21",
-      "last": "2026-09-22",
+      "last": "2026-09-29",
       "versions": [
         "v1.8.1",
         "v1.10.0",
         "v1.11.0",
         "v1.12.0",
         "v1.8.2",
-        "v1.9.0"
+        "v1.9.0",
+        "v1.12.1",
+        "v1.12.2",
+        "v1.12.3",
+        "v1.12.4"
       ],
       "landmark": "v1.12.0",
       "headline": "",
       "entries": [
+        {
+          "version": "v1.12.4",
+          "date": "2026-09-29",
+          "headline": ""
+        },
+        {
+          "version": "v1.12.3",
+          "date": "2026-09-29",
+          "headline": ""
+        },
+        {
+          "version": "v1.12.2",
+          "date": "2026-09-28",
+          "headline": ""
+        },
+        {
+          "version": "v1.12.1",
+          "date": "2026-09-28",
+          "headline": ""
+        },
         {
           "version": "v1.9.0",
           "date": "2026-09-22",
@@ -4471,6 +3989,10 @@
           "help": "Hard-reset: delete all non-generated requirements and strip membership tags from source files before re-extracting."
         },
         {
+          "flag": "--minimal",
+          "help": "Skip planning, release, MCP and site scaffolding."
+        },
+        {
           "flag": "--no-site",
           "help": "Skip the final site step (scaffolding docs/architecture.html)."
         }
@@ -4484,7 +4006,7 @@
       "flags": [
         {
           "flag": "--audit",
-          "help": "Print every pass that discovers a problem as one report: the gate, corpus risk, duplicate contracts, design signals and tag coverage. The exit code still comes from the gate alone."
+          "help": "Print every pass that discovers a problem as one report: the gate, corpus risk, duplicate contracts and tag coverage. The exit code still comes from the gate alone."
         },
         {
           "flag": "--risk",
@@ -4525,13 +4047,17 @@
         {
           "flag": "--no-map-check",
           "help": "Skip the committed-map freshness check."
+        },
+        {
+          "flag": "--full",
+          "help": "Run every gate rule and print every readability warning. Bare, the gate runs only the rules that say a link, the drift baseline or the committed map is broken, and prints readability errors only."
         }
       ]
     },
     {
       "name": "ask",
       "group": "read",
-      "summary": "Ask the corpus a question without running the verdict. Read-only, never writes, and its exit code is the question's, never the gate's: --search ranks requirements by relevance, --dupes ranks overlapping contracts, --design reviews the code, --review emits the machine-readable review plan, --i18n lists missing translations. Exactly one mode per call. Since v8.0.0, `gate` refuses these flags and names `ask`.",
+      "summary": "Ask the corpus a question without running the verdict. Read-only, never writes, and its exit code is the question's, never the gate's: --search ranks requirements by relevance, --dupes ranks overlapping contracts, --design reviews the code against the OOP pillars, --review emits the machine-readable review plan. Exactly one mode per call. Since v8.0.0, `gate` refuses these flags and names `ask`.",
       "arg": null,
       "flags": [
         {
@@ -4544,7 +4070,7 @@
         },
         {
           "flag": "--design",
-          "help": "Print the advisory design review of the code. Never part of the verdict."
+          "help": "Advisory design review of the code: encapsulation, abstraction, inheritance and polymorphism candidates plus file length and line width, grouped by pillar. Read-only, exit 0, never the gate."
         },
         {
           "flag": "--review",
@@ -4552,7 +4078,7 @@
         },
         {
           "flag": "--i18n",
-          "help": "List the translations the configured LANGUAGE (en | ro | both, in requirements/_config.json) expects and does not have, missing or stale. --json emits each entry's source fields and cache key for whoever translates."
+          "help": "Removed in v8.2.0 (ADR-0047): accepted and ignored, refused from v9.0.0."
         },
         {
           "flag": "--top",
@@ -4600,7 +4126,7 @@
         },
         {
           "flag": "--attach",
-          "help": "Target HTML to inject the site's engine-owned regions into (scaffolds it if absent)."
+          "help": "HTML page to refresh the site's engine-owned regions in (scaffolds it if absent). Without it, `sync` refreshes docs/architecture.html when that exists."
         },
         {
           "flag": "--accept-drift",
@@ -4624,7 +4150,7 @@
       "flags": [
         {
           "flag": "--decompose",
-          "help": "Split a requirement into code-rung children along the bold group labels its author wrote in the Description; --apply writes them and rewrites the parent. With no id, every requirement carrying groups. A requirement with no groups falls back to one draft per over-long clause."
+          "help": "Split a requirement into code-rung children along the bold group labels its author wrote in the Description; --apply writes them and never edits the parent. With no id, every requirement carrying groups. A requirement with no groups falls back to one draft per over-long clause."
         },
         {
           "flag": "--levels",
@@ -4648,127 +4174,30 @@
       "flags": [
         {
           "flag": "--allow-writes",
-          "help": "Also offer the tools that write: sync, new and release."
+          "help": "Also offer the tools that write: sync and release."
         }
       ]
     }
   ],
   "design": {
-    "files": 29,
-    "clean_files": 1,
-    "score": 3,
+    "files": 30,
+    "clean_files": 25,
+    "score": 83,
     "candidates": {
-      "encapsulation": 4,
-      "abstraction": 14,
+      "encapsulation": 0,
+      "abstraction": 2,
       "inheritance": 0,
       "polymorphism": 0,
-      "metrics": 0,
-      "standards": 55
+      "standards": 5
     },
     "findings": [
       {
         "pillar": "standards",
-        "kind": "line-too-long",
-        "file": ".claude/skills/run-consilium/driver.py",
-        "line": 14,
-        "name": "driver.py",
-        "detail": "9 line(s) wider than 100 columns, first at line 14"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": ".claude/skills/run-consilium/driver.py",
-        "line": 74,
-        "name": "script",
-        "detail": "1 public definition(s) without a docstring: script"
-      },
-      {
-        "pillar": "standards",
         "kind": "file-too-long",
         "file": "scripts/aggregator.py",
         "line": 1,
         "name": "aggregator.py",
-        "detail": "565 lines (over 500)"
-      },
-      {
-        "pillar": "abstraction",
-        "kind": "long-function",
-        "file": "scripts/aggregator.py",
-        "line": 86,
-        "name": "aggregate_conservative_override",
-        "detail": "`aggregate_conservative_override` is 103 lines (over 80)"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/aggregator.py",
-        "line": 144,
-        "name": "aggregator.py",
-        "detail": "7 line(s) wider than 100 columns, first at line 144"
-      },
-      {
-        "pillar": "abstraction",
-        "kind": "long-function",
-        "file": "scripts/aggregator.py",
-        "line": 356,
-        "name": "aggregate_sequential",
-        "detail": "`aggregate_sequential` is 149 lines (over 80)"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/aggregator.py",
-        "line": 529,
-        "name": "main",
-        "detail": "1 public definition(s) without a docstring: main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/audit_feedback.py",
-        "line": 67,
-        "name": "audit_feedback.py",
-        "detail": "7 line(s) wider than 100 columns, first at line 67"
-      },
-      {
-        "pillar": "abstraction",
-        "kind": "long-function",
-        "file": "scripts/audit_feedback.py",
-        "line": 76,
-        "name": "main",
-        "detail": "`main` is 125 lines (over 80)"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/audit_feedback.py",
-        "line": 76,
-        "name": "main",
-        "detail": "1 public definition(s) without a docstring: main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/build_report.py",
-        "line": 105,
-        "name": "build_report.py",
-        "detail": "5 line(s) wider than 100 columns, first at line 105"
-      },
-      {
-        "pillar": "abstraction",
-        "kind": "long-function",
-        "file": "scripts/build_report.py",
-        "line": 194,
-        "name": "build",
-        "detail": "`build` is 81 lines (over 80)"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/build_report.py",
-        "line": 194,
-        "name": "build",
-        "detail": "2 public definition(s) without a docstring: build, main"
+        "detail": "765 lines (over 500)"
       },
       {
         "pillar": "standards",
@@ -4776,375 +4205,31 @@
         "file": "scripts/check_doc_drift.py",
         "line": 1,
         "name": "check_doc_drift.py",
-        "detail": "964 lines (over 500)"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/check_doc_drift.py",
-        "line": 86,
-        "name": "check_doc_drift.py",
-        "detail": "35 line(s) wider than 100 columns, first at line 86"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/check_doc_drift.py",
-        "line": 208,
-        "name": "check_text_invariants",
-        "detail": "4 public definition(s) without a docstring: check_text_invariants, check_skill_md_size, check_ci_checks_completeness, main"
+        "detail": "1283 lines (over 500)"
       },
       {
         "pillar": "abstraction",
         "kind": "prefix-family",
         "file": "scripts/check_doc_drift.py",
-        "line": 208,
+        "line": 364,
         "name": "check",
         "detail": "13 top-level functions start with `check`: check_ci_checks_completeness, check_confidence_floor_completeness, check_implement_pipeline_spec_alignment, check_legacy_mode_milestone, check_referenced_contracts_exist, check_referenced_scripts_exist"
       },
       {
-        "pillar": "abstraction",
-        "kind": "long-function",
-        "file": "scripts/check_doc_drift.py",
-        "line": 724,
-        "name": "check_trias_spec_alignment",
-        "detail": "`check_trias_spec_alignment` is 101 lines (over 80)"
-      },
-      {
         "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/check_public_leak.py",
-        "line": 35,
-        "name": "tracked_files",
-        "detail": "2 public definition(s) without a docstring: tracked_files, main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/check_versions.py",
-        "line": 71,
-        "name": "main",
-        "detail": "1 public definition(s) without a docstring: main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/check_versions.py",
-        "line": 72,
-        "name": "check_versions.py",
-        "detail": "2 line(s) wider than 100 columns, first at line 72"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/confidence.py",
-        "line": 290,
-        "name": "confidence.py",
-        "detail": "1 line(s) wider than 100 columns, first at line 290"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/confidence.py",
-        "line": 313,
-        "name": "derive",
-        "detail": "2 public definition(s) without a docstring: derive, main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/confidence_calibration.py",
-        "line": 95,
-        "name": "confidence_calibration.py",
-        "detail": "1 line(s) wider than 100 columns, first at line 95"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/confidence_calibration.py",
-        "line": 95,
-        "name": "band_rate",
-        "detail": "5 public definition(s) without a docstring: band_rate, decide, render, run, main"
-      },
-      {
-        "pillar": "encapsulation",
-        "kind": "long-parameter-list",
-        "file": "scripts/confidence_calibration.py",
-        "line": 101,
-        "name": "decide",
-        "detail": "`decide` takes 7 parameters (over 6)"
-      },
-      {
-        "pillar": "encapsulation",
-        "kind": "long-parameter-list",
-        "file": "scripts/confidence_calibration.py",
-        "line": 167,
-        "name": "run",
-        "detail": "`run` takes 8 parameters (over 6)"
-      },
-      {
-        "pillar": "abstraction",
-        "kind": "deep-nesting",
-        "file": "scripts/feedback.py",
-        "line": 52,
-        "name": "parse_feedback",
-        "detail": "`parse_feedback` nests 5 levels deep (over 4)"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/feedback.py",
-        "line": 52,
-        "name": "parse_feedback",
-        "detail": "4 public definition(s) without a docstring: parse_feedback, parse_runs, report, main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/feedback.py",
-        "line": 79,
-        "name": "feedback.py",
-        "detail": "2 line(s) wider than 100 columns, first at line 79"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/implement_pipeline.py",
-        "line": 19,
-        "name": "implement_pipeline.py",
-        "detail": "4 line(s) wider than 100 columns, first at line 19"
-      },
-      {
-        "pillar": "abstraction",
-        "kind": "deep-nesting",
-        "file": "scripts/implement_pipeline.py",
-        "line": 185,
-        "name": "_header_colon_index",
-        "detail": "`_header_colon_index` nests 7 levels deep (over 4)"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/implement_pipeline.py",
-        "line": 303,
-        "name": "main",
-        "detail": "1 public definition(s) without a docstring: main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/infer_pipeline.py",
-        "line": 131,
-        "name": "infer_pipeline.py",
-        "detail": "3 line(s) wider than 100 columns, first at line 131"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/infer_pipeline.py",
-        "line": 186,
-        "name": "main",
-        "detail": "1 public definition(s) without a docstring: main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
+        "kind": "file-too-long",
         "file": "scripts/log_feedback.py",
-        "line": 55,
+        "line": 1,
         "name": "log_feedback.py",
-        "detail": "22 line(s) wider than 100 columns, first at line 55"
+        "detail": "536 lines (over 500)"
       },
       {
         "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/log_feedback.py",
-        "line": 103,
-        "name": "truncate",
-        "detail": "4 public definition(s) without a docstring: truncate, derive_note, build_entry, main"
-      },
-      {
-        "pillar": "abstraction",
-        "kind": "long-function",
-        "file": "scripts/log_feedback.py",
-        "line": 184,
-        "name": "append_entry",
-        "detail": "`append_entry` is 127 lines (over 80)"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/mark_outcome.py",
-        "line": 29,
-        "name": "mark_outcome.py",
-        "detail": "11 line(s) wider than 100 columns, first at line 29"
-      },
-      {
-        "pillar": "abstraction",
-        "kind": "long-function",
-        "file": "scripts/mark_outcome.py",
-        "line": 125,
-        "name": "main",
-        "detail": "`main` is 128 lines (over 80)"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/mark_outcome.py",
-        "line": 125,
-        "name": "main",
-        "detail": "1 public definition(s) without a docstring: main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/memory.py",
-        "line": 90,
-        "name": "read_medium",
-        "detail": "4 public definition(s) without a docstring: read_medium, read_long, read_all, main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/memory.py",
-        "line": 118,
-        "name": "memory.py",
-        "detail": "3 line(s) wider than 100 columns, first at line 118"
-      },
-      {
-        "pillar": "encapsulation",
-        "kind": "global-state",
-        "file": "scripts/memory.py",
-        "line": 143,
-        "name": "main",
-        "detail": "`main` writes module state: FEEDBACK, RUNS"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/personalities.py",
-        "line": 66,
-        "name": "main",
-        "detail": "1 public definition(s) without a docstring: main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/personalities.py",
-        "line": 87,
-        "name": "personalities.py",
-        "detail": "1 line(s) wider than 100 columns, first at line 87"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/priors.py",
-        "line": 116,
-        "name": "priors.py",
-        "detail": "12 line(s) wider than 100 columns, first at line 116"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/priors.py",
-        "line": 186,
-        "name": "find_stale_pendings",
-        "detail": "3 public definition(s) without a docstring: find_stale_pendings, build_priors, main"
-      },
-      {
-        "pillar": "encapsulation",
-        "kind": "global-state",
-        "file": "scripts/priors.py",
-        "line": 320,
-        "name": "main",
-        "detail": "`main` writes module state: FEEDBACK, RUNS"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/probe_change.py",
-        "line": 56,
-        "name": "probe_change.py",
-        "detail": "2 line(s) wider than 100 columns, first at line 56"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/probe_change.py",
-        "line": 81,
-        "name": "parse_numstat",
-        "detail": "4 public definition(s) without a docstring: parse_numstat, probe_churn, probe, main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/render_feedback_html.py",
-        "line": 30,
-        "name": "Entry",
-        "detail": "4 public definition(s) without a docstring: Entry, render_drill, render, main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/render_feedback_html.py",
-        "line": 41,
-        "name": "render_feedback_html.py",
-        "detail": "16 line(s) wider than 100 columns, first at line 41"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
+        "kind": "file-too-long",
         "file": "scripts/render_impl_preview.py",
-        "line": 23,
+        "line": 1,
         "name": "render_impl_preview.py",
-        "detail": "17 line(s) wider than 100 columns, first at line 23"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/render_impl_preview.py",
-        "line": 373,
-        "name": "main",
-        "detail": "1 public definition(s) without a docstring: main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/run_evals.py",
-        "line": 35,
-        "name": "is_subset",
-        "detail": "3 public definition(s) without a docstring: is_subset, run_one, main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/run_evals.py",
-        "line": 129,
-        "name": "run_evals.py",
-        "detail": "2 line(s) wider than 100 columns, first at line 129"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/scope_gate.py",
-        "line": 68,
-        "name": "scope_gate.py",
-        "detail": "3 line(s) wider than 100 columns, first at line 68"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/scope_gate.py",
-        "line": 162,
-        "name": "find_blocklist_hits",
-        "detail": "4 public definition(s) without a docstring: find_blocklist_hits, load_config, decide, main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/strip_context.py",
-        "line": 60,
-        "name": "strip_for_control",
-        "detail": "3 public definition(s) without a docstring: strip_for_control, strip_for_conservator, main"
+        "detail": "522 lines (over 500)"
       },
       {
         "pillar": "standards",
@@ -5152,131 +4237,143 @@
         "file": "scripts/validate_report.py",
         "line": 1,
         "name": "validate_report.py",
-        "detail": "655 lines (over 500)"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/validate_report.py",
-        "line": 49,
-        "name": "validate_report.py",
-        "detail": "20 line(s) wider than 100 columns, first at line 49"
+        "detail": "809 lines (over 500)"
       },
       {
         "pillar": "abstraction",
         "kind": "prefix-family",
         "file": "scripts/validate_report.py",
-        "line": 87,
+        "line": 90,
         "name": "validate",
         "detail": "7 top-level functions start with `validate`: _validate_deliberation_log, _validate_pipeline_executed, _validate_regression_risk, _validate_sequential_fields, _validate_telemetry, _validate_telemetry_required"
-      },
-      {
-        "pillar": "abstraction",
-        "kind": "deep-nesting",
-        "file": "scripts/validate_report.py",
-        "line": 132,
-        "name": "_validate_telemetry",
-        "detail": "`_validate_telemetry` nests 6 levels deep (over 4)"
-      },
-      {
-        "pillar": "abstraction",
-        "kind": "deep-nesting",
-        "file": "scripts/validate_report.py",
-        "line": 334,
-        "name": "_validate_trias",
-        "detail": "`_validate_trias` nests 6 levels deep (over 4)"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/validate_report.py",
-        "line": 404,
-        "name": "validate",
-        "detail": "2 public definition(s) without a docstring: validate, main"
-      },
-      {
-        "pillar": "abstraction",
-        "kind": "deep-nesting",
-        "file": "scripts/validate_report.py",
-        "line": 499,
-        "name": "_strict_substance_problems",
-        "detail": "`_strict_substance_problems` nests 5 levels deep (over 4)"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/validate_skeptic.py",
-        "line": 69,
-        "name": "validate_skeptic",
-        "detail": "2 public definition(s) without a docstring: validate_skeptic, main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/version.py",
-        "line": 107,
-        "name": "main",
-        "detail": "1 public definition(s) without a docstring: main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/vocabulary_map.py",
-        "line": 61,
-        "name": "vocabulary_map.py",
-        "detail": "1 line(s) wider than 100 columns, first at line 61"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/vocabulary_map.py",
-        "line": 74,
-        "name": "main",
-        "detail": "1 public definition(s) without a docstring: main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "missing-docstring",
-        "file": "scripts/vote_degeneracy.py",
-        "line": 81,
-        "name": "scan",
-        "detail": "3 public definition(s) without a docstring: scan, assess, main"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/vote_degeneracy.py",
-        "line": 134,
-        "name": "vote_degeneracy.py",
-        "detail": "2 line(s) wider than 100 columns, first at line 134"
       }
     ],
     "advice": {
-      "deep-nesting": "nesting this deep hides the main path: return early, or extract the inner block",
       "file-too-long": "a file this long is several modules sharing a name: split it along the prefix families it already shows",
-      "global-state": "module state mutated from inside a function has no owner: hold it in an object, or pass it in and return it",
-      "line-too-long": "lines wider than the limit hide their tail in every diff and side-by-side view: wrap them",
-      "long-function": "a function this long hides several steps: extract each step under a name that says what it does",
-      "long-parameter-list": "a parameter list this long is an object waiting to be named: group the parameters that travel together",
-      "missing-docstring": "a public name without a docstring makes every caller read the body: one sentence saying what it returns is enough",
       "prefix-family": "functions sharing a prefix are a namespace: a class (or module) with that name makes the boundary explicit"
     }
   },
   "health": {
-    "score": 98,
+    "score": 100,
     "total": 56,
     "scored": 55,
-    "healthy": 54,
+    "healthy": 55,
+    "exempt": 17,
     "deprecated": 1,
     "confirmed": 55,
     "implemented": 46,
-    "tested": 27,
+    "tested": 31,
     "drafts": 0,
     "orphans": 0,
     "untested": 0,
-    "open_intent": 1,
+    "open_intent": 0,
     "drift": 0,
     "gate_errors": 0,
-    "gate_link_sync_clean": true
+    "gate_link_sync_clean": true,
+    "unhealthy": [],
+    "exempt_ids": [
+      {
+        "id": "CONSILIUM-AUDIT-FEEDBACK-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-CHECK-DOC-DRIFT-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-IMPLEMENT-SUBAGENT-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-LENS-ESSENTIALIST-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-LENS-SENTINEL-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-LENS-VERIFIER-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-MODE-DIALECTIC-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-MODE-SEQUENTIAL-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-MODE-SKEPTIC-ON-CHOSEN-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-MODE-TRIAS-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-RUN-EVALS-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-SUBAGENT-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-VOICE-CONSERVATOR-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-VOICE-CONTROL-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-VOICE-GENERATOR-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "CONSILIUM-VOICE-SKEPTIC-001",
+        "keys": [
+          "test_exempt"
+        ]
+      },
+      {
+        "id": "SKILL-RUN-CONSILIUM-001",
+        "keys": [
+          "test_exempt"
+        ]
+      }
+    ]
   }
 }

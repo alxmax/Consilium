@@ -5,7 +5,6 @@ status: confirmed
 level: code
 layer: feature
 owner: alxmax
-test_exempt: "importlib module loading and FEEDBACK.html mutation — integration-only"
 depends_on: [CONSILIUM-FEEDBACK-001, CONSILIUM-RENDER-FEEDBACK-HTML-001, CONSILIUM-UTILS-001]
 risk: 1
 satisfies: [ARCH-CONSILIUM-LEARNING-001]
@@ -52,7 +51,3 @@ Every line in this section is binding.
 **Notes** — Input: `--run-path` (relative or absolute path to a `runs/*.json` file); `--date YYYY-MM-DD` + `--chosen <id>` as an alternative direct-match strategy; `--outcome` one of `OK | BAD | OVR | PEND | PEND_HEADLESS` (required); `--reason`; `--dry-run`; `--benchmark` (required guard for `--outcome PEND_HEADLESS`); `--feedback` override path. Reads and rewrites `.consilium/FEEDBACK.html` in place and reads the `.consilium/runs/.run_path_map.json` sidecar populated by `log_feedback.py`. Rationale: the initial outcome logged at Step 6 is a subjective gut-feel, and production reality can contradict it days later (a chosen approach may break production, or a risky override may prove correct); `[confirmed]` lets `priors.py` weight confirmed-outcome rows higher than purely subjective ones.
 
 **Current implementation** — `scripts/mark_outcome.py`.
-
-## Why test_exempt
-
-`mark_outcome.py` mutates `FEEDBACK.html` rows in-place, using a path resolved from a sidecar map (`runs/.run_path_map.json`). The mutation logic is tightly coupled to a live HTML file with real prior rows. The HTML read/write format is already covered by `test_feedback_html.py`; the row-matching and outcome-update behavior specific to `mark_outcome.py` is exercised through that shared infrastructure. A separate unit test would require a multi-row FEEDBACK fixture and path-map setup that duplicates what those existing tests already provide.

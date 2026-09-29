@@ -34,7 +34,8 @@ FEEDBACK_PATH = DATA_DIR / "FEEDBACK.html"
 
 
 def canonical_run_path(run_path: str) -> str:
-    """Normalize a run-path to the DATA_DIR-relative sidecar key ``runs/<name>``.
+    """Normalize a run-path to the DATA_DIR-relative sidecar key
+    ``runs/<name>``.
 
     Run files are flat under ``RUNS_DIR`` with timestamped (unique) basenames,
     so the basename alone identifies a run. Callers may pass any of

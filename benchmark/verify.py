@@ -508,7 +508,7 @@ def _verify_llm_judge(workspace: Path, verify_src: Path, meta: dict) -> dict:
     # `judge_model:` for backward compat with single-judge configs.
     models = meta.get("judge_models")
     if not models:
-        models = [meta.get("judge_model", "claude-sonnet-5")]
+        models = [meta.get("judge_model", "claude-sonnet-5-5")]
 
     ws_verify = workspace / "verify"
     ws_verify.mkdir(exist_ok=True)

@@ -29,25 +29,29 @@ Output (always to stdout, exit 0 on success):
     "config_used": {"max_files": int, "max_lines": int, "blocklist": [...]}
   }
 
-consent_required is the PRE-DISPATCH irreversibility consent gate (Generator runs
-first, so the consent check must fire before any voice). It is True when the diff
-touches a sensitive/irreversible path (blocklist hit) and — crucially — FAILS SAFE:
-a probe/config failure returns consent_required=true (uncertainty must NOT silently
-bypass consent). This is independent of should_skip's fail-OPEN, which only governs
-whether to deliberate. Text-based irreversible markers (e.g. "DROP TABLE", "no way
-back") are the orchestrator's complementary check in SKILL.md Step 1.6.
+consent_required is the PRE-DISPATCH irreversibility consent gate (Generator
+runs first, so the consent check must fire before any voice). It is True when
+the diff touches a sensitive/irreversible path (blocklist hit) and — crucially —
+FAILS SAFE: a probe/config failure returns consent_required=true (uncertainty
+must NOT silently bypass consent). This is independent of should_skip's
+fail-OPEN, which only governs whether to deliberate. Text-based irreversible
+markers (e.g. "DROP TABLE", "no way back") are the orchestrator's complementary
+check in SKILL.md Step 1.6.
 
 magnitude thresholds (used by Trias lazy routing — independent of should_skip):
   low      — files ≤ 1, lines ≤ 15, no blocklist hits
   medium   — files ≤ 5, lines ≤ 100, no blocklist hits
   high     — files > 5 or lines > 100, no blocklist hits
-  critical — any blocklist hit (auth, security, migrations, CI workflows, secrets)
+  critical — any blocklist hit (auth, security, migrations, CI workflows,
+             secrets)
 
 mode_ceiling — mechanical upper bound on mode cost derived from magnitude:
   low      → sequential  (single-context deliberation is sufficient)
   medium   → sequential  (single-context sufficient; Dialectic/Trias over-spec)
-  high     → dialectic   (large but routine refactor; Trias over-spec without a critical signal)
-  critical → trias       (security/sensitive path; full 3-personality deliberation warranted)
+  high     → dialectic   (large but routine refactor; Trias over-spec
+             without a critical signal)
+  critical → trias       (security/sensitive path; full 3-personality
+             deliberation warranted)
   Blocklist hits force magnitude=critical and therefore mode_ceiling=trias.
   This makes advisory prose in SKILL.md enforceable via script output.
 
@@ -65,7 +69,8 @@ CLI:
     python scripts/scope_gate.py --range origin/main..HEAD
     python scripts/scope_gate.py --files src/foo.py
     python scripts/scope_gate.py --config my_gate.json
-    echo '{"files_changed":1,"paths":[".github/workflows/ci.yml"]}' | python scripts/scope_gate.py --signals-stdin
+    echo '{"files_changed":1,"paths":[".github/workflows/ci.yml"]}' | \
+        python scripts/scope_gate.py --signals-stdin
 """
 # implements: CONSILIUM-SCOPE-GATE-001
 
@@ -104,7 +109,9 @@ DEFAULT_CONFIG: dict = {
 
 def _load_probe_module():
     here = Path(__file__).resolve().parent
-    spec = importlib.util.spec_from_file_location("probe_change", here / "probe_change.py")
+    spec = importlib.util.spec_from_file_location(
+        "probe_change", here / "probe_change.py"
+    )
     if spec is None or spec.loader is None:
         raise RuntimeError("could not load probe_change.py from sibling path")
     mod = importlib.util.module_from_spec(spec)
@@ -132,7 +139,8 @@ def _path_matches(path: str, pattern: str) -> bool:
         tail = pattern[3:]
         return any(fnmatch.fnmatchcase(p, tail) for p in path.split("/"))
     base = path.rsplit("/", 1)[-1]
-    return fnmatch.fnmatchcase(path, pattern) or fnmatch.fnmatchcase(base, pattern)
+    return (fnmatch.fnmatchcase(path, pattern)
+            or fnmatch.fnmatchcase(base, pattern))
 
 
 _MODE_CEILING: dict[str, str] = {
@@ -173,13 +181,19 @@ def load_config(path: str | None) -> dict:
     if path is None:
         candidate = Path.cwd() / "scope_gate.json"
         if not candidate.exists():
-            return {k: (list(v) if isinstance(v, list) else v) for k, v in DEFAULT_CONFIG.items()}
+            return {
+                k: (list(v) if isinstance(v, list) else v)
+                for k, v in DEFAULT_CONFIG.items()
+            }
         path = str(candidate)
     with open(path, "r", encoding="utf-8") as f:
         user = json.load(f)
     if not isinstance(user, dict):
         raise RuntimeError(f"config {path} must be a JSON object")
-    cfg = {k: (list(v) if isinstance(v, list) else v) for k, v in DEFAULT_CONFIG.items()}
+    cfg = {
+        k: (list(v) if isinstance(v, list) else v)
+        for k, v in DEFAULT_CONFIG.items()
+    }
     for k, v in user.items():
         if k in DEFAULT_CONFIG:
             cfg[k] = v
@@ -203,20 +217,29 @@ def _gather_signals(probe_mod, ref, range_, files):
 
 def decide(summary: dict, paths: list[str], cfg: dict) -> dict:
     if "error" in summary:
-        # Fail SAFE on consent: an undeterminable change must not silently bypass
-        # the pre-dispatch consent gate (should_skip still fails OPEN → deliberate).
+        # Fail SAFE on consent: an undeterminable change must not silently
+        # bypass the pre-dispatch consent gate (should_skip still fails OPEN →
+        # deliberate).
         return {
             "should_skip": False,
             "consent_required": True,
             "magnitude": "critical",
             "mode_ceiling": "trias",
             "reason": f"probe failed: {summary['error']}",
-            "signals": {"files_changed": 0, "lines_changed": 0, "blocklist_hits": []},
+            "signals": {
+                "files_changed": 0,
+                "lines_changed": 0,
+                "blocklist_hits": [],
+            },
         }
     files = summary.get("files_changed", 0)
     lines = summary.get("lines_added", 0) + summary.get("lines_removed", 0)
     hits = find_blocklist_hits(paths, cfg["blocklist"])
-    signals = {"files_changed": files, "lines_changed": lines, "blocklist_hits": hits}
+    signals = {
+        "files_changed": files,
+        "lines_changed": lines,
+        "blocklist_hits": hits,
+    }
     magnitude = classify_magnitude(files, lines, bool(hits))
 
     if files == 0:
@@ -266,6 +289,35 @@ def decide(summary: dict, paths: list[str], cfg: dict) -> dict:
     }
 
 
+def _read_signals(args: argparse.Namespace) -> tuple[dict, list]:
+    """Signals from stdin (--signals-stdin) or from probing git; an error
+    is carried in the summary, never raised, so ``decide`` fails safe."""
+    if args.signals_stdin:
+        try:
+            payload = json.load(sys.stdin)
+            summary = {
+                "files_changed": int(payload.get("files_changed", 0)),
+                "lines_added": int(payload.get("lines_added", 0)),
+                "lines_removed": int(payload.get("lines_removed", 0)),
+            }
+            paths = list(payload.get("paths", []))
+        except (
+            json.JSONDecodeError, ValueError, TypeError, AttributeError
+        ) as exc:
+            summary = {"error": f"bad --signals-stdin payload: {exc}"}
+            paths = []
+    else:
+        try:
+            probe_mod = _load_probe_module()
+            summary, paths = _gather_signals(
+                probe_mod, args.ref, args.range_, args.files
+            )
+        except RuntimeError as exc:
+            summary = {"error": str(exc)}
+            paths = []
+    return summary, paths
+
+
 def main(argv: list[str] | None = None) -> int:
     # Check env override first — before any config load attempt so a config
     # failure cannot shadow the escape hatch.
@@ -276,11 +328,17 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--ref", help="diff <ref>..HEAD")
     mode.add_argument("--range", dest="range_", help="diff <A>..<B>")
     ap.add_argument("--files", nargs="+", help="restrict to specific paths")
-    ap.add_argument("--config", help="path to scope_gate.json (default: ./scope_gate.json if exists)")
+    ap.add_argument(
+        "--config",
+        help="path to scope_gate.json (default: ./scope_gate.json if exists)",
+    )
     ap.add_argument(
         "--signals-stdin",
         action="store_true",
-        help="read pre-computed signals as JSON from stdin instead of probing git",
+        help=(
+            "read pre-computed signals as JSON from stdin instead of "
+            "probing git"
+        ),
     )
     args = ap.parse_args(argv)
 
@@ -292,7 +350,12 @@ def main(argv: list[str] | None = None) -> int:
                 "magnitude": "critical",
                 "mode_ceiling": "trias",
                 "reason": "CONSILIUM_FORCE_FULL=1 (override)",
-                "signals": {"files_changed": 0, "lines_changed": 0, "blocklist_hits": [], "forced": True},
+                "signals": {
+                    "files_changed": 0,
+                    "lines_changed": 0,
+                    "blocklist_hits": [],
+                    "forced": True,
+                },
                 "config_used": DEFAULT_CONFIG,
             },
             sys.stdout,
@@ -311,7 +374,11 @@ def main(argv: list[str] | None = None) -> int:
                 "magnitude": "high",
                 "mode_ceiling": _MODE_CEILING["high"],
                 "reason": f"config load failed: {exc}",
-                "signals": {"files_changed": 0, "lines_changed": 0, "blocklist_hits": []},
+                "signals": {
+                    "files_changed": 0,
+                    "lines_changed": 0,
+                    "blocklist_hits": [],
+                },
                 "config_used": DEFAULT_CONFIG,
             },
             sys.stdout,
@@ -320,25 +387,7 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.write("\n")
         return 0
 
-    if args.signals_stdin:
-        try:
-            payload = json.load(sys.stdin)
-            summary = {
-                "files_changed": int(payload.get("files_changed", 0)),
-                "lines_added": int(payload.get("lines_added", 0)),
-                "lines_removed": int(payload.get("lines_removed", 0)),
-            }
-            paths = list(payload.get("paths", []))
-        except (json.JSONDecodeError, ValueError, TypeError, AttributeError) as exc:
-            summary = {"error": f"bad --signals-stdin payload: {exc}"}
-            paths = []
-    else:
-        try:
-            probe_mod = _load_probe_module()
-            summary, paths = _gather_signals(probe_mod, args.ref, args.range_, args.files)
-        except RuntimeError as exc:
-            summary = {"error": str(exc)}
-            paths = []
+    summary, paths = _read_signals(args)
 
     result = decide(summary, paths, cfg)
     result["config_used"] = cfg

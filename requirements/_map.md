@@ -1,9 +1,9 @@
 ---
-generated: 2026-09-22
-engine: 2026-09-21.1
+generated: 2026-09-29
+engine: 2026-09-28.2
 nodes: 56
 edges: 105
-design pass-rate: 3% (1/29 source files without a design candidate)
+design pass-rate: 83% (25/30 source files without a design candidate)
 ---
 
 # Requirement Map
@@ -187,8 +187,6 @@ graph LR
   ARCH_CONSILIUM_VOICES_001 -->|generated-from| f_docs_architecture_html_4
   f_docs_architecture_index_html_4["docs/architecture/index.html:4"]
   ARCH_CONSILIUM_VOICES_001 -->|generated-from| f_docs_architecture_index_html_4
-  CONSILIUM_AUDIT_COUNTER_001["Silent parallel audit counter<br><small>CONSILIUM-AUDIT-COUNTER-001</small>"]
-  style CONSILIUM_AUDIT_COUNTER_001 fill:#eee,stroke:#bbb,color:#888
   SYS_CONSILIUM_IMPLEMENT_001["A verified implementation from a GO verdict<br><small>SYS-CONSILIUM-IMPLEMENT-001</small>"]
   style SYS_CONSILIUM_IMPLEMENT_001 fill:#fee,stroke:#c66
   SYS_CONSILIUM_INTEGRITY_001["A repository that stays consistent with itself<br><small>SYS-CONSILIUM-INTEGRITY-001</small>"]
@@ -222,14 +220,5 @@ _Requirements needing attention: red = unimplemented (confirmed, no code); orang
 
 ```mermaid
 graph LR
-  subgraph sg_misc["misc"]
-    CONSILIUM_CONFIDENCE_CALIBRATION_001["confidence_calibration<br><small>CONSILIUM-CONFIDENCE-CALIBRATION-001</small><br>unverified-intent"]
-  end
-  style CONSILIUM_CONFIDENCE_CALIBRATION_001 fill:#fff9c4,stroke:#aa0,color:#550
+  ok["No risk signals detected"]
 ```
-
-### Risk Table
-
-| ID | status | members | dependents | risks | recommendation |
-| --- | --- | --- | --- | --- | --- |
-| CONSILIUM-CONFIDENCE-CALIBRATION-001 | confirmed | 2 | 1 | unverified-intent | Has open `## Verify intent` question(s): run `reqmap.py sync`, resolve each in `requirements/_findings.md`, then fold the answer into the Contract or delete the bullet. |

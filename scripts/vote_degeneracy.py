@@ -3,7 +3,8 @@
 design audit 2026-05-26 (trias-dialectic-audit-improvements) raised the
 hypothesis that Trias's "democratic vote" is theater: 3 personality lenses on
 the SAME model are correlated samples, so they would always agree (3-0) and the
-vote would carry no information. Reviewer 1/Reviewer 4/Reviewer 5 voted on that premise.
+vote would carry no information. Reviewer 1/Reviewer 4/Reviewer 5 voted on that
+premise.
 
 This script tests the premise empirically instead of assuming it. It scans the
 run corpus for Trias runs (those that recorded a `vote_pattern`), tallies the
@@ -14,7 +15,8 @@ distribution, and reports the 3-0 unanimity rate. The decision rule:
     signal over a single Sequential run, and the 3-0=0.95 confidence is suspect.
 - 3-0 rate <= threshold → the vote is MEANINGFUL: personalities disagree often
   enough that the majority vote can change the outcome vs a single run.
-- n < --min-n → `insufficient`: not enough Trias runs to conclude (Reviewer 8 gate).
+- n < --min-n → `insufficient`: not enough Trias runs to conclude
+  (Reviewer 8 gate).
 
 Unanimity is 3-0 ONLY. A 2-0 pattern is a *veto* (one personality had all
 candidates vetoed), not three lenses agreeing — it is tallied separately as
@@ -107,15 +109,24 @@ def assess(patterns: Counter, threshold: float, min_n: int) -> dict:
     veto_rate = (veto / n) if n else None
     if n < min_n:
         verdict = "insufficient"
-        note = f"n={n} < min_n={min_n}; not enough Trias runs to conclude (Reviewer 8 gate)."
+        note = (
+            f"n={n} < min_n={min_n}; not enough Trias runs to "
+            f"conclude (Reviewer 8 gate)."
+        )
     elif rate is not None and rate > threshold:
         verdict = "vote_degenerate"
-        note = (f"3-0 unanimity rate {rate:.0%} > {threshold:.0%}: lenses do not decorrelate; "
-                f"the majority vote adds no signal over a single Sequential run.")
+        note = (
+            f"3-0 unanimity rate {rate:.0%} > {threshold:.0%}: "
+            f"lenses do not decorrelate; the majority vote adds no "
+            f"signal over a single Sequential run."
+        )
     else:
         verdict = "vote_meaningful"
-        note = (f"3-0 unanimity rate {rate:.0%} <= {threshold:.0%}: personalities disagree often "
-                f"enough that the vote can change the outcome - the vote carries information.")
+        note = (
+            f"3-0 unanimity rate {rate:.0%} <= {threshold:.0%}: "
+            f"personalities disagree often enough that the vote can "
+            f"change the outcome - the vote carries information."
+        )
     return {
         "n": n,
         "distribution": dict(patterns.most_common()),
@@ -131,10 +142,22 @@ def assess(patterns: Counter, threshold: float, min_n: int) -> dict:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--runs-dir", default=str(DEFAULT_RUNS), help="runs directory (default: .consilium/runs)")
-    ap.add_argument("--degenerate-threshold", type=float, default=DEGENERATE_THRESHOLD,
-                    help="unanimity rate above which the vote is judged degenerate (default 0.85)")
-    ap.add_argument("--min-n", type=int, default=MIN_N, help="minimum Trias runs to render a verdict (default 20)")
+    ap.add_argument(
+        "--runs-dir", default=str(DEFAULT_RUNS),
+        help="runs directory (default: .consilium/runs)",
+    )
+    ap.add_argument(
+        "--degenerate-threshold", type=float,
+        default=DEGENERATE_THRESHOLD,
+        help=(
+            "unanimity rate above which the vote is judged "
+            "degenerate (default 0.85)"
+        ),
+    )
+    ap.add_argument(
+        "--min-n", type=int, default=MIN_N,
+        help="minimum Trias runs to render a verdict (default 20)",
+    )
     ap.add_argument("--json", action="store_true", help="emit JSON only")
     args = ap.parse_args(argv)
 
@@ -159,7 +182,10 @@ def main(argv: list[str] | None = None) -> int:
     if report["unanimity_rate"] is not None:
         print(f"  3-0 unanimity rate: {report['unanimity_rate']:.0%}")
     if report["veto_rate"] is not None:
-        print(f"  2-0 veto rate:      {report['veto_rate']:.0%}  ({report['veto_count']} run(s))")
+        print(
+            f"  2-0 veto rate:      {report['veto_rate']:.0%}  "
+            f"({report['veto_count']} run(s))"
+        )
     print(f"  verdict: {report['verdict']}")
     print(f"  {report['note']}")
     return 0

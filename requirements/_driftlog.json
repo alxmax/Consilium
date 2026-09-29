@@ -70,8 +70,8 @@
       "reason": "sync dev PRs #501-#506 into demo"
     },
     "CONSILIUM-IMPLEMENT-TEST-WRITER-001": {
-      "hash": "46dc065304c9",
-      "reason": "sync dev PRs #501-#506 into demo"
+      "hash": "57e2dea31ce2",
+      "reason": "dev->demo sync 2026-09-29: dev PRs #515-#526 (engine 2026-09-28.2, Sonnet 5.5 models, acceptance-case tests, design refactor, implement-output validator)"
     },
     "CONSILIUM-INFER-PIPELINE-001": {
       "hash": "85c814c8f476",
@@ -174,8 +174,8 @@
       "reason": "sync dev PRs #501-#506 into demo"
     },
     "CONSILIUM-VOCABULARY-MAP-001": {
-      "hash": "251bc8cdb9b9",
-      "reason": "sync dev PRs #501-#506 into demo"
+      "hash": "f61eb6c5c765",
+      "reason": "dev->demo sync 2026-09-29: dev PRs #515-#526 (engine 2026-09-28.2, Sonnet 5.5 models, acceptance-case tests, design refactor, implement-output validator)"
     },
     "CONSILIUM-VOICE-CONSERVATOR-001": {
       "hash": "2d5d70ffd024",

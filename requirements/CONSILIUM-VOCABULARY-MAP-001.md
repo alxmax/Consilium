@@ -35,7 +35,7 @@ Every line in this section is binding.
 
 ## Cases
 
-- **CASE-1** — Given `translate('reversibility', 'complete')`, when it runs, then it returns the Romanian string `usor de anulat`.
+- **CASE-1** — Given `translate('reversibility', 'complete')`, when it runs, then it returns the Romanian string `ușor de anulat`.
 - **CASE-2** — Given `translate('verdict', 'GO')`, when it runs, then it returns `aprobat de majoritate`.
 - **CASE-3** — Given `compute_tokens_budget('critical', 'irreversible')`, when it runs, then it returns `{'generator': 4000, 'control': 4000}`.
 - **CASE-4** — Given `compute_tokens_budget` with `meta='scale_down'`, when it runs, then it always returns `{'generator': 300, 'control': 300}` regardless of magnitude or reversibility.

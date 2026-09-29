@@ -3,45 +3,45 @@
   "members": {
     "CONSILIUM-AGGREGATOR-001": {
       "modes/aggregator_schemes.md": "3b9c587ac70ae315afafe0b0e10549f4eb3e6b5e9d3553108ff8166a510b5dfa",
-      "scripts/aggregator.py": "e6b0cc3dcffba720d6f155d11012e9bce7479e0f172c2953f331b6f213fe3a25"
+      "scripts/aggregator.py": "d90fa231f56f6459cc3295dda6f54d3566d50f49c19d0969ba08f82364977ed3"
     },
     "CONSILIUM-AUDIT-FEEDBACK-001": {
-      "scripts/audit_feedback.py": "2c15916c1d03174bde7aa4a71c499316c4a05a028e84d26c661ae34b3d4aae0f"
+      "scripts/audit_feedback.py": "78bdc67fcefb9b2569b44e091579366135d51851665c71c5a4ba28d87abb19de"
     },
     "CONSILIUM-BUILD-REPORT-001": {
-      "scripts/build_report.py": "94e8625fe721b492220b06fb1d22627da7179522a76b128d36e595b0800a8956"
+      "scripts/build_report.py": "684adfb06ec1672eb6cb4abec06c3f75e4b2efdff348f9906a41b5e2edba8956"
     },
     "CONSILIUM-CHECK-PUBLIC-LEAK-001": {
-      "scripts/check_public_leak.py": "a0efa717766035be459f65c38c562abe1b5df1df61a78945f37bb057211e5872"
+      "scripts/check_public_leak.py": "f2bcdddac3f43cd3c5dfb9dadeeb18016cac02822cbce1e54279cc772faa5bdb"
     },
     "CONSILIUM-CHECK-VERSIONS-001": {
-      "scripts/check_versions.py": "1b935cdeab63f0fb5b30d06dd9a0c5c9095189e3b8b4697e2089fc5d15e70630"
+      "scripts/check_versions.py": "04476d1967ca6f0029d5b7e49dd8f88dd00ce5d36b46cf5253c2ffe5f6d1c5a2"
     },
     "CONSILIUM-CONFIDENCE-001": {
       "modes/confidence.md": "c58466f4da12e9a8b0619a75882cea08d98377e146b0350257d837311408f40f",
-      "scripts/confidence.py": "4ecbb37b7fb61b536c831e0805d394362945ebef9a28ad178b2e3cf9a760bf0f"
+      "scripts/confidence.py": "e0fb559cb0e1b15bff76e8015c46a2d20caaca668c542d65d00d9c0cecb3951d"
     },
     "CONSILIUM-CONFIDENCE-CALIBRATION-001": {
-      "scripts/confidence_calibration.py": "880e608e679bf10c820a995079e32f0cdff42ab8802512b6b4be399c83380869"
+      "scripts/confidence_calibration.py": "aee25644846808d611467d9622f6e0c392dfac0e1650d8da3d3ee48f1f476cae"
     },
     "CONSILIUM-FEEDBACK-001": {
-      "scripts/feedback.py": "daa8ce25370a5e54078aba9f2d1028bec1d8d4bb7183e8a1f393ed86b56b0532"
+      "scripts/feedback.py": "52c8cdf7cc4a1ab42e8240551ce17ba8da4b87237f449ef2b509138bc423c4fc"
     },
     "CONSILIUM-IMPLEMENT-CODER-001": {
       "prompts/implement/coder.md": "c038feb961f0d5c071d700facbb5356d4a1bc99018dc8d8eaac55c19f45b0369"
     },
     "CONSILIUM-IMPLEMENT-PIPELINE-001": {
-      "modes/implement_pipeline.md": "9d9a9c1ee047a0fea85e55579b170fc2c628dabdeb9d1ccdbeae7bfeb4012b3a",
-      "scripts/implement_pipeline.py": "0d33021e7d5355dc2ac72b302552c9ff28912735ce7e083d747066923eaa3cd9"
+      "modes/implement_pipeline.md": "8d5dd526c80cd0bcd72f8d9a074790c3ffa47b8c24af4a93543730d8c31457d8",
+      "scripts/implement_pipeline.py": "e57a78da34041757c4702e01317d96b7f997a99f36600f36e4a4eac919a7c37d"
     },
     "CONSILIUM-IMPLEMENT-SUBAGENT-001": {
-      "agents/consilium-implement-subagent.md": "dfa6a39b8554ffd7dec09f8fb926518d4655ba6f2cd9383cb1e65f8ac7c67893"
+      "agents/consilium-implement-subagent.md": "35d4b4e4a57e4ae9a25ced46f2f9a94524f4052c5a6f148ff141911a594a5c8d"
     },
     "CONSILIUM-IMPLEMENT-TEST-WRITER-001": {
       "prompts/implement/test_writer.md": "3b14bef70c77157ce06d6aa600700be903bb729754e786b6f75b8efc2fc8e608"
     },
     "CONSILIUM-INFER-PIPELINE-001": {
-      "scripts/infer_pipeline.py": "cf76a442c4eb4a77896a6285a9321fcd6e482d420f8af013893854b6468b0994"
+      "scripts/infer_pipeline.py": "8e0d4d2b5b4b19e4272bdeadb37d5e17a2183bcdaaea304baeb2d74341963c2d"
     },
     "CONSILIUM-LENS-ESSENTIALIST-001": {
       "prompts/voices/essentialist_lens.md": "8b2c860805fbc308cce9614c2ecd6a04bfa04b67118c680ae87e63407464aa40"
@@ -50,53 +50,53 @@
       "prompts/voices/sentinel_lens.md": "2050e06a45f0c3fe785b1651edabcee68454908a1fe8142557ea81804fcbb0d9"
     },
     "CONSILIUM-LOG-FEEDBACK-001": {
-      "scripts/log_feedback.py": "78c556128881ace7aeb5411a77b2035fae1ba64f8b5b191881077a0c0f3c0bdf"
+      "scripts/log_feedback.py": "ec33e3cd3b75bda78dc6de45699c2838e3f56fdb189ea855d1891c335bcde3c3"
     },
     "CONSILIUM-MARK-OUTCOME-001": {
-      "scripts/mark_outcome.py": "bfb105119610bd8508e2d3947218d18bea9f7465de218bcce28f034f2fe5cbe4"
+      "scripts/mark_outcome.py": "adccf60a856f220da06704306eac139c3951986cc5055ce41c0d2eebf1655707"
     },
     "CONSILIUM-MEMORY-001": {
-      "scripts/memory.py": "60c43e3ad26e91954e1bda4631ecd9496a37d912a9f9d3489bb8b2d66c7f0f87"
+      "scripts/memory.py": "9ededeeaf6d1071f01fbde6c51509bc9311df6dd8ba5db956ff319de208a4968"
     },
     "CONSILIUM-MODE-SKEPTIC-ON-CHOSEN-001": {
-      "modes/skeptic_on_chosen.md": "5a8720bd03ddca30e230dc81a753f656abcd1ae525c6ababcaf24b8614de07ac"
+      "modes/skeptic_on_chosen.md": "e52a60d798eaa74f9dcbe80a0598f05c36e1caf22990ffbc96e7ad9d6475cc73"
     },
     "CONSILIUM-MODE-TRIAS-001": {
-      "modes/trias.md": "afc10ce4a3e56891729cc7f92fe5010938464735c79dbda2aff29f3bd78a9a6c"
+      "modes/trias.md": "ccbd133b6f77d106daf40edf1334d7dee8f73726772de9405a638f38ee70d65f"
     },
     "CONSILIUM-PRIORS-001": {
-      "scripts/priors.py": "b99b33d67b4e2f3ec921d03ab7e615380609bee3e9a68bb4ef3aebdc4eb7df6f"
+      "scripts/priors.py": "323e37aa81684364ccee7e4806bbc800bbbe9219af6d9e6d8cd95058273ac444"
     },
     "CONSILIUM-RENDER-FEEDBACK-HTML-001": {
-      "scripts/render_feedback_html.py": "01c510b0704950ee45f4beb24d71ad60468dd67ae4cc117c0d9ea133af904143"
+      "scripts/render_feedback_html.py": "c9eeb95f7fa18d8c432821823a714dba2c131cda38a3a50ab645bc3433909f41"
     },
     "CONSILIUM-RENDER-IMPL-PREVIEW-001": {
-      "scripts/render_impl_preview.py": "73b7d705541e722f0573f76a411bc68001ed4cd9cbb6dc298c907f8ec2d73d62"
+      "scripts/render_impl_preview.py": "6e13d7dbdf29bba7c9d6efb44888ac7925d0dab57073b4e080b076eda8e08f61"
     },
     "CONSILIUM-RUN-EVALS-001": {
-      "scripts/run_evals.py": "b87a4180f9b86244941843ce89818c32b0cd4167d4e283ca18a87a03500f301e"
+      "scripts/run_evals.py": "bd972049da7a948a7ae570d4e00f2513dcd8dd8469c17e46fac619968f51906a"
     },
     "CONSILIUM-SCOPE-GATE-001": {
-      "scripts/probe_change.py": "88ba363ff86a25d277674da5625cdc9e22c99c7b67f458d86c247fe123fa3479",
-      "scripts/scope_gate.py": "2059ce203bd21a55d45f9b69cf51fc893ab90a0ba4c92e1097ddea8bd23fc918"
+      "scripts/probe_change.py": "0cbde945697ee4a6bfe4d6e4c0c2df3e3ffe672d31605f1786ee4c4772467eb8",
+      "scripts/scope_gate.py": "345dfe6ff4450f7db6c920defda43c9390a0ca7ebfb2cc6331081bef0052c915"
     },
     "CONSILIUM-STRIP-CONTEXT-001": {
-      "scripts/strip_context.py": "5446605fd5c825962b484da0759700e7d219969e906d86daae7d292c502d9762"
+      "scripts/strip_context.py": "6900aa530bdba3792eb04b45863b07b126176dc2f1bc77ac7b2767dd91eff9ed"
     },
     "CONSILIUM-SUBAGENT-001": {
       "agents/consilium-subagent.md": "cb70f5ebe4542c2b3db68d5ae6de8c2d403122bc9063fac7649f4b6235a6703a"
     },
     "CONSILIUM-UTILS-001": {
-      "scripts/utils.py": "c5533818d454b0f6d4bf76aca5b5a7d0bb49c02bb04e6b329749f4839e9c131b"
+      "scripts/utils.py": "6ee17dbdce4a2c5cc6cd522e593a53ec6864da06de58a924a859a02c6526b294"
     },
     "CONSILIUM-VALIDATE-SKEPTIC-001": {
-      "scripts/validate_skeptic.py": "683c1bf3de2282961d985a53d8bd2de9caf4b78805a515e05b09b6cde64ef910"
+      "scripts/validate_skeptic.py": "3c54be066cffb61c2fc899b0a86d26c08e87ebbd9baf3031d74194b13e1d166f"
     },
     "CONSILIUM-VERSION-001": {
-      "scripts/version.py": "6cf545ecbe3a970b7b48005e9899246b9dd8fb9582ee84bb9cb84638e6adb4c0"
+      "scripts/version.py": "6ae7f2036dae4e1ee628759e0cc2f462354a7a3f01e153ce93a7aed46ca5b181"
     },
     "CONSILIUM-VOCABULARY-MAP-001": {
-      "scripts/vocabulary_map.py": "52b2efad75bfe41b539ae63d84398404723623794fde00124817963ca4e7e82d"
+      "scripts/vocabulary_map.py": "1306c350df919216b5bb4dc40ff690adf424ee6a8ab39c66f3c44c2e36663c0b"
     },
     "CONSILIUM-VOICE-CONSERVATOR-001": {
       "prompts/voices/conservator.md": "c026426e9c6cf1c769d35faf289ff71680f43020b3f861292e83b702deec2f69"
@@ -111,10 +111,10 @@
       "prompts/voices/skeptic.md": "bf0031cdf099a97b04e6657946c92c83ec5746175c91504e319ad5a019747aa4"
     },
     "CONSILIUM-VOTE-DEGENERACY-001": {
-      "scripts/vote_degeneracy.py": "e40c81b625f824c98b76e52dfc387935359dbbf12deb612ca9e90bd5486b20a8"
+      "scripts/vote_degeneracy.py": "38481f5fd61a49a4bbeb1099f6789d4e57607aed3a62607ba1bca6f8af38ff62"
     },
     "SKILL-RUN-CONSILIUM-001": {
-      ".claude/skills/run-consilium/driver.py": "0f6fda06b0b746df06600fd9e5396197f9ded6005e4236aef37693b119c6ccc5"
+      ".claude/skills/run-consilium/driver.py": "ff647812b85df1968510a15d133853912b0552fa2c7ecd5fbffc2ad8d39ee322"
     }
   }
 }

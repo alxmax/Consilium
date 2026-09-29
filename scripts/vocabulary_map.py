@@ -1,6 +1,7 @@
 """Human-readable translations for deliberation report values.
 
-Single source of truth for all user-facing natural language in Consilium outputs.
+Single source of truth for all user-facing natural language in Consilium
+outputs.
 
 CLI:
     python scripts/vocabulary_map.py reversibility complete
@@ -58,7 +59,9 @@ def translate(category: str, value: object) -> str:
     return cat.get(value, str(value) if value is not None else "")
 
 
-def compute_tokens_budget(magnitude: str, reversibility: str, meta: str | None = None) -> dict[str, int]:
+def compute_tokens_budget(
+    magnitude: str, reversibility: str, meta: str | None = None
+) -> dict[str, int]:
     """Compute per-voice token budget from Conservator's Q1+Q2 outputs.
 
     Returns dict with keys 'generator' and 'control'.
@@ -73,8 +76,15 @@ def compute_tokens_budget(magnitude: str, reversibility: str, meta: str | None =
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("category", help="e.g. reversibility, magnitude, meta_recommendation")
-    ap.add_argument("value", nargs="?", default=None, help="e.g. complete, trivial, scale_down")
+    ap.add_argument(
+        "category", help="e.g. reversibility, magnitude, meta_recommendation"
+    )
+    ap.add_argument(
+        "value",
+        nargs="?",
+        default=None,
+        help="e.g. complete, trivial, scale_down",
+    )
     args = ap.parse_args(argv)
     print(translate(args.category, args.value))
     return 0

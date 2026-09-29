@@ -13,7 +13,7 @@ Read this file first. Find your mode below and follow ONLY that section.
 - OS: Windows 11, PowerShell + Git Bash
 - Python: 3.11 on PATH
 - C++ compiler: `g++` (MSYS2 UCRT64, GCC 14.2.0) at `C:\msys64\ucrt64\bin\g++.exe` — `run_task.py` puts this on PATH before invoking `claude -p`, so `g++ -std=c++17 ...` works directly.
-- Default model + effort: Sonnet 5 + `--effort high`. Budget cap: `$1.5/task` default, raised to `$3.0/task` for `consilium_trias` and `superpowers` (multi-agent / multi-skill modes that exhaust $1.5 even on easy tasks). Override with `--budget`. Timeout: 15 min wall-clock per run.
+- Default model + effort: Sonnet 5.5 + `--effort high`. Budget cap: `$5/task`, uniform across modes. Override with `--budget`. Timeout: 15 min wall-clock per run.
 - All runs go through `python run_task.py` (headless `claude -p`, including `superpowers`).
 
 ---
@@ -64,7 +64,7 @@ doesn't drop the task content on consecutive invocations.
 ---
 
 ## SONNET BARE
-No skill or plugin. Plain Sonnet 5 baseline. Run via Claude Code:
+No skill or plugin. Plain Sonnet 5.5 baseline. Run via Claude Code:
 ```
 python run_task.py --mode sonnet_bare --task code/01_circuit_breaker
 ```

@@ -16,7 +16,8 @@ Auto-fill rules:
             outcome is unknown when it is logged, so Step 6 logs PEND;
             OK needs --confirmed (verification passed / user confirmed),
             confidence < 0.7 + user picks alt -> OVR with --override-target,
-            headless -> PEND_HEADLESS. PEND rows close later via mark_outcome.py.
+            headless -> PEND_HEADLESS. PEND rows close later via
+            mark_outcome.py.
 - note    : auto-derived from report shape, max 80 chars:
             * skipped report      -> "skipped: <skip_reason>"
             * all-vetoed (chosen=null) -> "all vetoed; relaxed=<X>"
@@ -35,10 +36,12 @@ Otherwise exits 0 and prints the appended entry summary to stdout.
 
 CLI:
     cat runs/<file>.json | python scripts/log_feedback.py
-    cat runs/<file>.json | python scripts/log_feedback.py --outcome OK --confirmed
+    cat runs/<file>.json | python scripts/log_feedback.py
+        --outcome OK --confirmed
     cat runs/<file>.json | python scripts/log_feedback.py --outcome OVR \\
         --override-target alt_b --user-note "preferred safer rollback"
-    python scripts/log_feedback.py --feedback path/to/FEEDBACK.html < report.json
+    python scripts/log_feedback.py --feedback path/to/FEEDBACK.html
+        < report.json
     python scripts/log_feedback.py --dry-run < report.json
 """
 # implements: CONSILIUM-LOG-FEEDBACK-001
@@ -52,20 +55,31 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
-from utils import FEEDBACK_PATH, atomic_write_text, canonical_run_path, force_utf8_streams, load_json_stdin
+from utils import (
+    FEEDBACK_PATH,
+    atomic_write_text,
+    canonical_run_path,
+    force_utf8_streams,
+    load_json_stdin,
+)
 
 
 CONTEXT_MAX = 60
 NOTE_MAX = 80
 HEADER_LINES = ()  # legacy MD header no longer used
 RUN_PATH_MAP = ".run_path_map.json"
-CONFIRMED_MARKER = "[confirmed]"  # same marker mark_outcome.py writes; priors.py rates only these rows
+CONFIRMED_MARKER = "[confirmed]"  # same marker mark_outcome.py writes;
+# priors.py rates only these rows
 
 
-def _fingerprint(date_str: str, chosen: str, context: str, run_id: str | None = None) -> str:
-    """16-char hex fingerprint for a feedback entry (used as sidecar map key).
+def _fingerprint(
+    date_str: str, chosen: str, context: str, run_id: str | None = None
+) -> str:
+    """16-char hex fingerprint for a feedback entry (used as sidecar
+    map key).
 
-    ``run_id`` is the basename of the run JSON file (e.g. ``2026-05-17_foo.json``).
+    ``run_id`` is the basename of the run JSON file
+    (e.g. ``2026-05-17_foo.json``).
     When provided it makes the fingerprint unique per run, preventing collisions
     between same-day entries with the same chosen+context prefix.  When absent
     (e.g. when recomputing fingerprints for rows already in FEEDBACK.html that
@@ -113,7 +127,13 @@ def derive_note(report: dict) -> str:
         return truncate(f"skipped: {report.get('skip_reason', '')}", NOTE_MAX)
 
     log = report.get("deliberation_log") or []
-    aggregate_step = next((s for s in log if isinstance(s, dict) and s.get("step") == "aggregate"), {})
+    aggregate_step = next(
+        (
+            s for s in log
+            if isinstance(s, dict) and s.get("step") == "aggregate"
+        ),
+        {},
+    )
     raw_result = aggregate_step.get("result")
     # Manual-assembled runs may put a narrative string in `result` instead of
     # the canonical aggregate dict; coerce to {} so note derivation keeps going.
@@ -121,15 +141,32 @@ def derive_note(report: dict) -> str:
 
     chosen = report.get("chosen_approach")
     if chosen is None:
-        relaxed = (aggregate_result.get("retry_suggested") or {}).get("relaxed_threshold")
-        relaxed_s = f"{relaxed:.2f}" if isinstance(relaxed, (int, float)) and not isinstance(relaxed, bool) else "?"
+        relaxed = (aggregate_result.get("retry_suggested") or {}).get(
+            "relaxed_threshold"
+        )
+        relaxed_s = (
+            f"{relaxed:.2f}"
+            if isinstance(relaxed, (int, float))
+            and not isinstance(relaxed, bool)
+            else "?"
+        )
         return truncate(f"all vetoed; relaxed={relaxed_s}", NOTE_MAX)
 
-    generator_step = next((s for s in log if isinstance(s, dict) and s.get("step") == "generator"), {})
+    generator_step = next(
+        (
+            s for s in log
+            if isinstance(s, dict) and s.get("step") == "generator"
+        ),
+        {},
+    )
     n_cand = len(generator_step.get("candidates") or [])
     n_vetoed = len(aggregate_result.get("vetoed") or [])
     conf = report.get("confidence")
-    conf_s = f"{conf:.2f}" if isinstance(conf, (int, float)) and not isinstance(conf, bool) else "?"
+    conf_s = (
+        f"{conf:.2f}"
+        if isinstance(conf, (int, float)) and not isinstance(conf, bool)
+        else "?"
+    )
     mode = (report.get("telemetry") or {}).get("mode", "?")
     return truncate(
         f"{n_cand} cand, {n_vetoed} vetoed, conf={conf_s}, mode={mode}",
@@ -181,7 +218,93 @@ def build_entry(
     }
 
 
-def append_entry(feedback_path: Path, entry: dict, run_path: str | None) -> int:
+def _load_sibling(mod_name: str, filename: str):
+    """Load a sibling script by path (importlib; scripts are not a package)."""
+    import importlib.util
+    here = Path(__file__).resolve().parent
+    spec = importlib.util.spec_from_file_location(mod_name, here / filename)
+    assert spec and spec.loader
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[mod_name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _row_run_path(row: dict, run_map: dict[str, str]) -> str | None:
+    """Restore run_path for an existing row from the sidecar map so
+    drill-down survives re-renders. For each row, reconstruct its
+    fingerprint using the run_id extracted from each known
+    run_path; on a match the row's run_path is recovered. Rows
+    logged without a run_id used an unstable timestamp and cannot
+    be matched — they fall back to run_path=None (legacy
+    behaviour)."""
+    for fp, rp in run_map.items():
+        run_id_candidate = Path(rp).name if rp else None
+        fp_candidate = _fingerprint(
+            row["date"], row["chosen"], row["context"],
+            run_id=run_id_candidate,
+        )
+        if fp_candidate == fp:
+            return rp
+    return None
+
+
+def _find_run_row(
+    existing: list[dict], run_map: dict[str, str], run_path: str | None
+) -> int | None:
+    """Index of the existing row already mapped to ``run_path``, if any."""
+    if not (run_path and run_path in run_map.values()):
+        return None
+    for i, row in enumerate(existing):
+        if _row_run_path(row, run_map) == run_path:
+            return i
+    return None
+
+
+def _stable_fp(row: dict) -> str:
+    return hashlib.sha256(
+        f"{row['date']}|{row['chosen']}|{row['context']}".encode()
+    ).hexdigest()[:16]
+
+
+def _print_duplicate(new_fp: str) -> None:
+    print(
+        f"log_feedback: duplicate entry (fp {new_fp[:8]}) — "
+        "already in FEEDBACK.html, skipping append.",
+        file=sys.stderr,
+    )
+
+
+def _existing_entries(
+    existing: list[dict], run_map: dict[str, str], render_mod
+) -> list:
+    return [
+        render_mod.Entry(**row, run_path=_row_run_path(row, run_map))
+        for row in existing
+    ]
+
+
+def _upgrade_entries(
+    existing: list[dict],
+    matched_idx: int,
+    entry: dict,
+    run_map: dict[str, str],
+    render_mod,
+) -> list:
+    """Outcome update (PEND -> OK/BAD/OVR): patch the matched row with the
+    new outcome/note (and vote_pattern when given) and return the full
+    re-render list."""
+    prior = existing[matched_idx]
+    prior["outcome"] = entry["outcome"]
+    prior["note"] = entry["note"]
+    if entry.get("vote_pattern"):
+        prior["vote_pattern"] = entry["vote_pattern"]
+    return _existing_entries(existing, run_map, render_mod)
+
+
+def append_entry(
+    feedback_path: Path, entry: dict, run_path: str | None
+) -> int:
     """Round-trip the HTML: parse existing rows, append, re-render.
 
     Returns:
@@ -192,105 +315,56 @@ def append_entry(feedback_path: Path, entry: dict, run_path: str | None) -> int:
     Callers can use the return value to track how many real appends happened —
     important for audit_feedback's --backfill summary.
     """
-    import importlib.util
-    here = Path(__file__).resolve().parent
-    import sys as _sys
-
-    feedback_spec = importlib.util.spec_from_file_location("consilium_feedback", here / "feedback.py")
-    assert feedback_spec and feedback_spec.loader
-    feedback_mod = importlib.util.module_from_spec(feedback_spec)
-    _sys.modules["consilium_feedback"] = feedback_mod
-    feedback_spec.loader.exec_module(feedback_mod)
-
-    render_spec = importlib.util.spec_from_file_location("consilium_render", here / "render_feedback_html.py")
-    assert render_spec and render_spec.loader
-    render_mod = importlib.util.module_from_spec(render_spec)
-    _sys.modules["consilium_render"] = render_mod
-    render_spec.loader.exec_module(render_mod)
+    feedback_mod = _load_sibling("consilium_feedback", "feedback.py")
+    render_mod = _load_sibling("consilium_render", "render_feedback_html.py")
 
     existing = feedback_mod.parse_feedback(feedback_path)
     runs_dir = feedback_path.parent / "runs"
     run_map = _load_map(runs_dir)
 
     run_id = Path(run_path).name if run_path else None
-    new_fp = _fingerprint(entry["date"], entry["chosen"], entry["context"], run_id=run_id)
-
-    # Restore run_path for existing rows from the sidecar map so drill-down
-    # survives re-renders. For each row, reconstruct its fingerprint using the
-    # run_id extracted from each known run_path; on a match the row's run_path is
-    # recovered. Rows logged without a run_id used an unstable timestamp and
-    # cannot be matched — they fall back to run_path=None (legacy behaviour).
-    def _row_run_path(row: dict) -> str | None:
-        for fp, rp in run_map.items():
-            run_id_candidate = Path(rp).name if rp else None
-            fp_candidate = _fingerprint(row["date"], row["chosen"], row["context"], run_id=run_id_candidate)
-            if fp_candidate == fp:
-                return rp
-        return None
+    new_fp = _fingerprint(
+        entry["date"], entry["chosen"], entry["context"], run_id=run_id
+    )
 
     # Close-the-loop: when run_path already has a row, distinguish a true
     # duplicate (same outcome — skip) from an outcome update (PEND -> OK/BAD/OVR
     # — upgrade the row in place). The old blanket "run_path seen => duplicate"
     # swallowed Step-6 close-the-loop calls, leaving PEND rows un-upgraded.
-    matched_idx = None
-    if run_path and run_path in run_map.values():
-        for i, row in enumerate(existing):
-            if _row_run_path(row) == run_path:
-                matched_idx = i
-                break
-
+    matched_idx = _find_run_row(existing, run_map, run_path)
     if matched_idx is not None:
         assert run_path  # matched_idx is only set when run_path is truthy
         prior = existing[matched_idx]
         if prior.get("outcome") == entry["outcome"]:
-            print(
-                f"log_feedback: duplicate entry (fp {new_fp[:8]}) — already in FEEDBACK.html, skipping append.",
-                file=sys.stderr,
-            )
+            _print_duplicate(new_fp)
             run_map[new_fp] = run_path
             _save_map(runs_dir, run_map)
             return 3
-        prior["outcome"] = entry["outcome"]
-        prior["note"] = entry["note"]
-        if entry.get("vote_pattern"):
-            prior["vote_pattern"] = entry["vote_pattern"]
-        entries = [render_mod.Entry(**row, run_path=_row_run_path(row)) for row in existing]
+        entries = _upgrade_entries(existing, matched_idx, entry, run_map,
+                                   render_mod)
         run_map[new_fp] = run_path
         _save_map(runs_dir, run_map)
-        atomic_write_text(feedback_path, render_mod.render(entries, runs_dir))
+        atomic_write_text(
+            feedback_path, render_mod.render(entries, runs_dir)
+        )
         print(
-            f"log_feedback: upgraded {prior['chosen']} -> {entry['outcome']} in place (run {run_id}).",
+            f"log_feedback: upgraded {prior['chosen']} -> "
+            f"{entry['outcome']} in place (run {run_id}).",
             file=sys.stderr,
         )
         return 0
 
     # Content-only duplicate check for rows logged WITHOUT a run_path:
-    # same date+chosen+full-context means the same entry (no timestamp component).
-    if not run_path:
-        stable_fp = hashlib.sha256(
-            f"{entry['date']}|{entry['chosen']}|{entry['context']}".encode()
-        ).hexdigest()[:16]
-        stable_existing = {
-            hashlib.sha256(
-                f"{row['date']}|{row['chosen']}|{row['context']}".encode()
-            ).hexdigest()[:16]
-            for row in existing
-        }
-        if stable_fp in stable_existing:
-            print(
-                f"log_feedback: duplicate entry (fp {new_fp[:8]}) — already in FEEDBACK.html, skipping append.",
-                file=sys.stderr,
-            )
-            return 3
+    # same date+chosen+full-context means the same entry (no
+    # timestamp component).
+    if not run_path and _stable_fp(entry) in {
+        _stable_fp(row) for row in existing
+    }:
+        _print_duplicate(new_fp)
+        return 3
 
-    entries = [
-        render_mod.Entry(
-            **row,
-            run_path=_row_run_path(row),
-        )
-        for row in existing
-    ]
-    new_entry = render_mod.Entry(
+    entries = _existing_entries(existing, run_map, render_mod)
+    entries.append(render_mod.Entry(
         date=entry["date"],
         context=entry["context"],
         chosen=entry["chosen"],
@@ -298,10 +372,10 @@ def append_entry(feedback_path: Path, entry: dict, run_path: str | None) -> int:
         note=entry["note"],
         run_path=run_path,
         vote_pattern=entry.get("vote_pattern", ""),
-    )
-    entries.append(new_entry)
+    ))
 
-    # Persist run_path for the new entry so future re-renders can recover it.
+    # Persist run_path for the new entry so future re-renders can
+    # recover it.
     if run_path:
         run_map[new_fp] = run_path
         _save_map(runs_dir, run_map)
@@ -310,29 +384,111 @@ def append_entry(feedback_path: Path, entry: dict, run_path: str | None) -> int:
     return 0
 
 
-def main(argv: list[str] | None = None) -> int:
-    force_utf8_streams()
+def _build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--feedback", default=None, help="path to FEEDBACK.html (default: .consilium/FEEDBACK.html)")
-    ap.add_argument("--dry-run", action="store_true", help="print summary, don't write file")
+    ap.add_argument(
+        "--feedback",
+        default=None,
+        help="path to FEEDBACK.html (default: .consilium/FEEDBACK.html)",
+    )
+    ap.add_argument(
+        "--dry-run", action="store_true",
+        help="print summary, don't write file",
+    )
     ap.add_argument(
         "--outcome",
         choices=("OK", "BAD", "OVR", "PEND", "PEND_HEADLESS"),
         default="PEND",
-        help="outcome to record (default: PEND; set OK/OVR after confidence-gated user prompt; use PEND_HEADLESS in headless/CI context to avoid polluting pend_pressure)",
+        help=(
+            "outcome to record (default: PEND; set OK/OVR after "
+            "confidence-gated user prompt; use PEND_HEADLESS in "
+            "headless/CI context to avoid polluting pend_pressure)"
+        ),
     )
-    ap.add_argument("--override-target", default=None, help="alt_id when --outcome=OVR")
-    ap.add_argument("--user-note", default=None, help="optional user-supplied note appended to auto-note")
-    ap.add_argument("--run-path", default=None, help="relative path to runs/*.json for drill-down (e.g. runs/2026-05-12_foo.json)")
-    ap.add_argument("--force-override", action="store_true",
-        help="allow --outcome OK even when confidence < 0.70 (use when user has confirmed the pick despite low confidence)")
-    ap.add_argument("--confirmed", action="store_true",
-        help="the outcome was verified (the verification command passed, or the user confirmed it worked); "
-             "required for --outcome OK; adds the [confirmed] marker")
-    args = ap.parse_args(argv)
+    ap.add_argument(
+        "--override-target", default=None,
+        help="alt_id when --outcome=OVR",
+    )
+    ap.add_argument(
+        "--user-note", default=None,
+        help="optional user-supplied note appended to auto-note",
+    )
+    ap.add_argument(
+        "--run-path", default=None,
+        help=(
+            "relative path to runs/*.json for drill-down "
+            "(e.g. runs/2026-05-12_foo.json)"
+        ),
+    )
+    ap.add_argument(
+        "--force-override", action="store_true",
+        help=(
+            "allow --outcome OK even when confidence < 0.70 (use "
+            "when user has confirmed the pick despite low confidence)"
+        ),
+    )
+    ap.add_argument(
+        "--confirmed", action="store_true",
+        help=(
+            "the outcome was verified (the verification command "
+            "passed, or the user confirmed it worked); "
+            "required for --outcome OK; adds the [confirmed] marker"
+        ),
+    )
+    return ap
+
+
+def _check_ok_gate(args: argparse.Namespace, report: dict) -> int | None:
+    """Guards for --outcome OK; returns an exit code, or None to proceed."""
+    if args.outcome == "OK" and not args.confirmed:
+        print(
+            "log_feedback: --outcome OK is a verified outcome — pass "
+            "--confirmed once the verification passed; otherwise log "
+            "PEND (default) and close it later with mark_outcome.py",
+            file=sys.stderr,
+        )
+        return 1
+
+    if args.outcome == "OK":
+        conf = report.get("confidence")
+        below = conf is None or (
+            isinstance(conf, (int, float))
+            and not isinstance(conf, bool)
+            and conf < 0.7
+        )
+        if below and not args.force_override:
+            conf_s = (
+                f"{conf:.2f}"
+                if isinstance(conf, (int, float))
+                and not isinstance(conf, bool)
+                else str(conf)
+            )
+            print(
+                f"confidence {conf_s} is below threshold 0.70 — "
+                "pass --force-override to log OK despite low confidence",
+                file=sys.stderr,
+            )
+            return 1
+    return None
+
+
+def _entry_line(entry: dict) -> str:
+    return (
+        f"{entry['date']} | {entry['context']} | {entry['chosen']} | "
+        f"{entry['outcome']} | {entry['note']}"
+    )
+
+
+def main(argv: list[str] | None = None) -> int:
+    force_utf8_streams()
+    args = _build_parser().parse_args(argv)
 
     if args.outcome == "OVR" and not args.override_target:
-        print("log_feedback: --outcome OVR requires --override-target <alt_id>", file=sys.stderr)
+        print(
+            "log_feedback: --outcome OVR requires "
+            "--override-target <alt_id>",
+            file=sys.stderr,
+        )
         sys.exit(2)
 
     report = load_json_stdin("log_feedback.py")
@@ -340,25 +496,9 @@ def main(argv: list[str] | None = None) -> int:
         print("log_feedback.py: report must be a JSON object", file=sys.stderr)
         return 2
 
-    if args.outcome == "OK" and not args.confirmed:
-        print(
-            "log_feedback: --outcome OK is a verified outcome — pass --confirmed once the "
-            "verification passed; otherwise log PEND (default) and close it later with mark_outcome.py",
-            file=sys.stderr,
-        )
-        return 1
-
-    if args.outcome == "OK":
-        conf = report.get("confidence")
-        below = conf is None or (isinstance(conf, (int, float)) and not isinstance(conf, bool) and conf < 0.7)
-        if below and not args.force_override:
-            conf_s = f"{conf:.2f}" if isinstance(conf, (int, float)) and not isinstance(conf, bool) else str(conf)
-            print(
-                f"confidence {conf_s} is below threshold 0.70 — "
-                "pass --force-override to log OK despite low confidence",
-                file=sys.stderr,
-            )
-            return 1
+    gate_rc = _check_ok_gate(args, report)
+    if gate_rc is not None:
+        return gate_rc
 
     try:
         entry = build_entry(
@@ -373,16 +513,21 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     if not args.dry_run:
-        feedback_path = Path(args.feedback) if args.feedback else FEEDBACK_PATH
-        run_path = canonical_run_path(args.run_path) if args.run_path else None
+        feedback_path = (
+            Path(args.feedback) if args.feedback else FEEDBACK_PATH
+        )
+        run_path = (
+            canonical_run_path(args.run_path) if args.run_path else None
+        )
         rc = append_entry(feedback_path, entry, run_path)
         if rc != 0:
-            # Exit 3 means duplicate detected — prefix the line so callers parsing
-            # stdout can distinguish "duplicate skipped" from a real "success" write.
-            print(f"skipped (duplicate): {entry['date']} | {entry['context']} | {entry['chosen']} | {entry['outcome']} | {entry['note']}")
+            # Exit 3 means duplicate detected — prefix the line so
+            # callers parsing stdout can distinguish "duplicate
+            # skipped" from a real "success" write.
+            print(f"skipped (duplicate): {_entry_line(entry)}")
             return rc
 
-    print(f"{entry['date']} | {entry['context']} | {entry['chosen']} | {entry['outcome']} | {entry['note']}")
+    print(_entry_line(entry))
     return 0
 
 
