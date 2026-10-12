@@ -7,7 +7,8 @@ its private source across rebuilds and dev->demo migrations — a private-repo
 reference becomes un-shippable rather than a silent leak (e.g. the explainer's
 "View repository" link, which once pointed at the private repo).
 
-    python scripts/check_public_leak.py        # exit 1 + offending file:line on any hit
+    python scripts/check_public_leak.py
+    # exit 1 + offending file:line on any hit
 
 Stdlib only. Wired into CI (.github/workflows/ci.yml). Patterns are written
 with character classes so this guard file does not match its own source.
@@ -24,8 +25,14 @@ from pathlib import Path
 # Owner-qualified repo refs only (the bare project name "consilium" appears in
 # countless legitimate paths/strings). `_Demo` is the allowed public repo.
 PATTERNS = [
-    (re.compile(r"alxmax/[Cc]onsilium(?!_[Dd]emo)"), "reference to the private dev repo"),
-    (re.compile(r"Desktop[\\/]+Doc[\\/]+[Cc]onsilium"), "local dev absolute path"),
+    (
+        re.compile(r"alxmax/[Cc]onsilium(?!_[Dd]emo)"),
+        "reference to the private dev repo",
+    ),
+    (
+        re.compile(r"Desktop[\\/]+Doc[\\/]+[Cc]onsilium"),
+        "local dev absolute path",
+    ),
 ]
 SKIP_SUFFIX = (".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg",
                ".woff", ".woff2", ".ttf", ".zip", ".pdf")
@@ -39,7 +46,11 @@ def tracked_files() -> list[str]:
     # then silently dropped from the leak scan by main()'s `except OSError`.
     # Same fix already applied in probe_change._run_numstat (PR #332).
     out = subprocess.run(
-        ["git", "ls-files"], capture_output=True, text=True, encoding="utf-8", check=True
+        ["git", "ls-files"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=True,
     ).stdout
     return [f for f in out.splitlines() if f.strip()]
 
@@ -71,8 +82,12 @@ def main() -> int:
         hits.extend(scan_text(f, text))
 
     if hits:
-        print("public-leak guard FAILED — the published repo must not point back to "
-              "the private dev repo or leak local paths:", file=sys.stderr)
+        print(
+            "public-leak guard FAILED — the published repo must not "
+            "point back to "
+            "the private dev repo or leak local paths:",
+            file=sys.stderr,
+        )
         print("\n".join(hits), file=sys.stderr)
         return 1
     print("public-leak guard: clean")

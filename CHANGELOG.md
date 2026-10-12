@@ -4,6 +4,35 @@ All notable changes to Consilium are recorded here, following
 [Keep a Changelog](https://keepachangelog.com/). This project is source-available
 under the Business Source License 1.1 (see `LICENSE`).
 
+## [1.12.4] — 2026-09-29
+
+### Added
+- `scripts/validate_implement_output.py`: a stdlib validator for the STRICT-JSON output of the implement Coder, Test Writer and the implement-subagent manifest (blocked/reason rules, disjoint paths, scope escapes, `fails_on_empty_impl`, red->green reporting). Exit 0 ok, 1 problems, 2 not JSON. The implement-subagent spec now runs it before trusting a role's output (same single retry as any schema-invalid output).
+- Tests for it (`test_validate_implement_output.py`) tie Coder AC-1..3 and Test Writer AC-1..2 to real checks, and assert the validator's key sets match the JSON examples in the three spec files so they cannot drift apart.
+
+### Changed
+- Those five cases no longer carry `verifiable by: inspection`. Test Writer AC-3 stays inspection: no spec pins the shape of `uncoverable[]` or how a test refers to it, so "no test is emitted for it" has nothing to check against.
+
+## [1.12.3] — 2026-09-29
+
+### Changed
+- Behavior-preserving refactor of the long functions, deep nesting, long parameter lists and module-state writes the design pass flagged (33 candidates -> 7): `aggregator.py`, `validate_report.py`, `log_feedback.py`, `mark_outcome.py`, `audit_feedback.py`, `feedback.py`, `check_doc_drift.py`, `check_versions.py`, `build_report.py`, `infer_pipeline.py`, `implement_pipeline.py`, `render_impl_preview.py`, `scope_gate.py`, `confidence_calibration.py` (now takes a `Thresholds` tuple), `memory.py`, `priors.py` and the run-consilium driver. Public names, CLI flags, exit codes and output are unchanged.
+- Not addressed on purpose: the five files over 500 lines and the two function-name-prefix families; splitting them would break the stdlib-only stand-alone-script convention.
+
+## [1.12.2] — 2026-09-28
+
+### Fixed
+- Acceptance-case traceability: every case of the implement pipeline, aggregator, validate-report, vocabulary-map and lens-ladder requirements is now tied to a `# verifies:` test (new tests for the pipeline CLI and gate edge cases, `team_vote`, `validate_report` exit codes and the lens_applied problem text). The Coder and Test Writer cases describe model output and are marked `verifiable by: inspection`.
+
+### Changed
+- Dropped four `test_exempt` exemptions that were stale (`feedback.py`, `check_public_leak.py`, `mark_outcome.py`, `memory.py`) by testing them; the other 17 stay because they cover model-run prompts, agent specs or integration harnesses.
+
+## [1.12.1] — 2026-09-28
+
+### Changed
+- Benchmark harness now targets Claude Sonnet 5.5 (`claude-sonnet-5-5`) by default and for the `sonnet_bare` pin and verifier judge; the Opus 5.5 batch runs with `--model claude-opus-5-5`.
+- Docs and the architecture explainer name Sonnet 5.5 for the voices and sub-agents (dispatch already tracks the `sonnet` alias).
+
 ## [1.12.0] — 2026-09-22
 
 ### Removed

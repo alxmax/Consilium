@@ -5,7 +5,6 @@ status: confirmed
 level: code
 layer: feature
 owner: alxmax
-test_exempt: "subprocess git ls-files and filesystem scan — integration-only"
 depends_on: []
 risk: 1
 satisfies: [ARCH-CONSILIUM-REPO-GATES-001]
@@ -48,7 +47,3 @@ Every line in this section is binding.
 ## Context (non-binding)
 
 **Current implementation** — `scripts/check_public_leak.py`.
-
-## Why test_exempt
-
-`check_public_leak.py` shells out to `git ls-files` and scans all tracked file paths for local-path strings and private-repo references. Reproducing the scan in a unit test requires a real git repository with a known tracked file set. The CI run against the actual repo serves as the acceptance test — the script is meaningless outside a real git working tree.

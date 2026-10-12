@@ -149,7 +149,7 @@ function EfficiencySection() {
         <div style={{ marginTop: 32, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
           {[
             { role: 'Orchestrator', model: 'your session model', color: 'var(--con)', note: 'the main Claude Code session that runs the workflow and dispatches sub-agents — on whatever model you launched Claude Code with (Opus or Sonnet). The skill does not pin it; Opus gives the strongest orchestration.' },
-            { role: 'Voices & sub-agents', model: 'Sonnet 5', color: 'var(--ctl)', note: 'Generator · Control · Conservator · Skeptic · Trias personalities — pinned to model: "sonnet"; they do not inherit the session model.' },
+            { role: 'Voices & sub-agents', model: 'Sonnet 5.5', color: 'var(--ctl)', note: 'Generator · Control · Conservator · Skeptic · Trias personalities — pinned to model: "sonnet"; they do not inherit the session model.' },
             { role: 'Override', model: '→ Opus', color: 'var(--gen)', note: 'an opt-in that bumps the Generator from its pinned Sonnet up to Opus for high-stakes / ambiguous changes.' },
           ].map((m) => (
             <div key={m.role} style={{ padding: '14px 16px', border: '1px solid var(--rule)', borderTop: `3px solid ${m.color}`, borderRadius: 4, background: 'var(--paper)' }}>

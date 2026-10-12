@@ -31,7 +31,7 @@ description: Cross-cutting flag — +1 Skeptic sub-agent over any base mode post
 
 ## Workflow
 1. Run the full base mode (any: Sequential / Dialectic / Trias) → produces `chosen`, `confidence`, intermediate report
-2. If an auto-trigger condition above holds or the `--skeptic-on-chosen` flag is active, dispatch 1 Sonnet 5 sub-agent with `prompts/voices/skeptic.md` inline + minimal input:
+2. If an auto-trigger condition above holds or the `--skeptic-on-chosen` flag is active, dispatch 1 Sonnet 5.5 sub-agent with `prompts/voices/skeptic.md` inline + minimal input:
    ```
    chosen: <id, summary, sketch, rationale>
    success_criterion: <the testable sentence>

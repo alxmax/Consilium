@@ -1,7 +1,7 @@
 # BENCHMARK COMMANDS
 
-All runs use `claude -p` headless mode (Sonnet 5 by default, effort=high,
-budget cap $3/task).
+All runs use `claude -p` headless mode (Sonnet 5.5 by default, effort=high,
+budget cap $5/task).
 
 > **Easy mode:** the wrapper at `scripts/run.py` covers the common batches
 > (`python scripts/run.py all`, `mode`, `task`, `report`). It runs in
@@ -42,9 +42,10 @@ claude --version
 ```
 --clean             → wipe this task's workspace before running
 --rep N             → write to workspace/<mode>/<task>/rep_<N>/ (single slot)
---model    claude-sonnet-5   (default; sonnet_bare pins claude-sonnet-5)
+--model    claude-sonnet-5-5   (default; sonnet_bare pins claude-sonnet-5-5;
+                                pass claude-opus-5-5 for the Opus 5.5 batch)
 --effort   high                (default; choices: low/medium/high/xhigh/max)
---budget   3.0                 (USD cap; halts with `error_max_budget` if hit)
+--budget   5.0                 (USD cap; halts with `error_max_budget` if hit)
 --no-verify                    (skip automatic verify step after the run)
 ```
 
@@ -199,7 +200,7 @@ python analyze.py
 
 ## TOTAL
 
-5 modes × 3 tasks = 15 runs. Budget cap @ $3/task → maximum spend ~$45.
+5 modes × 3 tasks = 15 runs. Budget cap @ $5/task → maximum spend ~$75.
 Reasoning-only tasks typically cost well under $1 each.
 
 ---

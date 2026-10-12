@@ -41,3 +41,4 @@ AC-3
 
 ## WHERE — Current implementation
 - prompts/implement/coder.md
+- scripts/validate_implement_output.py

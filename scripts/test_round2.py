@@ -68,6 +68,39 @@ class TestVocabularyMap(unittest.TestCase):
         self.assertEqual(budget["generator"], 1200)
 
 
+class TestVocabularyMapCases(unittest.TestCase):
+    # verifies: CONSILIUM-VOCABULARY-MAP-001#CASE-1
+    def test_translate_reversibility_complete_exact(self):
+        self.assertEqual(
+            translate("reversibility", "complete"), "ușor de anulat")
+
+    # verifies: CONSILIUM-VOCABULARY-MAP-001#CASE-2
+    def test_translate_verdict_go(self):
+        self.assertEqual(translate("verdict", "GO"), "aprobat de majoritate")
+
+    # verifies: CONSILIUM-VOCABULARY-MAP-001#CASE-3
+    def test_compute_tokens_budget_critical_irreversible_dict(self):
+        self.assertEqual(
+            compute_tokens_budget("critical", "irreversible"),
+            {"generator": 4000, "control": 4000},
+        )
+
+    # verifies: CONSILIUM-VOCABULARY-MAP-001#CASE-4
+    def test_scale_down_is_300_for_every_magnitude_and_reversibility(self):
+        for magnitude in ("trivial", "moderate", "high", "critical"):
+            for reversibility in ("complete", "partial", "irreversible"):
+                self.assertEqual(
+                    compute_tokens_budget(
+                        magnitude, reversibility, meta="scale_down"),
+                    {"generator": 300, "control": 300},
+                )
+
+    # verifies: CONSILIUM-VOCABULARY-MAP-001#CASE-5
+    def test_translate_unknown_category_or_value_returns_str_value(self):
+        self.assertEqual(translate("nonexistent", "value"), "value")
+        self.assertEqual(translate("reversibility", "bogus"), "bogus")
+
+
 class TestAggregateRound2(unittest.TestCase):
     def _base_conservator(self, reversibility="complete", magnitude="trivial", meta=None, flag=False):
         # Mirror the real conservator.md output contract: every per-candidate
@@ -118,6 +151,22 @@ class TestAggregateRound2(unittest.TestCase):
         self.assertEqual(result["result"], "BLOCK")
         self.assertEqual(result["reason"], "glossary_fail")
 
+    # verifies: CONSILIUM-AGGREGATOR-001#CASE-4
+    def test_glossary_fail_blocks_regardless_of_other_signals(self):
+        result = aggregator.aggregate_sequential(
+            self._base_generator(abstain=True),
+            self._base_control(
+                glossary_fail=True,
+                disagreements=[
+                    {"between": ["g", "c"], "type": "substantial",
+                     "detail": "x"}
+                ],
+            ),
+            self._base_conservator(meta="scale_up", flag=True),
+        )
+        self.assertEqual(result["result"], "BLOCK")
+        self.assertEqual(result["reason"], "glossary_fail")
+
     def test_irreversibility_flag_blocks(self):
         result = aggregator.aggregate_sequential(
             self._base_generator(),
@@ -151,6 +200,7 @@ class TestAggregateRound2(unittest.TestCase):
         )
         self.assertEqual(result["result"], "ADAPT_EXTENDED")
 
+    # verifies: CONSILIUM-AGGREGATOR-001#CASE-5
     def test_three_triggers_escalate(self):
         result = aggregator.aggregate_sequential(
             self._base_generator(abstain=True),
@@ -238,6 +288,7 @@ class TestConservativeOverride(unittest.TestCase):
         self.assertEqual(result["chosen"], "at_080")
         self.assertEqual([v["id"] for v in result["vetoed"]], ["over_081"])
 
+    # verifies: CONSILIUM-AGGREGATOR-001#CASE-1
     def test_all_vetoed_auto_relax_suggests_retry(self):
         # Acceptance #1: every candidate over threshold, auto_relax on ->
         # chosen null + non-empty retry_suggested with the lowest risk relaxed.
@@ -251,6 +302,7 @@ class TestConservativeOverride(unittest.TestCase):
         self.assertEqual(result["retry_suggested"]["lowest_risk_candidate"]["id"], "b")
         self.assertNotIn("escalation_required", result)
 
+    # verifies: CONSILIUM-AGGREGATOR-001#CASE-2
     def test_lower_risk_ranks_first(self):
         # Acceptance #2: identical generator+control, different conservator ->
         # the lower-risk candidate ranks first.
@@ -259,6 +311,7 @@ class TestConservativeOverride(unittest.TestCase):
             self._cand("safe", 0.7, 0.7, 0.20),
         ])
         self.assertEqual(result["chosen"], "safe")
+        self.assertEqual(result["ranking"][0]["id"], "safe")
 
     def test_equal_score_tiebreak_prefers_safer(self):
         # Genuine weighted-score tie (both == 0.6): safer (lower conservator)
@@ -281,6 +334,22 @@ class TestConservativeOverride(unittest.TestCase):
         self.assertIsNone(result["chosen"])
         self.assertTrue(result["escalation_required"])
         self.assertNotIn("retry_suggested", result)
+
+
+class TestTeamVote(unittest.TestCase):
+    # verifies: CONSILIUM-AGGREGATOR-001#CASE-3
+    def test_two_one_vote_picks_majority_and_records_dissent(self):
+        result = aggregator.aggregate_team_vote(
+            [
+                {"name": "essentialist", "chose": "A"},
+                {"name": "verifier", "chose": "A"},
+                {"name": "sentinel", "chose": "B"},
+            ],
+            [{"id": "A"}, {"id": "B"}],
+        )
+        self.assertEqual(result["vote_pattern"], "2-1")
+        self.assertEqual(result["chosen"], "A")
+        self.assertTrue(result["dissent"])
 
 
 class TestValidateReportRound2(unittest.TestCase):
@@ -357,6 +426,75 @@ class TestValidateTriasTrigger(unittest.TestCase):
             any(p.startswith("trias:") for p in problems),
             f"sequential report must NOT trigger trias checks; got {problems}",
         )
+
+
+class ValidateReportCli(unittest.TestCase):
+    """validate_report.main exit codes: 0 valid, 1 invalid, 2 bad JSON."""
+
+    @staticmethod
+    def _valid_report():
+        return {
+            "success_criterion": "x",
+            "verification": "x",
+            "chosen_approach": "x",
+            "confidence": 0.8,
+            "telemetry": {"mode": "sequential", "voices": {}},
+            "pipeline_executed": True,
+            "deliberation_log": [
+                {"step": "generator"},
+                {"step": "control"},
+                {"step": "aggregate", "result": {"chosen": "x"}},
+            ],
+        }
+
+    def _run_cli(self, text):
+        import contextlib, io, tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as td:
+            f = Path(td) / "report.json"
+            f.write_text(text, encoding="utf-8")
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                rc = validate_report.main(["--input", str(f)])
+        return rc, err.getvalue()
+
+    def _run_report(self, report):
+        import json
+        return self._run_cli(json.dumps(report))
+
+    # verifies: CONSILIUM-VALIDATE-REPORT-001#CASE-1
+    def test_valid_report_exits_0(self):
+        rc, _ = self._run_report(self._valid_report())
+        self.assertEqual(rc, 0)
+
+    # verifies: CONSILIUM-VALIDATE-REPORT-001#CASE-2
+    def test_missing_success_criterion_exits_1_naming_field(self):
+        report = self._valid_report()
+        del report["success_criterion"]
+        rc, err = self._run_report(report)
+        self.assertEqual(rc, 1)
+        self.assertIn("success_criterion", err)
+
+    # verifies: CONSILIUM-VALIDATE-REPORT-001#CASE-3
+    def test_skipped_without_skip_reason_exits_1(self):
+        report = self._valid_report()
+        report["skipped"] = True
+        rc, err = self._run_report(report)
+        self.assertEqual(rc, 1)
+        self.assertIn("skip_reason", err)
+
+    # verifies: CONSILIUM-VALIDATE-REPORT-001#CASE-4
+    def test_missing_telemetry_mode_exits_1(self):
+        report = self._valid_report()
+        del report["telemetry"]["mode"]
+        rc, err = self._run_report(report)
+        self.assertEqual(rc, 1)
+        self.assertIn("telemetry.mode", err)
+
+    # verifies: CONSILIUM-VALIDATE-REPORT-001#CASE-5
+    def test_malformed_json_exits_2(self):
+        rc, _ = self._run_cli("{not json")
+        self.assertEqual(rc, 2)
 
 
 class ValidateReportSweep(unittest.TestCase):

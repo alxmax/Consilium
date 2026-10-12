@@ -21,7 +21,8 @@ from collections import Counter
 from pathlib import Path
 
 # Loaded via importlib from several entry points (priors, log_feedback,
-# mark_outcome, audit_feedback), so scripts/ may not be on sys.path. Bootstrap it.
+# mark_outcome, audit_feedback), so scripts/ may not be on sys.path.
+# Bootstrap it.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from utils import FEEDBACK_PATH, RUNS_DIR
 
@@ -49,73 +50,70 @@ def _strip_tags(s: str) -> str:
     return _html.unescape(s).strip()
 
 
+# Legacy positional layouts (rows without data-field attrs), keyed by cell
+# count; values are cell indices for (date, context, chosen, outcome, note,
+# vote_pattern), None = absent.
+# Trias layout (8 cells): [chev, date, context, chosen, outcome, tokens,
+# note, vote_pattern]
+# Previous layout (7 cells): [chev, date, context, chosen, outcome, tokens,
+# note]
+# Legacy layout (6 cells): [chev, date, context, chosen, outcome, note]
+# The tokens cell is regenerated at render time from run telemetry, so it
+# is dropped here — the parser only returns the persistent fields.
+_ROW_FIELDS = ("date", "context", "chosen", "outcome", "note", "vote_pattern")
+_LEGACY_LAYOUTS = {
+    8: (1, 2, 3, 4, 6, 7),
+    7: (1, 2, 3, 4, 6, None),
+    6: (1, 2, 3, 4, 5, None),
+}
+
+
+def _fields_from_attrs(cell_matches: list) -> dict[str, str]:
+    """Attribute-based parsing (preferred, order-independent): rows written
+    by render_feedback_html.py carry data-field="<name>" on each <td>."""
+    field_map: dict[str, str] = {}
+    for cm in cell_matches:
+        fa = FIELD_ATTR_RE.search(cm.group("attrs"))
+        if fa:
+            field_map[fa.group(1)] = _strip_tags(cm.group("text"))
+    return field_map
+
+
+def _fields_from_legacy(cell_matches: list) -> dict[str, str] | None:
+    """Legacy positional fallback; None when the cell count is unknown."""
+    layout = _LEGACY_LAYOUTS.get(len(cell_matches))
+    if layout is None:
+        return None
+    cells = [cm.group("text") for cm in cell_matches]
+    return {
+        name: "" if idx is None else _strip_tags(cells[idx])
+        for name, idx in zip(_ROW_FIELDS, layout)
+    }
+
+
+def _parse_row(body: str) -> dict | None:
+    cell_matches = list(CELL_RE.finditer(body))
+    field_map = _fields_from_attrs(cell_matches)
+    if field_map:
+        fields = {k: field_map.get(k, "") for k in _ROW_FIELDS}
+    else:
+        fields = _fields_from_legacy(cell_matches)
+        if fields is None:
+            return None
+    if fields["outcome"] not in OUTCOMES:
+        return None
+    return fields
+
+
 def parse_feedback(path: Path) -> list[dict]:
     entries = []
     if not path.exists():
         return entries
     text = path.read_text(encoding="utf-8-sig")
     for m in ROW_RE.finditer(text):
-        cell_matches = list(CELL_RE.finditer(m.group("body")))
-
-        # --- Attribute-based parsing (preferred, order-independent) ---
-        # Rows written by render_feedback_html.py carry data-field="<name>"
-        # on each <td>. Extract them into a dict keyed by field name.
-        field_map: dict[str, str] = {}
-        for cm in cell_matches:
-            fa = FIELD_ATTR_RE.search(cm.group("attrs"))
-            if fa:
-                field_map[fa.group(1)] = _strip_tags(cm.group("text"))
-
-        if field_map:
-            # data-field rows: require the four mandatory fields.
-            date = field_map.get("date", "")
-            context = field_map.get("context", "")
-            chosen = field_map.get("chosen", "")
-            outcome = field_map.get("outcome", "")
-            note = field_map.get("note", "")
-            vote_pattern = field_map.get("vote_pattern", "")
-        else:
-            # --- Legacy positional fallback (rows without data-field attrs) ---
-            # Trias layout (8 cells): [chev, date, context, chosen, outcome, tokens, note, vote_pattern]
-            # Previous layout (7 cells): [chev, date, context, chosen, outcome, tokens, note]
-            # Legacy layout (6 cells): [chev, date, context, chosen, outcome, note]
-            # The tokens cell is regenerated at render time from run telemetry,
-            # so we drop it here — the parser only returns the persistent fields.
-            cells = [cm.group("text") for cm in cell_matches]
-            if len(cells) == 8:
-                date = _strip_tags(cells[1])
-                context = _strip_tags(cells[2])
-                chosen = _strip_tags(cells[3])
-                outcome = _strip_tags(cells[4])
-                note = _strip_tags(cells[6])
-                vote_pattern = _strip_tags(cells[7])
-            elif len(cells) == 7:
-                date = _strip_tags(cells[1])
-                context = _strip_tags(cells[2])
-                chosen = _strip_tags(cells[3])
-                outcome = _strip_tags(cells[4])
-                note = _strip_tags(cells[6])
-                vote_pattern = ""
-            elif len(cells) == 6:
-                date = _strip_tags(cells[1])
-                context = _strip_tags(cells[2])
-                chosen = _strip_tags(cells[3])
-                outcome = _strip_tags(cells[4])
-                note = _strip_tags(cells[5])
-                vote_pattern = ""
-            else:
-                continue
-
-        if outcome not in OUTCOMES:
-            continue
-        entries.append({
-            "date": date,
-            "context": context,
-            "chosen": chosen,
-            "outcome": outcome,
-            "note": note,
-            "vote_pattern": vote_pattern,
-        })
+        row = _parse_row(m.group("body"))
+        if row is not None:
+            entries.append(row)
     return entries
 
 
@@ -131,7 +129,8 @@ def parse_runs(path: Path) -> list[dict]:
             # raising JSONDecodeError and being silently dropped from priors.
             runs.append(json.loads(f.read_text(encoding="utf-8-sig")))
         except json.JSONDecodeError as e:
-            print(f"[feedback] warning: skipping {f.name}: {e}", file=sys.stderr)
+            print(f"[feedback] warning: skipping {f.name}: {e}",
+                  file=sys.stderr)
             continue
     return runs
 
@@ -140,7 +139,9 @@ def report(entries: list[dict], runs: list[dict] | None = None) -> str:
     out = []
     out.append(f"Total logged uses: {len(entries)}")
     if not entries:
-        out.append("No entries yet. Use the skill on a real change — log_feedback.py will append to FEEDBACK.html automatically.")
+        out.append("No entries yet. Use the skill on a real change — "
+                    "log_feedback.py will append to FEEDBACK.html "
+                    "automatically.")
         return "\n".join(out)
 
     outcomes = Counter(e["outcome"] for e in entries)
@@ -190,7 +191,8 @@ def _run_scheme(run: dict) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--recent", type=int, default=0, help="only consider the N most recent entries")
+    ap.add_argument("--recent", type=int, default=0,
+                     help="only consider the N most recent entries")
     ap.add_argument("--runs", action="store_true", help="also scan runs/*.json")
     args = ap.parse_args(argv)
 

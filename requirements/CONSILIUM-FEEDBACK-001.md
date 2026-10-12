@@ -5,7 +5,6 @@ status: confirmed
 level: code
 layer: bus
 owner: alxmax
-test_exempt: "file I/O wrapper with no isolated pure-function surface"
 depends_on: [CONSILIUM-UTILS-001]
 risk: 1
 satisfies: [ARCH-CONSILIUM-LEARNING-001]
@@ -45,7 +44,3 @@ Every line in this section is binding.
 **Notes** — Input: `.consilium/FEEDBACK.html` (path from `utils.FEEDBACK_PATH`); `.consilium/runs/*.json` read only when `--runs` is passed. Exists to give the developer a human-readable health check on the skill's real-world usefulness without opening the HTML journal manually.
 
 **Current implementation** — `scripts/feedback.py`.
-
-## Why test_exempt
-
-`feedback.py` is a thin read-only wrapper over `FEEDBACK.html` — its only logic is HTML row parsing and outcome counting. Both are exercised indirectly by `test_feedback_html.py` (which tests the HTML round-trip format) and by `test_priors.py` (which calls the same HTML-parsing path to derive priors signals). A dedicated `test_feedback.py` would duplicate fixture setup already done in those two files without adding independent signal.

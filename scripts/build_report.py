@@ -16,10 +16,13 @@ Input bundle shape on stdin:
       "generator":   {"candidates": [...]},                  // from Step 2
       "control":     {"verdicts":   [...]},                  // from Step 3
       "conservator": {"scores":     [...]},                  // from Step 4
-      "aggregate":   {"scheme":"...", "chosen":"...", ...},  // from Step 5 (aggregator.py)
-      "confidence":  {"confidence":0.85, ...},               // from Step 5b (confidence.py)
+      "aggregate":   {"scheme":"...", "chosen":"...", ...},
+      // from Step 5 (aggregator.py)
+      "confidence":  {"confidence":0.85, ...},
+      // from Step 5b (confidence.py)
       "telemetry":   {...},                                  // optional, Step 6
-      "alternatives_limit": 3                                // optional, default 3
+      "alternatives_limit": 3
+      // optional, default 3
     }
 
 Output: the canonical full report (or skipped report if ``skipped: true``
@@ -36,7 +39,8 @@ Exits 1 on missing required field. Exits 2 on malformed JSON.
 Run ``validate_report.py`` after to confirm Principle #4 compliance.
 
 CLI:
-    cat bundle.json | python scripts/build_report.py | python scripts/validate_report.py
+    cat bundle.json | python scripts/build_report.py | python
+    scripts/validate_report.py
     python scripts/build_report.py --input bundle.json
 """
 # implements: CONSILIUM-BUILD-REPORT-001
@@ -59,10 +63,11 @@ def _err(msg: str) -> None:
 def _stamp_provenance(report: dict) -> dict:
     """Stamp repo version provenance into every report's telemetry block.
 
-    consilium_version = human display stamp; consilium_ref = the resolvable diff
-    operand drift checks read (empty on a dirty/unknown tree). build_report is one
-    of three report producers — the two hand-built SKILL.md templates (scale_down,
-    prior-deliberation passthrough) stamp the same two fields inline.
+    consilium_version = human display stamp; consilium_ref = the resolvable
+    diff operand drift checks read (empty on a dirty/unknown tree).
+    build_report is one of three report producers — the two hand-built
+    SKILL.md templates (scale_down, prior-deliberation passthrough) stamp
+    the same two fields inline.
     """
     tele = report.get("telemetry")
     if not isinstance(tele, dict):
@@ -92,30 +97,51 @@ def _conservator_risk(score: dict) -> float | None:
     return None
 
 
-def _voice_scores_for(chosen: str | None, control: dict, conservator: dict) -> dict | None:
+def _voice_scores_for(
+    chosen: str | None, control: dict, conservator: dict
+) -> dict | None:
     if chosen is None:
         return None
     verdict = _candidate_by_id(control.get("verdicts") or [], chosen) or {}
     if not verdict:
-        print(f"build_report: no control verdict found for chosen={chosen!r}", file=sys.stderr)
+        print(
+            f"build_report: no control verdict found for chosen={chosen!r}",
+            file=sys.stderr,
+        )
     score = _candidate_by_id(conservator.get("scores") or [], chosen) or {}
-    # An empty verdict ({}) naturally yields control_score 0.0 here (no `valid` key),
-    # so no separate not-found branch is needed.
+    # An empty verdict ({}) naturally yields control_score 0.0 here (no
+    # `valid` key), so no separate not-found branch is needed.
     issues = verdict.get("issues") or []
-    control_score = 0.0 if not verdict.get("valid") else max(0.3, 1.0 - sum(issue_penalty(i) for i in issues))
+    control_score = (
+        0.0
+        if not verdict.get("valid")
+        else max(0.3, 1.0 - sum(issue_penalty(i) for i in issues))
+    )
     risk = _conservator_risk(score)
     return {
-        "generator": 0.5 if chosen == "do_nothing" or chosen.startswith("adversarial_") else 1.0,
+        "generator": (
+            0.5
+            if chosen == "do_nothing" or chosen.startswith("adversarial_")
+            else 1.0
+        ),
         "control": round(control_score, 3),
         "conservator": 0.5 if risk is None else risk,
     }
 
 
-def _why_not(verdict: dict | None, score: dict | None, no_chosen: bool = False) -> str:
+def _why_not(
+    verdict: dict | None, score: dict | None, no_chosen: bool = False
+) -> str:
     bits: list[str] = []
     if verdict and not verdict.get("valid"):
-        details = ", ".join(i.get("category", "?") for i in (verdict.get("issues") or []) if isinstance(i, dict))
-        bits.append(f"control: invalid ({details})" if details else "control: invalid")
+        details = ", ".join(
+            i.get("category", "?")
+            for i in (verdict.get("issues") or [])
+            if isinstance(i, dict)
+        )
+        bits.append(
+            f"control: invalid ({details})" if details else "control: invalid"
+        )
     elif verdict and verdict.get("issues"):
         first = verdict["issues"][0] if verdict["issues"] else {}
         if isinstance(first, dict):
@@ -144,12 +170,24 @@ def validate_input(bundle: dict) -> None:
     else:
         validate_keys(
             bundle,
-            ["success_criterion", "verification", "generator", "control", "conservator"],
+            [
+                "success_criterion",
+                "verification",
+                "generator",
+                "control",
+                "conservator",
+            ],
             context="build_report bundle",
         )
 
 
-def _alternatives(generator: dict, control: dict, conservator: dict, aggregate: dict, limit: int) -> list[dict]:
+def _alternatives(
+    generator: dict,
+    control: dict,
+    conservator: dict,
+    aggregate: dict,
+    limit: int,
+) -> list[dict]:
     if limit <= 0:
         return []
     chosen = aggregate.get("chosen")
@@ -167,7 +205,11 @@ def _alternatives(generator: dict, control: dict, conservator: dict, aggregate: 
         out.append({
             "id": cid,
             "summary": cand.get("summary", ""),
-            "why_not": _why_not(_candidate_by_id(verdicts, cid), _candidate_by_id(scores, cid), no_chosen=no_chosen),
+            "why_not": _why_not(
+                _candidate_by_id(verdicts, cid),
+                _candidate_by_id(scores, cid),
+                no_chosen=no_chosen,
+            ),
         })
     return out
 
@@ -176,7 +218,9 @@ def _build_skipped(bundle: dict) -> dict:
     for required in ("success_criterion", "verification", "skip_reason"):
         v = bundle.get(required)
         if not isinstance(v, str) or not v.strip():
-            raise ValueError(f"skipped bundle missing required field: {required}")
+            raise ValueError(
+                f"skipped bundle missing required field: {required}"
+            )
     return {
         "success_criterion": bundle["success_criterion"],
         "verification": bundle["verification"],
@@ -223,21 +267,57 @@ def build(bundle: dict) -> dict:
         "success_criterion": bundle["success_criterion"],
         "verification": bundle["verification"],
         "chosen_approach": chosen,
-        "reasoning": bundle.get("reasoning") or _default_reasoning(aggregate, confidence_block),
-        "alternatives": _alternatives(generator, control, conservator, aggregate, alt_limit),
+        "reasoning": bundle.get("reasoning")
+        or _default_reasoning(aggregate, confidence_block),
+        "alternatives": _alternatives(
+            generator, control, conservator, aggregate, alt_limit
+        ),
         "voice_scores": _voice_scores_for(chosen, control, conservator),
         "confidence": confidence_block.get("confidence"),
-        # pipeline_executed: True when the 3-voice deliberation pipeline ran end-to-end.
-        # Hand-built reports (trivial-direct from scale_down, prior-deliberation passthrough)
-        # set this to False in their template — see SKILL.md Step 2.
+        # pipeline_executed: True when the 3-voice deliberation pipeline ran
+        # end-to-end. Hand-built reports (trivial-direct from scale_down,
+        # prior-deliberation passthrough) set this to False in their
+        # template — see SKILL.md Step 2.
         "pipeline_executed": True,
-        "deliberation_log": [
-            {"step": "generator",   "candidates": generator.get("candidates") or []},
-            {"step": "control",     "verdicts":   control.get("verdicts")   or []},
-            {"step": "conservator", "scores":     conservator.get("scores") or []},
-            {"step": "aggregate",   "scheme": aggregate.get("scheme", "?"), "result": aggregate},
-        ],
+        "deliberation_log": _deliberation_log(
+            generator, control, conservator, aggregate
+        ),
     }
+    _attach_optional_fields(report, bundle, control, aggregate)
+    return _stamp_provenance(report)
+
+
+def _deliberation_log(
+    generator: dict,
+    control: dict,
+    conservator: dict,
+    aggregate: dict,
+) -> list[dict]:
+    return [
+        {
+            "step": "generator",
+            "candidates": generator.get("candidates") or [],
+        },
+        {
+            "step": "control",
+            "verdicts": control.get("verdicts") or [],
+        },
+        {
+            "step": "conservator",
+            "scores": conservator.get("scores") or [],
+        },
+        {
+            "step": "aggregate",
+            "scheme": aggregate.get("scheme", "?"),
+            "result": aggregate,
+        },
+    ]
+
+
+def _attach_optional_fields(
+    report: dict, bundle: dict, control: dict, aggregate: dict
+) -> None:
+    """Pass through the optional bundle fields onto the report."""
     # Persist Control's declared falsifier so mark_outcome.py --auto-suggest can
     # read it back when the outcome is scored later (consumer wired 2026-07-07;
     # design review 2026-07-07_011914 required consumer-first).
@@ -245,12 +325,14 @@ def build(bundle: dict) -> dict:
     if "strongest_objection" in control:
         _control_step["strongest_objection"] = control["strongest_objection"]
     if "no_blocking_defect_attested" in control:
-        _control_step["no_blocking_defect_attested"] = control["no_blocking_defect_attested"]
+        _control_step["no_blocking_defect_attested"] = control[
+            "no_blocking_defect_attested"
+        ]
     if "telemetry" in bundle:
         report["telemetry"] = bundle["telemetry"]
     if "deliberation_quality" in bundle:
-        # Legacy advisory block (its producer, the meta-critic step, is deleted);
-        # still passed through so older bundles round-trip.
+        # Legacy advisory block (its producer, the meta-critic step, is
+        # deleted); still passed through so older bundles round-trip.
         report["deliberation_quality"] = bundle["deliberation_quality"]
     # Trias mode: pass through team/personalities/vote_pattern/dissent/abstained
     # fields when present in the bundle. These come from the orchestrator after
@@ -261,7 +343,8 @@ def build(bundle: dict) -> dict:
         report["personalities"] = bundle["personalities"]
     if "vote_pattern" in bundle:
         report["vote_pattern"] = bundle["vote_pattern"]
-    # B3: per-personality choices breakdown (orchestrator populates this after step 3)
+    # B3: per-personality choices breakdown (orchestrator populates this
+    # after step 3)
     if "personality_choices" in bundle:
         report["personality_choices"] = bundle["personality_choices"]
     if "vote_skipped" in bundle:
@@ -271,7 +354,6 @@ def build(bundle: dict) -> dict:
             report["dissent"] = aggregate["dissent"]
         if "abstained" in aggregate:
             report["abstained"] = aggregate["abstained"]
-    return _stamp_provenance(report)
 
 
 def _default_reasoning(aggregate: dict, confidence_block: dict) -> str:
@@ -280,7 +362,10 @@ def _default_reasoning(aggregate: dict, confidence_block: dict) -> str:
     if chosen is None:
         if scheme == "team_vote":
             vote_pattern = aggregate.get("vote_pattern", "unknown")
-            return f"deliberation fragmented (vote_pattern={vote_pattern}); orchestrator must intervene"
+            return (
+                f"deliberation fragmented (vote_pattern={vote_pattern}); "
+                "orchestrator must intervene"
+            )
         return f"all candidates vetoed under {scheme}; see retry_suggested"
     conf = confidence_block.get("confidence")
     conf_s = f"{conf:.2f}" if isinstance(conf, (int, float)) else "?"

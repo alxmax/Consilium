@@ -4,6 +4,9 @@ Run: python scripts/test_feedback_html.py
 Exit 0 = all pass; exit 1 = one or more failures (all tests run; failures listed).
 """
 # tested-by: CONSILIUM-RENDER-FEEDBACK-HTML-001
+# tested-by: CONSILIUM-FEEDBACK-001
+# tested-by: CONSILIUM-MARK-OUTCOME-001
+# tested-by: CONSILIUM-MEMORY-001
 from __future__ import annotations
 
 import json
@@ -236,6 +239,7 @@ def test_parse_feedback_roundtrip_html():
 
 
 def test_parse_feedback_returns_empty_for_missing_file():
+    # verifies: CONSILIUM-FEEDBACK-001#CASE-1
     sys.path.insert(0, str(ROOT / "scripts"))
     import feedback  # noqa: E402
     assert feedback.parse_feedback(Path("/nonexistent/FEEDBACK.html")) == []
@@ -438,6 +442,7 @@ def test_mark_outcome_happy_path():
 def test_mark_outcome_auto_suggest_reads_falsifier():
     """--auto-suggest with no explicit --reason pulls the declared falsifier
     (Control's strongest_objection.reason) from the run JSON as the default reason."""
+    # verifies: CONSILIUM-MARK-OUTCOME-001#CASE-1
     import subprocess
     sys.path.insert(0, str(ROOT / "scripts"))
     import feedback  # noqa: E402
@@ -544,6 +549,305 @@ def test_main_malformed_stdin_exits_2():
     )
     assert result.returncode == 2, f"expected exit 2, got {result.returncode}"
     assert b"Traceback" not in result.stderr
+
+
+# ---------------------------------------------------------------------------
+# feedback.py parser + CLI report  (CONSILIUM-FEEDBACK-001)
+# ---------------------------------------------------------------------------
+
+def _tr(*cells: str) -> str:
+    return '<tr class="entry">' + "".join(
+        f"<td>{c}</td>" for c in cells) + "</tr>"
+
+
+def _tr_attr(**fields: str) -> str:
+    return '<tr class="entry">' + "".join(
+        f'<td data-field="{k}">{v}</td>' for k, v in fields.items()) + "</tr>"
+
+
+def _write_fb(td: str, *rows: str) -> Path:
+    p = Path(td) / "FEEDBACK.html"
+    p.write_text("<table>" + "".join(rows) + "</table>", encoding="utf-8")
+    return p
+
+
+def _feedback_cli(fb_path: Path, runs_dir: Path, *args: str) -> str:
+    """Run feedback.main in-process against a temp journal; return stdout."""
+    import contextlib
+    import io
+    import feedback  # noqa: E402
+
+    saved = (feedback.FEEDBACK, feedback.RUNS)
+    feedback.FEEDBACK, feedback.RUNS = fb_path, runs_dir
+    buf = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(buf):
+            assert feedback.main(list(args)) == 0
+    finally:
+        feedback.FEEDBACK, feedback.RUNS = saved
+    return buf.getvalue()
+
+
+def test_parse_feedback_all_row_layouts():
+    # verifies: CONSILIUM-FEEDBACK-001#CASE-2
+    import feedback  # noqa: E402
+
+    with tempfile.TemporaryDirectory() as td:
+        p = _write_fb(
+            td,
+            _tr_attr(date="d1", context="c1", chosen="k1", outcome="OK",
+                     note="n1", vote_pattern="2-1"),
+            # 8 cells, data-field in shuffled order: attributes win over
+            # position (positional reading would see outcome="cc" and drop it)
+            _tr_attr(vote_pattern="1-1", note="nn", outcome="BAD", chosen="kk",
+                     context="cc", date="dd", tokens="t", chev="x"),
+            _tr("+", "d3", "c3", "k3", "OK", "tok", "n3", "3-0"),  # 8-cell
+            _tr("+", "d4", "c4", "k4", "OVR", "tok", "n4"),        # 7-cell
+            _tr("+", "d5", "c5", "k5", "PEND", "n5"),              # 6-cell
+            _tr("+", "d6", "c6", "k6", "OK"),                      # 5 -> skip
+        )
+        got = [(e["date"], e["chosen"], e["outcome"], e["note"],
+                e["vote_pattern"]) for e in feedback.parse_feedback(p)]
+    assert got == [
+        ("d1", "k1", "OK", "n1", "2-1"),
+        ("dd", "kk", "BAD", "nn", "1-1"),
+        ("d3", "k3", "OK", "n3", "3-0"),
+        ("d4", "k4", "OVR", "n4", ""),
+        ("d5", "k5", "PEND", "n5", ""),
+    ], got
+
+
+def test_parse_feedback_drops_unknown_outcome():
+    # verifies: CONSILIUM-FEEDBACK-001#CASE-3
+    import feedback  # noqa: E402
+
+    with tempfile.TemporaryDirectory() as td:
+        p = _write_fb(
+            td,
+            _tr_attr(date="d1", context="c", chosen="k1", outcome="MAYBE",
+                     note=""),
+            _tr("+", "d2", "c", "k2", "WIN", "tok", "n"),
+            _tr("+", "d3", "c", "k3", "OK", "tok", "n"),
+        )
+        parsed = feedback.parse_feedback(p)
+        assert [e["chosen"] for e in parsed] == ["k3"], parsed
+        out = _feedback_cli(p, Path(td) / "runs")
+    assert "Total logged uses: 1" in out, out
+
+
+def test_feedback_cli_recent_and_success_rate():
+    # verifies: CONSILIUM-FEEDBACK-001#CASE-4
+    with tempfile.TemporaryDirectory() as td:
+        rows = [_tr("+", f"d{i}", "c", f"k{i}", o, "tok", "n")
+                for i, o in enumerate(
+                    ["OK", "BAD", "PEND", "PEND_HEADLESS", "OK"])]
+        p = _write_fb(td, *rows)
+        runs = Path(td) / "runs"
+        everything = _feedback_cli(p, runs)
+        recent = _feedback_cli(p, runs, "--recent", "3")
+    # PEND / PEND_HEADLESS are outside the denominator: OK 2 / (2 OK + 1 BAD)
+    assert "Total logged uses: 5" in everything, everything
+    assert "Success rate (excluding PEND): 67%" in everything, everything
+    # last 3 = PEND, PEND_HEADLESS, OK -> only OK is rated
+    assert "Total logged uses: 3" in recent, recent
+    assert "Success rate (excluding PEND): 100%" in recent, recent
+
+
+def test_feedback_cli_runs_breakdown_both_scheme_shapes():
+    # verifies: CONSILIUM-FEEDBACK-001#CASE-5
+    with tempfile.TemporaryDirectory() as td:
+        p = _write_fb(td, _tr("+", "d1", "c", "k1", "OK", "tok", "n"))
+        runs = Path(td) / "runs"
+        runs.mkdir()
+        (runs / "a.json").write_text(
+            json.dumps({"aggregation": {"scheme": "vote"}}), encoding="utf-8")
+        (runs / "b.json").write_text(json.dumps({"deliberation_log": [
+            {"step": "aggregate", "scheme": "sequential"}]}), encoding="utf-8")
+        (runs / "c.json").write_text(json.dumps({"deliberation_log": [
+            {"step": "aggregate", "result": {"scheme": "sequential"}}]}),
+            encoding="utf-8")
+        with_runs = _feedback_cli(p, runs, "--runs")
+        without = _feedback_cli(p, runs)
+    assert "Deliberation runs on disk: 3" in with_runs, with_runs
+    assert "scheme=sequential: 2" in with_runs, with_runs
+    assert "scheme=vote: 1" in with_runs, with_runs
+    assert "Deliberation runs on disk" not in without, without
+
+
+# ---------------------------------------------------------------------------
+# mark_outcome.py  (CONSILIUM-MARK-OUTCOME-001)
+# ---------------------------------------------------------------------------
+
+def _mark(fb: Path, *args: str):
+    import subprocess
+    return subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "mark_outcome.py"),
+         "--feedback", str(fb), *args],
+        capture_output=True, text=True, encoding="utf-8", check=False,
+    )
+
+
+def _seed_pend_row(td: str, outcome: str = "PEND") -> Path:
+    fb = Path(td) / "FEEDBACK.html"
+    e = rfh.Entry(date="2026-06-01", context="mo-ctx", chosen="approach_m",
+                  outcome=outcome, note="conf=0.7")
+    fb.write_text(rfh.render([e], runs_dir=Path(td) / "runs"),
+                  encoding="utf-8")
+    return fb
+
+
+def test_mark_outcome_dry_run_writes_nothing():
+    # verifies: CONSILIUM-MARK-OUTCOME-001#CASE-2
+    with tempfile.TemporaryDirectory() as td:
+        fb = _seed_pend_row(td)
+        before = fb.read_bytes()
+        r = _mark(fb, "--date", "2026-06-01", "--chosen", "approach_m",
+                  "--outcome", "BAD", "--dry-run")
+        assert r.returncode == 0, r.stderr
+        assert "matched [0]: 2026-06-01 | approach_m | PEND -> BAD" in r.stdout
+        assert "(dry-run; no write)" in r.stdout, r.stdout
+        assert fb.read_bytes() == before
+
+
+def test_mark_outcome_pend_headless_requires_benchmark():
+    # verifies: CONSILIUM-MARK-OUTCOME-001#CASE-3
+    with tempfile.TemporaryDirectory() as td:
+        fb = _seed_pend_row(td)
+        before = fb.read_bytes()
+        r = _mark(fb, "--date", "2026-06-01", "--chosen", "approach_m",
+                  "--outcome", "PEND_HEADLESS")
+        assert r.returncode == 1, r.stdout
+        assert "--benchmark" in r.stderr, r.stderr
+        assert fb.read_bytes() == before
+
+
+def test_mark_outcome_pend_headless_skips_non_pend_row():
+    with tempfile.TemporaryDirectory() as td:
+        fb = _seed_pend_row(td, outcome="OK")
+        before = fb.read_bytes()
+        r = _mark(fb, "--date", "2026-06-01", "--chosen", "approach_m",
+                  "--outcome", "PEND_HEADLESS", "--benchmark")
+        assert r.returncode == 0, r.stderr
+        assert "only PEND rows" in r.stderr, r.stderr
+        assert fb.read_bytes() == before
+
+
+def test_mark_outcome_requires_a_row_selector():
+    # verifies: CONSILIUM-MARK-OUTCOME-001#CASE-4
+    with tempfile.TemporaryDirectory() as td:
+        fb = _seed_pend_row(td)
+        before = fb.read_bytes()
+        for sel in ([], ["--date", "2026-06-01"], ["--chosen", "approach_m"]):
+            r = _mark(fb, *sel, "--outcome", "BAD")
+            assert r.returncode == 1, (sel, r.stdout)
+            assert "provide --run-path" in r.stderr, r.stderr
+        assert fb.read_bytes() == before
+
+
+def test_mark_outcome_no_match_lists_recent_rows():
+    # verifies: CONSILIUM-MARK-OUTCOME-001#CASE-5
+    with tempfile.TemporaryDirectory() as td:
+        fb = _seed_pend_row(td)
+        before = fb.read_bytes()
+        r = _mark(fb, "--date", "2099-01-01", "--chosen", "nope",
+                  "--outcome", "BAD")
+        assert r.returncode == 1, r.stdout
+        assert "no row matched" in r.stderr, r.stderr
+        assert "last 5 rows" in r.stderr and "approach_m" in r.stderr, r.stderr
+        assert fb.read_bytes() == before
+
+
+def test_mark_outcome_annotate_note_is_idempotent():
+    import mark_outcome  # noqa: E402
+
+    once = mark_outcome._annotate_note("conf=0.7", "first")
+    twice = mark_outcome._annotate_note(once, "second")
+    assert twice == "conf=0.7; [confirmed]; outcome_reason=second", twice
+    assert twice.count("[confirmed]") == 1
+    # a non-verified outcome drops a stale marker instead of adding one
+    dropped = mark_outcome._annotate_note(twice, None, "PEND")
+    assert "[confirmed]" not in dropped, dropped
+
+
+# ---------------------------------------------------------------------------
+# memory.py  (CONSILIUM-MEMORY-001)
+# ---------------------------------------------------------------------------
+
+def _memory(*args: str) -> dict:
+    import subprocess
+    r = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "memory.py"), *args],
+        capture_output=True, check=False,
+    )
+    assert r.returncode == 0, r.stderr.decode()
+    return json.loads(r.stdout.decode("utf-8"))
+
+
+def _memory_fixture(td: str) -> tuple[Path, Path]:
+    """(feedback.html, runs/) holding 3 runs and 4 journal rows."""
+    runs = Path(td) / "runs"
+    runs.mkdir()
+    for name, chosen, conf in (("2026-05-01_a", "alpha", 0.5),
+                               ("2026-05-02_b", "beta", 0.6),
+                               ("2026-05-03_c", "gamma", 0.7)):
+        (runs / f"{name}.json").write_text(json.dumps({
+            "success_criterion": f"criterion {name}",
+            "chosen_approach": chosen, "confidence": conf,
+        }), encoding="utf-8")
+    fb = Path(td) / "FEEDBACK.html"
+    entries = [
+        rfh.Entry(date="2026-05-01", context="Rollback plan", chosen="a",
+                  outcome="OK", note="seed; [confirmed]"),
+        rfh.Entry(date="2026-05-02", context="auth", chosen="do_rollback",
+                  outcome="BAD", note="plain"),
+        rfh.Entry(date="2026-05-03", context="auth", chosen="c",
+                  outcome="OK", note="needs rollback"),
+        rfh.Entry(date="2026-05-04", context="cache", chosen="d",
+                  outcome="OK", note="unrelated"),
+    ]
+    fb.write_text(rfh.render(entries, runs_dir=runs), encoding="utf-8")
+    return fb, runs
+
+
+def test_memory_medium_caps_entries_and_reads_run_fields():
+    # verifies: CONSILIUM-MEMORY-001#CASE-1
+    with tempfile.TemporaryDirectory() as td:
+        fb, runs = _memory_fixture(td)
+        out = _memory("--tier", "medium", "--n", "2", "--runs-dir", str(runs))
+    assert out["tier"] == "medium" and out["total"] == 3, out
+    assert [e["chosen"] for e in out["entries"]] == ["gamma", "beta"], out
+    assert set(out["entries"][0]) == {
+        "run", "date", "success_criterion", "chosen", "confidence"}, out
+
+
+def test_memory_long_query_is_case_insensitive_and_flags_confirmed():
+    # verifies: CONSILIUM-MEMORY-001#CASE-2
+    with tempfile.TemporaryDirectory() as td:
+        fb, runs = _memory_fixture(td)
+        out = _memory("--tier", "long", "--query", "ROLLBACK",
+                      "--feedback-file", str(fb))
+    # context / chosen / note each matched once; the "cache" row is excluded
+    assert [e["chosen"] for e in out["entries"]] == ["a", "do_rollback", "c"]
+    assert [e["confirmed"] for e in out["entries"]] == [True, False, False]
+    assert out["total"] == 4, out
+
+
+def test_memory_short_tier_is_a_fixed_stub():
+    # verifies: CONSILIUM-MEMORY-001#CASE-3
+    out = _memory("--tier", "short")
+    assert out["tier"] == "short" and out["entries"] == [], out
+    assert "session-local" in out["note"], out
+
+
+def test_memory_all_tiers_honour_path_overrides():
+    # verifies: CONSILIUM-MEMORY-001#CASE-4
+    # verifies: CONSILIUM-MEMORY-001#CASE-5
+    with tempfile.TemporaryDirectory() as td:
+        fb, runs = _memory_fixture(td)
+        out = _memory("--tier", "all", "--feedback-file", str(fb),
+                      "--runs-dir", str(runs))
+    assert set(out) == {"short", "medium", "long"}, sorted(out)
+    assert out["medium"]["total"] == 3 and out["long"]["total"] == 4, out
 
 
 def _run_tests():

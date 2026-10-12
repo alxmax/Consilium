@@ -6,8 +6,10 @@ Run:
 # tested-by: CONSILIUM-IMPLEMENT-PIPELINE-001
 # tested-by: CONSILIUM-IMPLEMENT-CODER-001
 # tested-by: CONSILIUM-IMPLEMENT-TEST-WRITER-001
+import json
 import os
 import shlex
+import subprocess
 import sys
 import tempfile
 import textwrap
@@ -15,6 +17,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import implement_pipeline as _ip
 from implement_pipeline import _stub_bodies, build_plan, verify_red_green
 
 MARKER = "raise NotImplementedError"
@@ -42,6 +45,7 @@ def check(name: str, condition: bool, detail: str = "") -> None:
 # ---------------------------------------------------------------------------
 
 def test_build_plan_resolves_chosen_candidate() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-1
     # coder.md promises chosen_approach as {id, summary, sketch, rationale};
     # the report top-level field is a bare id - build_plan must resolve it
     # from the generator deliberation_log step so the Coder is not handed an
@@ -381,6 +385,7 @@ def _run_gate_in(tmp: Path, targets) -> dict:
 
 
 def test_gate_multi_target_stubs_all() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-3
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d)
         result = _run_gate_in(tmp, ["impl_core.py", "impl_extra.py"])
@@ -406,6 +411,7 @@ def test_gate_multi_target_stubs_all() -> None:
 
 def test_gate_single_wrong_target_misses_sibling() -> None:
     """The hole: stubbing one untested sibling leaves the suite GREEN → gate fails."""
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-3
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d)
         result = _run_gate_in(tmp, ["impl_extra.py"])
@@ -475,6 +481,127 @@ def test_multiline_header_trailing_comment() -> None:
     )
 
 
+_SCRIPT = Path(__file__).parent / "implement_pipeline.py"
+
+
+def _run_cli(*args: str, stdin: str = "") -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, str(_SCRIPT), *args],
+        input=stdin, capture_output=True, text=True, encoding="utf-8",
+    )
+
+
+def test_build_plan_shape() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-1
+    plan = build_plan({
+        "chosen_approach": "x", "success_criterion": "sc",
+        "verification": "v",
+    })
+    check(
+        "plan shape: spec/sequence/roles/rules keys present",
+        {"spec", "sequence", "roles", "rules"} <= set(plan),
+        repr(sorted(plan)),
+    )
+    check(
+        "plan shape: coder/test_writer/reviewer roles each carry exists flag",
+        [r["role"] for r in plan["roles"]]
+        == ["coder", "test_writer", "reviewer"]
+        and all(isinstance(r["exists"], bool) for r in plan["roles"]),
+        repr(plan["roles"]),
+    )
+
+
+def test_cli_no_pipeline_exits_1() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-2
+    for chosen in ("do_nothing", "skipped"):
+        proc = _run_cli(stdin=json.dumps({"chosen_approach": chosen}))
+        check(
+            f"no-pipeline ({chosen}): exit 1",
+            proc.returncode == 1,
+            f"rc={proc.returncode} stderr={proc.stderr!r}",
+        )
+        check(
+            f"no-pipeline ({chosen}): message printed to stdout",
+            bool(proc.stdout.strip()),
+            repr(proc.stdout),
+        )
+
+
+def test_gate_fails_when_real_suite_fails() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-3
+    with tempfile.TemporaryDirectory() as d:
+        impl = Path(d) / "impl.py"
+        impl.write_text("def f():\n    return 1\n", encoding="utf-8")
+        failing = f'{_PY} -c "import sys; sys.exit(1)"'
+        result = verify_red_green(failing, str(impl))
+        check(
+            "gate: green_ok False when the real suite fails",
+            result.get("green_ok") is False,
+            repr(result),
+        )
+        check(
+            "gate: gate_passed False even though the stubbed run is red",
+            result.get("gate_passed") is False,
+            repr(result),
+        )
+
+
+def test_gate_restores_target_when_stubbed_run_raises() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-4
+    original = "def f():\n    return 1\n"
+    with tempfile.TemporaryDirectory() as d:
+        impl = Path(d) / "impl.py"
+        impl.write_text(original, encoding="utf-8")
+        calls: list[str] = []
+
+        def fake_run(_cmd: str) -> int:
+            calls.append(impl.read_text(encoding="utf-8"))
+            if len(calls) == 1:
+                return 0  # GREEN run against the real file
+            raise RuntimeError("stubbed run crashed")
+
+        real_run = _ip._run
+        _ip._run = fake_run
+        raised = False
+        try:
+            verify_red_green("ignored", str(impl))
+        except RuntimeError:
+            raised = True
+        finally:
+            _ip._run = real_run
+        check("restore-on-crash: the crash propagated", raised)
+        check(
+            "restore-on-crash: file was stubbed during the crashing run",
+            len(calls) == 2 and MARKER in calls[1],
+            repr(calls),
+        )
+        check(
+            "restore-on-crash: original content restored",
+            impl.read_text(encoding="utf-8") == original,
+            repr(impl.read_text(encoding="utf-8")),
+        )
+
+
+def test_cli_verify_gate_missing_args_exits_2() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-5
+    for label, args in (
+        ("neither flag", ["--verify-gate"]),
+        ("no --target", ["--verify-gate", "--test-cmd", "x"]),
+        ("no --test-cmd", ["--verify-gate", "--target", "x.py"]),
+    ):
+        proc = _run_cli(*args)
+        check(
+            f"verify-gate ({label}): exit 2",
+            proc.returncode == 2,
+            f"rc={proc.returncode}",
+        )
+        check(
+            f"verify-gate ({label}): error message on stderr",
+            "--verify-gate needs" in proc.stderr,
+            repr(proc.stderr),
+        )
+
+
 def main() -> None:
     print("=== test_implement_pipeline ===")
     test_single_line_def()
@@ -490,6 +617,11 @@ def main() -> None:
     test_gate_single_string_backward_compat()
     test_gate_missing_target_errors()
     test_build_plan_resolves_chosen_candidate()
+    test_build_plan_shape()
+    test_cli_no_pipeline_exits_1()
+    test_gate_fails_when_real_suite_fails()
+    test_gate_restores_target_when_stubbed_run_raises()
+    test_cli_verify_gate_missing_args_exits_2()
 
     total = _PASS + _FAIL
     print(f"\n{_PASS}/{total} passed, {_FAIL} failed")

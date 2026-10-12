@@ -55,6 +55,7 @@ _spec.loader.exec_module(personalities)
 # (conservator-heavy).
 EXPECTED_KEYWORDS: dict[str, tuple[str, ...]] = {
     "essentialist": ("first principles", "delete", "viable minimum", "earn its existence"),
+    # verifies: CONSILIUM-MODE-LENS-001#AC-2
     # "skeptic carve-out" is load-bearing: it makes the Verifier lens coherent when
     # tinted onto the Skeptic voice on Dialectic's opt-in `--lens` path (internal design review
     # 2026-07-07 audit — without it the tint is a no-op that describes core-voice
@@ -159,6 +160,8 @@ def run_tests(verbose: bool) -> int:
     sys.path.insert(0, str(REPO_ROOT / "scripts"))
     import validate_report  # noqa: E402
 
+    personalities_names = sorted(expected_names)
+
     def _lens_problems(lens_applied: object) -> list[str]:
         report = {
             "success_criterion": "x", "verification": "y", "chosen_approach": "a",
@@ -183,6 +186,25 @@ def run_tests(verbose: bool) -> int:
     for label, value, should_fail in lens_cases:
         got_fail = bool(_lens_problems(value))
         (passes if got_fail == should_fail else failures).append(f"lens_applied: {label}")
+
+    # Then-clauses of the lens_applied acceptance cases, asserted on the
+    # problem text returned by validate_report._validate_telemetry itself.
+    def _telemetry_problems(lens_applied: object) -> list[str]:
+        return validate_report._validate_telemetry(
+            {"mode": "dialectic", "lens_applied": lens_applied})
+
+    # verifies: CONSILIUM-MODE-LENS-001#AC-1
+    same = _telemetry_problems({"decider": "verifier", "skeptic": "verifier"})
+    ok = any("decider" in p and "must differ" in p for p in same)
+    (passes if ok else failures).append(
+        "lens_applied: decider == skeptic problem states they must differ")
+
+    # verifies: CONSILIUM-MODE-LENS-001#AC-3
+    typo = _telemetry_problems({"decider": "essentailist"})
+    ok = any("essentailist" in p and all(n in p for n in personalities_names)
+             for p in typo)
+    (passes if ok else failures).append(
+        "lens_applied: unknown lens problem names the valid personalities")
 
     if verbose:
         for line in passes:

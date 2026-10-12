@@ -49,6 +49,9 @@ python -X utf8 scripts/implement_pipeline.py --input .consilium/runs/<file>.json
 # Verify the red→green gate on an already-written impl (pass every impl file under fan-out)
 python -X utf8 scripts/implement_pipeline.py --verify-gate --test-cmd "pytest -x" --target <impl_file...>
 
+# Validate a role's JSON output before using it (coder | test_writer | manifest)
+python -X utf8 scripts/validate_implement_output.py --role coder --input coder_out.json
+
 # Dispatch (orchestrator calls this after routing decision)
 # Agent(subagent_type="consilium-implement-subagent", prompt=<inlined plan + spec>)
 ```

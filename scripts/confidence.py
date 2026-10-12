@@ -76,7 +76,8 @@ CONFIDENCE_CEIL = 0.99
 
 _MODES_DIR = pathlib.Path(__file__).parent.parent / "modes"
 
-# Hardcoded fallback used when modes/*.md files are absent (e.g. older installs).
+# Hardcoded fallback used when modes/*.md files are absent (e.g. older
+# installs).
 _FLOOR_FALLBACK: dict[str, float] = {
     "sequential": 0.70,
     "sequential_scale_down": 0.70,
@@ -90,7 +91,9 @@ def _parse_frontmatter(text: str) -> dict[str, str]:
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
         return {}
-    end = next((i for i, l in enumerate(lines[1:], 1) if l.strip() == "---"), None)
+    end = next(
+        (i for i, l in enumerate(lines[1:], 1) if l.strip() == "---"), None
+    )
     if end is None:
         return {}
     result: dict[str, str] = {}
@@ -102,7 +105,8 @@ def _parse_frontmatter(text: str) -> dict[str, str]:
 
 
 def _load_mode_floors() -> dict[str, float]:
-    """Read confidence_floor from modes/*.md frontmatter. Falls back to hardcoded dict."""
+    """Read confidence_floor from modes/*.md frontmatter. Falls back to
+    hardcoded dict."""
     if not _MODES_DIR.is_dir():
         return dict(_FLOOR_FALLBACK)
     floors: dict[str, float] = {}
@@ -120,7 +124,8 @@ def _load_mode_floors() -> dict[str, float]:
                 pass
     if not floors:
         return dict(_FLOOR_FALLBACK)
-    # sequential_scale_down inherits sequential floor when not explicitly defined
+    # sequential_scale_down inherits sequential floor when not explicitly
+    # defined
     if "sequential" in floors and "sequential_scale_down" not in floors:
         floors["sequential_scale_down"] = floors["sequential"]
     return floors
@@ -138,21 +143,25 @@ MODE_CONFIDENCE_FLOOR: dict[str, float] = _load_mode_floors()
 # transport_choice benchmark task a 3-0 was recorded on a WRONG answer (32/100).
 # Agreement != truth. Until a corpus of >=20 labeled (vote_pattern, outcome)
 # pairs yields a calibration curve (Brier/AUC), treat these as ordered priors,
-# not probabilities. (review 2026-05-26 round 2, D1 — 5 MODIFY / 2 STOP / 2 GO.)
+# not probabilities. (review 2026-05-26 round 2, D1 — 5 MODIFY / 2 STOP / 2
+# GO.)
 VOTE_PATTERN_CONFIDENCE = {
     "3-0": 0.95,
-    "2-1": 0.75,  # dissent: one personality chose a different candidate (recoverable)
-    "2-0": 0.70,  # veto: one personality had all candidates vetoed (stronger risk signal)
+    # dissent: one personality chose a different candidate (recoverable)
+    "2-1": 0.75,
+    # veto: one personality had all candidates vetoed (stronger risk signal)
+    "2-0": 0.70,
     "1-1-1": None,
     "1-1-0": None,
     "1-0-0": None,
     "0-0-0": None,
 }
 
-# Decisive Trias patterns (a winner emerged) — derived from the canonical map so
-# it cannot drift. Used by check_mode_floor to exempt structurally-bounded splits
-# (2-1/2-0) from the WEAK floor flag. Null patterns carry confidence=None and are
-# already handled by the confidence-is-None branch.
+# Decisive Trias patterns (a winner emerged) — derived from the canonical
+# map so it cannot drift. Used by check_mode_floor to exempt
+# structurally-bounded splits (2-1/2-0) from the WEAK floor flag. Null
+# patterns carry confidence=None and are already handled by the
+# confidence-is-None branch.
 _DECISIVE_VOTE_PATTERNS = frozenset(
     p for p, c in VOTE_PATTERN_CONFIDENCE.items() if c is not None
 )
@@ -166,11 +175,12 @@ def check_mode_floor(
     Callers check this after confidence derivation and log WEAK in FEEDBACK.html
     when below_floor is True. outcome_hint is 'WEAK' or 'OK' (advisory only).
 
-    Trias confidence is derived from the democratic vote pattern, not voice-score
-    variance: a decisive split (2-1=0.75, 2-0=0.70) sits *structurally* below the
-    0.80 Trias floor without signalling a weak deliberation. When ``vote_pattern``
-    is one of the decisive patterns (3-0/2-1/2-0) the run is exempt from the WEAK
-    flag, so the floor catches only genuinely weak runs (score-based modes that
+    Trias confidence is derived from the democratic vote pattern, not
+    voice-score variance: a decisive split (2-1=0.75, 2-0=0.70) sits
+    *structurally* below the 0.80 Trias floor without signalling a weak
+    deliberation. When ``vote_pattern`` is one of the decisive patterns
+    (3-0/2-1/2-0) the run is exempt from the WEAK flag, so the floor
+    catches only genuinely weak runs (score-based modes that
     underperform, or null/deadlock patterns whose confidence is already None).
     The exempt set is derived from VOTE_PATTERN_CONFIDENCE (single source — no
     drift), so it cannot diverge from the canonical patterns.
@@ -204,7 +214,9 @@ SENTINEL_NAME = "sentinel"
 def _sentinel_involved(items: list[dict] | None, key: str) -> bool:
     if not items:
         return False
-    return any(isinstance(it, dict) and it.get(key) == SENTINEL_NAME for it in items)
+    return any(
+        isinstance(it, dict) and it.get(key) == SENTINEL_NAME for it in items
+    )
 
 
 def confidence_from_vote_pattern(
@@ -236,14 +248,22 @@ def confidence_from_vote_pattern(
 
     notes: list[str] = []
     if conf is not None:
-        sentinel_dissenting = pattern == "2-1" and _sentinel_involved(dissent, "personality")
-        sentinel_abstaining = pattern == "2-0" and _sentinel_involved(abstained, "name")
+        sentinel_dissenting = pattern == "2-1" and _sentinel_involved(
+            dissent, "personality"
+        )
+        sentinel_abstaining = pattern == "2-0" and _sentinel_involved(
+            abstained, "name"
+        )
         if sentinel_dissenting:
             conf = round(conf - SENTINEL_DISSENT_PENALTY, 3)
-            notes.append(f"sentinel dissented (penalty {SENTINEL_DISSENT_PENALTY})")
+            notes.append(
+                f"sentinel dissented (penalty {SENTINEL_DISSENT_PENALTY})"
+            )
         if sentinel_abstaining:
             conf = round(conf - SENTINEL_ABSTAIN_PENALTY, 3)
-            notes.append(f"sentinel abstained (penalty {SENTINEL_ABSTAIN_PENALTY})")
+            notes.append(
+                f"sentinel abstained (penalty {SENTINEL_ABSTAIN_PENALTY})"
+            )
 
     result = {
         "confidence": conf,
@@ -281,14 +301,20 @@ def validate_input(data: dict) -> None:
         sys.exit(1)
     for i, cand in enumerate(data["candidates"]):
         if not isinstance(cand, dict):
-            print(f"confidence input: candidates[{i}] must be an object", file=sys.stderr)
+            print(
+                f"confidence input: candidates[{i}] must be an object",
+                file=sys.stderr,
+            )
             sys.exit(1)
         if "scores" not in cand:
             print(
-                f"confidence input: candidates[{i}] (id={cand.get('id', '?')!r}) "
+                f"confidence input: candidates[{i}] "
+                f"(id={cand.get('id', '?')!r}) "
                 f"missing required field 'scores'. "
-                f"For Trias mode, pass {{\"vote_pattern\": \"2-1\"}} instead of candidates with scores "
-                f"(or pipe aggregator --scheme team_vote output directly to confidence.py).",
+                f"For Trias mode, pass {{\"vote_pattern\": \"2-1\"}} instead "
+                f"of candidates with scores "
+                f"(or pipe aggregator --scheme team_vote output directly to "
+                f"confidence.py).",
                 file=sys.stderr,
             )
             sys.exit(1)
@@ -302,21 +328,29 @@ def validate_input(data: dict) -> None:
                 v = float(cand["scores"][voice])
             except (TypeError, ValueError):
                 raise ValueError(
-                    f"confidence input: candidates[{i}].scores.{voice} is not numeric"
+                    f"confidence input: candidates[{i}].scores.{voice} "
+                    f"is not numeric"
                 )
             if not (0.0 <= v <= 1.0):
                 raise ValueError(
-                    f"confidence input: candidates[{i}].scores.{voice} = {v} is out of range [0, 1]"
+                    f"confidence input: candidates[{i}].scores.{voice} = "
+                    f"{v} is out of range [0, 1]"
                 )
 
 
 def derive(candidates: list[dict], chosen: str | None) -> dict:
     if chosen is None:
-        return {"confidence": None, "reason": "no chosen candidate (e.g. all vetoed)"}
+        return {
+            "confidence": None,
+            "reason": "no chosen candidate (e.g. all vetoed)",
+        }
 
     by_id = {c["id"]: c for c in candidates}
     if chosen not in by_id:
-        return {"confidence": None, "reason": f"chosen={chosen!r} not in candidates"}
+        return {
+            "confidence": None,
+            "reason": f"chosen={chosen!r} not in candidates",
+        }
 
     chosen_c = by_id[chosen]
     agreement = 1.0 - (_spread(chosen_c["scores"]) / MAX_STDEV_3VALS)
@@ -364,9 +398,10 @@ def main(argv: list[str] | None = None) -> int:
     # instead of from utility/variance over voice scores. Dissent/abstained
     # arrive on aggregator output piped from --scheme team_vote.
     if "vote_pattern" in data:
-        # Same clean-exit contract as the score path below: an unknown pattern
-        # (e.g. "3-0-0") raises ValueError in confidence_from_vote_pattern — catch
-        # it so the caller gets a one-line stderr message, not a raw traceback.
+        # Same clean-exit contract as the score path below: an unknown
+        # pattern (e.g. "3-0-0") raises ValueError in
+        # confidence_from_vote_pattern — catch it so the caller gets a
+        # one-line stderr message, not a raw traceback.
         try:
             result = confidence_from_vote_pattern(
                 data["vote_pattern"],

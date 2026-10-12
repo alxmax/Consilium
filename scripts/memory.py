@@ -87,10 +87,12 @@ def _matches(text: str, q: str) -> bool:
     return q.lower() in text.lower()
 
 
-def read_medium(n: int = 10, query: str | None = None) -> dict:
-    if not RUNS.exists():
+def read_medium(
+    n: int = 10, query: str | None = None, runs: Path = RUNS
+) -> dict:
+    if not runs.exists():
         return {"tier": "medium", "entries": [], "total": 0}
-    files = sorted(RUNS.glob("*.json"), reverse=True)
+    files = sorted(runs.glob("*.json"), reverse=True)
     entries: list[dict] = []
     for f in files:
         try:
@@ -111,11 +113,19 @@ def read_medium(n: int = 10, query: str | None = None) -> dict:
     return {"tier": "medium", "entries": entries, "total": len(files)}
 
 
-def read_long(query: str | None = None, n: int = 20) -> dict:
-    rows = parse_feedback(FEEDBACK)
+def read_long(
+    query: str | None = None, n: int = 20, feedback: Path = FEEDBACK
+) -> dict:
+    rows = parse_feedback(feedback)
     total = len(rows)
     if query:
-        rows = [r for r in rows if _matches(f"{r['context']} {r['chosen']} {r.get('note', '')}", query)]
+        rows = [
+            r for r in rows
+            if _matches(
+                f"{r['context']} {r['chosen']} {r.get('note', '')}",
+                query,
+            )
+        ]
         rows = rows[-n:]
     else:
         rows = rows[-n:]
@@ -132,38 +142,56 @@ def read_long(query: str | None = None, n: int = 20) -> dict:
     return {"tier": "long", "entries": out, "total": total}
 
 
-def read_all(query: str | None, n: int) -> dict:
+def read_all(
+    query: str | None, n: int, feedback: Path = FEEDBACK, runs: Path = RUNS
+) -> dict:
     return {
         "short": read_short(),
-        "medium": read_medium(n=n, query=query),
-        "long": read_long(query=query, n=n),
+        "medium": read_medium(n=n, query=query, runs=runs),
+        "long": read_long(query=query, n=n, feedback=feedback),
     }
 
 
 def main(argv: list[str] | None = None) -> int:
     force_utf8_streams()
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--tier", choices=("short", "medium", "long", "all"), default="all")
-    ap.add_argument("--n", type=int, default=10, help="cap on entries returned per tier")
-    ap.add_argument("--query", default=None, help="substring filter (medium/long only)")
-    ap.add_argument("--feedback-file", metavar="PATH", help="override FEEDBACK.html path (default: .consilium/FEEDBACK.html)")
-    ap.add_argument("--runs-dir", metavar="PATH", help="override runs/ directory path (default: .consilium/runs)")
+    ap.add_argument(
+        "--tier", choices=("short", "medium", "long", "all"), default="all"
+    )
+    ap.add_argument(
+        "--n", type=int, default=10, help="cap on entries returned per tier"
+    )
+    ap.add_argument(
+        "--query", default=None, help="substring filter (medium/long only)"
+    )
+    ap.add_argument(
+        "--feedback-file", metavar="PATH",
+        help=(
+            "override FEEDBACK.html path "
+            "(default: .consilium/FEEDBACK.html)"
+        ),
+    )
+    ap.add_argument(
+        "--runs-dir", metavar="PATH",
+        help="override runs/ directory path (default: .consilium/runs)",
+    )
     args = ap.parse_args(argv)
 
-    global RUNS, FEEDBACK
-    if args.feedback_file:
-        FEEDBACK = Path(args.feedback_file).resolve()
-    if args.runs_dir:
-        RUNS = Path(args.runs_dir).resolve()
+    feedback = (
+        Path(args.feedback_file).resolve() if args.feedback_file else FEEDBACK
+    )
+    runs = Path(args.runs_dir).resolve() if args.runs_dir else RUNS
 
     if args.tier == "short":
         result = read_short()
     elif args.tier == "medium":
-        result = read_medium(n=args.n, query=args.query)
+        result = read_medium(n=args.n, query=args.query, runs=runs)
     elif args.tier == "long":
-        result = read_long(query=args.query, n=args.n)
+        result = read_long(query=args.query, n=args.n, feedback=feedback)
     else:
-        result = read_all(query=args.query, n=args.n)
+        result = read_all(
+            query=args.query, n=args.n, feedback=feedback, runs=runs
+        )
 
     json.dump(result, sys.stdout, indent=2, ensure_ascii=False)
     sys.stdout.write("\n")

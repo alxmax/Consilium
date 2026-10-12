@@ -350,11 +350,11 @@ isolation guarantees in detail.
 
 | Mode | Model (default) | Effort (default) | What it adds |
 |------|-----------------|------------------|--------------|
-| `sonnet_bare`            | `claude-sonnet-5` | `high` | Plain Sonnet, no skills, no prefix. Baseline. |
-| `superpowers`            | `claude-sonnet-5` | `high` | Auto-loads the `superpowers:*` skill bundle. |
-| `consilium_sequential`   | `claude-sonnet-5` | `high` | `/consilium` skill in sequential mode. |
-| `consilium_trias`        | `claude-sonnet-5` | `high` | `/consilium --mode trias` (three voices). |
-| `consilium_dialectic`    | `claude-sonnet-5` | `high` | `/consilium --mode dialectic`. |
+| `sonnet_bare`            | `claude-sonnet-5-5` | `high` | Plain Sonnet, no skills, no prefix. Baseline. |
+| `superpowers`            | `claude-sonnet-5-5` | `high` | Auto-loads the `superpowers:*` skill bundle. |
+| `consilium_sequential`   | `claude-sonnet-5-5` | `high` | `/consilium` skill in sequential mode. |
+| `consilium_trias`        | `claude-sonnet-5-5` | `high` | `/consilium --mode trias` (three voices). |
+| `consilium_dialectic`    | `claude-sonnet-5-5` | `high` | `/consilium --mode dialectic`. |
 
 > The model is pinned per mode in `MODE_MODELS` (currently only `sonnet_bare`);
 > all other modes inherit the global `--model` default. Effort is the same
@@ -367,9 +367,9 @@ isolation guarantees in detail.
 | Flag         | Default              | Description |
 |--------------|----------------------|-------------|
 | `--clean`    | off                  | Delete `workspace/<mode>/<task>/` before run (the scripts pass this by default). |
-| `--model`    | `claude-sonnet-5`  | Model id or alias. Some modes pin a model — see `MODE_MODELS` in `run_task.py`. |
+| `--model`    | `claude-sonnet-5-5`  | Model id or alias. Some modes pin a model — see `MODE_MODELS` in `run_task.py`. Use `claude-opus-5-5` for the Opus 5.5 batch. |
 | `--effort`   | `high`               | `low / medium / high / xhigh / max`. |
-| `--budget`   | `3.0`                | `--max-budget-usd` cap (USD). |
+| `--budget`   | `5.0`                | `--max-budget-usd` cap (USD). |
 | `--no-verify`| off                  | Skip the automated verification step. |
 
 Hard wall-clock cap: 15 minutes per run (subprocess is killed past that), aligned with the task prompt's 15-minute API-duration limit (raised from 10 min so heavy consilium/trias deliberations aren't killed mid-pipeline).

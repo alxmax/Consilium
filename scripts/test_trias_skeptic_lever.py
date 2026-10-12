@@ -8,6 +8,7 @@ edit (review 2026-06-19 audit, Reviewer 6 blocking: "a targeted test gated in CI
 
 Run: python -X utf8 scripts/test_trias_skeptic_lever.py    (exit 0 = pass)
 """
+# tested-by: CONSILIUM-MODE-TRIAS-001
 from __future__ import annotations
 
 import re

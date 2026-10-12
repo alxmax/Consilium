@@ -60,8 +60,9 @@ def test_note_without_conf_skipped() -> None:
 
 
 def _decide(records):
-    return cc.decide(records, gate=0.7, margin=0.15, min_resolved=20,
-                     min_negatives=10, min_band=5, high_floor=0.75)
+    return cc.decide(records, cc.Thresholds(
+        gate=0.7, margin=0.15, min_resolved=20, min_negatives=10,
+        min_band=5, high_floor=0.75))
 
 
 def test_sharp_ship_c() -> None:
@@ -118,8 +119,9 @@ def test_html_end_to_end() -> None:
     with tempfile.TemporaryDirectory() as d:
         p = Path(d) / "FEEDBACK.html"
         p.write_text(html, encoding="utf-8")
-        result = cc.run(p, gate=0.7, margin=0.15, min_resolved=20, min_negatives=10,
-                        min_band=5, high_floor=0.75, edges=cc.DEFAULT_EDGES)
+        result = cc.run(p, cc.Thresholds(
+            gate=0.7, margin=0.15, min_resolved=20, min_negatives=10,
+            min_band=5, high_floor=0.75), cc.DEFAULT_EDGES)
     check("html end-to-end: parses resolved rows", result["resolved"] == 45)
     check("html end-to-end: produces a verdict", result["verdict"] in
           {"SHIP_C", "FALLBACK_A", "INSUFFICIENT_DATA"})
