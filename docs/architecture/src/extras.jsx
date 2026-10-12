@@ -122,7 +122,7 @@ function CostScatter() {
     <div style={{ margin: '24px 0' }}>
       <h3 className="h-sub" style={{ fontSize: 20, marginBottom: 6 }}>Cost vs voice independence</h3>
       <p className="body-prose" style={{ color: 'var(--ink-2)', fontSize: 14, marginBottom: 14, maxWidth: 720 }}>
-        Where each mode lands on the cost / isolation map. <code>BARE</code> (<code>sonnet_bare</code>, no Consilium) is the measured baseline — it sits below 1×; the deliberation modes cost more for the auditable process they add. <code>SEQ</code> is cheap but shared-context; <code>TRI</code> spends 4× for fully isolated sub-agents. Dispatched voices are pinned to <strong>Sonnet 5</strong> — including all three Trias personalities (per <code>personalities.py</code>); divergence comes from lens re-weighting, not model tier. The orchestrator runs on <strong>your session model</strong>, with an opt-in <strong>Opus</strong> override on the Generator for high-stakes changes.
+        Where each mode lands on the cost / isolation map. <code>BARE</code> (<code>sonnet_bare</code>, no Consilium) is the measured baseline — it sits below 1×; the deliberation modes cost more for the auditable process they add. <code>SEQ</code> is cheap but shared-context; <code>TRI</code> spends 4× for fully isolated sub-agents. Dispatched voices are pinned to <strong>Sonnet 5.5</strong> — including all three Trias personalities (per <code>personalities.py</code>); divergence comes from lens re-weighting, not model tier. The orchestrator runs on <strong>your session model</strong>, with an opt-in <strong>Opus</strong> override on the Generator for high-stakes changes.
       </p>
 
       <svg viewBox={`0 0 ${W} ${H}`} className="diagram">
@@ -618,7 +618,7 @@ function ImplementSection() {
       name: 'Coder',
       color: 'var(--gen)',
       lane: 'implementation files',
-      model: 'Sonnet 5',
+      model: 'Sonnet 5.5',
       desc: 'Reads chosen_approach + success_criterion. Writes all implementation files. Returns a strict JSON manifest. Skipped if chosen_approach is do_nothing or skipped.',
     },
     {
@@ -626,7 +626,7 @@ function ImplementSection() {
       name: 'Test Writer',
       color: 'var(--ctl)',
       lane: 'test_* files only',
-      model: 'Sonnet 5',
+      model: 'Sonnet 5.5',
       desc: 'Runs in parallel with Reviewer. Reads spec + files_written. Writes test_* files only. Tests must be RED against a stub and GREEN against the implementation (red→green gate).',
     },
     {
@@ -634,7 +634,7 @@ function ImplementSection() {
       name: 'Reviewer',
       color: 'var(--con)',
       lane: 'read-only',
-      model: 'Sonnet 5',
+      model: 'Sonnet 5.5',
       desc: 'Runs in parallel with Test Writer. Inlines prompts/voices/control.md against the actual written code as a single synthetic candidate. Goal-fit → types → logic → tests → style. Writes nothing.',
     },
   ];

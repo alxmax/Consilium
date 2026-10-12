@@ -8,6 +8,7 @@ owner: alxmax
 depends_on: [CONSILIUM-VOICE-SKEPTIC-001, CONSILIUM-UTILS-001]
 risk: 2
 satisfies: [ARCH-CONSILIUM-REPORT-001]
+distinct_from: [CONSILIUM-MODE-DIALECTIC-001, CONSILIUM-MODE-SKEPTIC-ON-CHOSEN-001]
 ---
 
 # validate_skeptic
@@ -47,3 +48,8 @@ Every line in this section is binding.
 ## Context (non-binding)
 
 **Current implementation** — `scripts/validate_skeptic.py`.
+
+**Not a duplicate** — CONSILIUM-MODE-DIALECTIC-001 and
+CONSILIUM-MODE-SKEPTIC-ON-CHOSEN-001 are the modes that dispatch a Skeptic;
+this requirement is the script that validates the verdict they get back.
+They share the Skeptic's vocabulary, not a capability.

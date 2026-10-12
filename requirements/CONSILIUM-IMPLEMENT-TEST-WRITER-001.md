@@ -33,10 +33,11 @@ AC-2
   When  the implement-subagent runs the Red→Green gate
   Then  the test is RED against a stub implementation and GREEN against the real one; any test that is green under the stub appears in gate_rejected
 
-AC-3
+AC-3  <!-- verifiable by: inspection -->
   Given a behavior that cannot be covered by automated tests
   When  the Test Writer identifies it
   Then  it appears in uncoverable[] with a reason and no test is emitted for it
 
 ## WHERE — Current implementation
 - prompts/implement/test_writer.md
+- scripts/validate_implement_output.py

@@ -1,6 +1,6 @@
 # benchmark-modes
 
-Local benchmark harness. Each task is solved by a single subprocess and graded by an automated verifier. Refer to `COMMANDS.md` for the full task list, defaults (Sonnet 5, effort=high, budget $3, 15-minute wall-clock cap — aligned with the task prompt's 15-minute API-duration limit) and how to run each one.
+Local benchmark harness. Each task is solved by a single subprocess and graded by an automated verifier. Refer to `COMMANDS.md` for the full task list, defaults (Sonnet 5.5, effort=high, budget $5, 15-minute wall-clock cap — aligned with the task prompt's 15-minute API-duration limit) and how to run each one.
 
 ## How to run
 

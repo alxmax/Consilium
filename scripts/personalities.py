@@ -14,7 +14,8 @@ diverge.
 CLI:
     python personalities.py                     # emit all 3 as JSON array
     python personalities.py --name essentialist # emit single personality
-    python personalities.py <N>                 # legacy form — rejected with exit 2
+    python personalities.py <N>
+    # legacy form — rejected with exit 2
 """
 # implements: CONSILIUM-PERSONALITIES-001
 # implements: CONSILIUM-TRIAS-MODEL-SCHEMA-001
@@ -82,9 +83,12 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.n_legacy is not None:
         print(
-            "error: personalities.py no longer samples random N personalities.\n"
-            "       Trias mode uses 3 fixed personalities: essentialist, verifier, sentinel.\n"
-            "       Run without arguments to emit all 3, or use --name <essentialist|verifier|sentinel>.",
+            "error: personalities.py no longer samples random N "
+            "personalities.\n"
+            "       Trias mode uses 3 fixed personalities: essentialist, "
+            "verifier, sentinel.\n"
+            "       Run without arguments to emit all 3, or use --name "
+            "<essentialist|verifier|sentinel>.",
             file=sys.stderr,
         )
         return 2
@@ -92,7 +96,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.name is not None:
         json.dump(get_by_name(args.name), sys.stdout, indent=2)
     else:
-        json.dump([copy.deepcopy(p) for p in PERSONALITIES], sys.stdout, indent=2)
+        json.dump(
+            [copy.deepcopy(p) for p in PERSONALITIES], sys.stdout, indent=2
+        )
     sys.stdout.write("\n")
     return 0
 

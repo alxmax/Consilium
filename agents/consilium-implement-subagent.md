@@ -103,7 +103,9 @@ correct default — fan-out is a speed optimization for genuinely independent wo
 2. **Malformed-JSON hard-fail.** If the Coder or Test Writer returns non-JSON or schema-invalid
    output, retry that one dispatch **once**. On a second failure, abort the pipeline and return
    `{"error": "subagent_json_invalid", "role": "<coder|test_writer>"}`. Never proceed on an empty
-   or fabricated manifest (silent-empty is the most dangerous failure — Reviewer 6).
+   or fabricated manifest (silent-empty is the most dangerous failure — Reviewer 6). Check each
+   role's JSON with `python scripts/validate_implement_output.py --role <coder|test_writer>` and the
+   final manifest with `--role manifest`; a non-zero exit is schema-invalid (same single retry).
 3. **Red→green gate is mandatory.** A test that passes against a `raise NotImplementedError` stub
    is rejected. Report rejected tests in the manifest under `gate_rejected`.
 4. **No re-deliberation.** The approach is already chosen. Do not run voices to re-pick it.

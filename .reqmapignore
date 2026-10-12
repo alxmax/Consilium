@@ -19,3 +19,14 @@ scripts/make_full_architecture.py
 docs/consilium_full.html
 # Legacy map viewer from Consilium_Demo public repo — generated artifact with stale tags
 docs/map.html
+# CI and hook plumbing: they run the gates the repo-gate requirements describe,
+# and scripts/commit_remind.sh is a local Claude Code Stop hook
+.githooks/**
+.github/workflows/**
+scripts/commit_remind.sh
+# Prose, templates and styles: about the capabilities, never a member of one
+README.md
+docs/*.md
+docs/architecture/README.md
+docs/architecture/styles.css
+templates/requirement.md

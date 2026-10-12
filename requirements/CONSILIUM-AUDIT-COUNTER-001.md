@@ -1,6 +1,7 @@
 ---
 id: CONSILIUM-AUDIT-COUNTER-001
 status: deprecated
+level: code
 layer: feature
 owner: auto
 depends_on: [CONSILIUM-UTILS-001]

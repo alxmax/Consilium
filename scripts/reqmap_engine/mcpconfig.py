@@ -1,8 +1,10 @@
-"""The client configuration that starts `reqmap.py mcp`, written by `init` (ADR-0043).
+"""The client configuration that starts `reqmap.py mcp`, written by `init`
+(ADR-0043).
 
-Two files, one per client family: `.mcp.json` for Claude Code and `.vscode/mcp.json` for
-VS Code with GitHub Copilot. Neither guarantees the server's working directory, so every
-path is written against the variable each client expands to the project root.
+Two files, one per client family: `.mcp.json` for Claude Code and
+`.vscode/mcp.json` for VS Code with GitHub Copilot. Neither guarantees the
+server's working directory, so every path is written against the variable
+each client expands to the project root.
 """
 # implements: ARCH-MCP-073
 import json, os
@@ -19,11 +21,13 @@ SERVER_NAME = "reqmap"
 
 def server_entry(code_root, reqs_dir, base, python=None):
     # implements: REQ-MCPSEED-1029
-    """The stdio server entry for one client, or None when the engine is not inside the
-    repository: a committed config cannot start an engine a clone does not contain."""
+    """The stdio server entry for one client, or None when the engine is
+    not inside the repository: a committed config cannot start an engine a
+    clone does not contain."""
     root = os.path.abspath(code_root)
     try:
-        rel_engine = os.path.relpath(os.path.join(ENGINE_DIR, "reqmap.py"), root)
+        rel_engine = os.path.relpath(
+            os.path.join(ENGINE_DIR, "reqmap.py"), root)
         rel_reqs = os.path.relpath(os.path.abspath(reqs_dir), root)
     except ValueError:          # Windows: another drive has no relative form
         return None
@@ -36,21 +40,24 @@ def server_entry(code_root, reqs_dir, base, python=None):
                      "--reqs", under(rel_reqs), "--code", base]}
 
 
-def seed_mcp_files(code_root, reqs_dir):  # implements: REQ-MCPSEED-1029
-    """Write each client's config when the file does not exist; never edit one that does.
-    Returns (created, notes)."""
+def seed_mcp_files(code_root, reqs_dir):
+    # implements: REQ-MCPSEED-1029
+    """Write each client's config when the file does not exist; never edit
+    one that does. Returns (created, notes)."""
     created, notes = [], []
     for rel, key, base in MCP_CONFIGS:
         path = os.path.join(code_root, *rel.split("/"))
         if os.path.exists(path):
             if SERVER_NAME not in _servers(path, key):
-                notes.append("{} exists and has no `{}` server; add one by hand to use "
-                             "`reqmap.py mcp` from that client.".format(rel, SERVER_NAME))
+                notes.append("{} exists and has no `{}` server; add one "
+                             "by hand to use `reqmap.py mcp` from that "
+                             "client.".format(rel, SERVER_NAME))
             continue
         entry = server_entry(code_root, reqs_dir, base)
         if entry is None:
-            notes.append("no MCP config: the engine is not inside this repository. Vendor it "
-                         "under scripts/ and re-run init.")
+            notes.append("no MCP config: the engine is not inside this "
+                         "repository. Vendor it under scripts/ and "
+                         "re-run init.")
             return created, notes
         os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
@@ -60,7 +67,8 @@ def seed_mcp_files(code_root, reqs_dir):  # implements: REQ-MCPSEED-1029
 
 
 def _servers(path, key):
-    """The server names an existing config declares; empty when it cannot be read."""
+    """The server names an existing config declares; empty when it cannot
+    be read."""
     try:
         with open(path, encoding="utf-8") as f:
             data = json.load(f)
