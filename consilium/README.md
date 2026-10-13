@@ -23,4 +23,4 @@ Ask in a Claude Code session, for example `Review the last commit using the cons
 
 Architecture, modes, benchmarks and the full reference: <https://github.com/alxmax/Consilium>.
 
-Source-available under the Business Source License 1.1 (see `LICENSE`).
+Licensed under the Apache License 2.0 (see `LICENSE`).

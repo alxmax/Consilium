@@ -190,6 +190,6 @@ What this project concretely shows, in Agentic-AI / LLMOps terms. Rated **Full**
 
 ## License
 
-[Business Source License 1.1](LICENSE) © 2026 Schipor Alexandru.
+[Apache License 2.0](LICENSE) © 2026 Schipor Alexandru. Versions up to 1.14.0 were published under the Business Source License 1.1.
 
-Free for non-commercial use (evaluation, education, research, personal). Commercial use within a revenue-generating organization requires a commercial license — contact the Licensor. Converts automatically to Apache 2.0 on **2030-05-16**.
+The vendored requirement-map engine (`scripts/reqmap.py`, `scripts/reqmap_engine/`, `scripts/_map_viewer.html`) comes from [requirement-manager](https://github.com/alxmax/requirement-manager) and keeps its MIT license (`scripts/reqmap_engine/LICENSE`).
