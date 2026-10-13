@@ -272,7 +272,7 @@ Lookup table and step definitions: [docs/skill-reference.md](docs/skill-referenc
 
 ## Feedback loop & memory
 
-All deliberation state lives under **`.consilium/`** in the current project, or under `$CONSILIUM_DATA_DIR` when set — never in the install directory (paths in `scripts/utils.py`): `.consilium/runs/*.json` (one report per deliberation, schema in `docs/runs-schema.md`) and `.consilium/FEEDBACK.html` (one row per use: `date | context | chosen | outcome | note`, outcome `OK`/`BAD`/`OVR`/`PEND`). `mark_outcome.py` adds a `[confirmed]` marker; `priors.py` rates only confirmed rows. `CLOSED_UNVERIFIED` closes a PEND with no evidence either way. Memory tiers (short/medium/long): `scripts/memory.py --tier <short|medium|long|all>`; see [docs/memory-tiers.md](docs/memory-tiers.md). Storage details: [docs/skill-reference.md](docs/skill-reference.md#feedback-loop--storage-details).
+All deliberation state lives under **`.consilium/`** in the current project, or under the directory the `CONSILIUM_DATA_DIR` environment variable names — never in the install directory (paths in `scripts/utils.py`): `.consilium/runs/*.json` (one report per deliberation, schema in `docs/runs-schema.md`) and `.consilium/FEEDBACK.html` (one row per use: `date | context | chosen | outcome | note`, outcome `OK`/`BAD`/`OVR`/`PEND`). `mark_outcome.py` adds a `[confirmed]` marker; `priors.py` rates only confirmed rows. `CLOSED_UNVERIFIED` closes a PEND with no evidence either way. Memory tiers (short/medium/long): `scripts/memory.py --tier <short|medium|long|all>`; see [docs/memory-tiers.md](docs/memory-tiers.md). Storage details: [docs/skill-reference.md](docs/skill-reference.md#feedback-loop--storage-details).
 
 ## Headless invariants
 

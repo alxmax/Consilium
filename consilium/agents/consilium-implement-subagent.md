@@ -49,6 +49,8 @@ if (-not $env:CONSILIUM_PATH -or -not (Test-Path "$env:CONSILIUM_PATH\SKILL.md")
 if (-not $env:CONSILIUM_PATH) { throw "consilium skill not found (tried skills dir, plugin cache, CWD)" }
 ```
 
+Run every script by its full path and stay in the project directory: `python -X utf8 "$CONSILIUM_PATH/scripts/<name>.py" ...`. Never `cd` into `$CONSILIUM_PATH`: the scripts keep deliberation state in `.consilium/` under the current directory (or under the `CONSILIUM_DATA_DIR` environment variable), so running them from the install directory would write the journal into the plugin cache, which every update replaces.
+
 If no candidate has a `SKILL.md`, return `{"error": "consilium skill not installed at any expected path", "tried": ["skills dir", "plugin cache", "cwd"]}` and stop — do not fabricate output.
 
 ## Pipeline sequence
@@ -64,7 +66,7 @@ report (GO) ──▶ Coder (alone first — can't test code that doesn't exist)
             run red→green gate + assemble manifest
 ```
 
-1. **Plan.** `cd "$CONSILIUM_PATH" && python -X utf8 scripts/implement_pipeline.py --input <report.json> --dry-run`
+1. **Plan.** `python -X utf8 "$CONSILIUM_PATH/scripts/implement_pipeline.py" --input <report.json> --dry-run`
    to get the role→prompt mapping and the extracted spec. Skip (exit 1) if `chosen_approach` is
    `do_nothing`/`skipped`.
 2. **Coder.** Inline `prompts/implement/coder.md` + the spec. It writes implementation files and
@@ -74,7 +76,7 @@ report (GO) ──▶ Coder (alone first — can't test code that doesn't exist)
    - **Reviewer:** inline `prompts/voices/control.md` with a single synthetic candidate whose
      `sketch` is the *actual written code* (read the files), `id: "implemented"`. Run goal-fit →
      types → logic → tests → style on the written code. Read-only — it writes nothing.
-4. **Gate.** `python -X utf8 scripts/implement_pipeline.py --verify-gate --test-cmd "<verification>" --target <impl_file...>`
+4. **Gate.** `python -X utf8 "$CONSILIUM_PATH/scripts/implement_pipeline.py" --verify-gate --test-cmd "<verification>" --target <impl_file...>`
    — pass **every** Coder-written impl file (all of `files_written`; under fan-out, the union across the parallel Coders), not just one. The gate stubs exactly what it is given, so passing a subset re-opens the single-file hole — this complete-union requirement is load-bearing and **not enforced by the script**. Stubbing only one of N leaves the rest live, so the suite can stay GREEN under the stub and the gate spuriously **fails** a correctly-tested change. Tests must be RED against the fully-stubbed impl and GREEN against the real one. Reject tests that are green under the stub. (The gate confirms the tests are non-vacuously coupled to the passed files; it does not certify each file is individually covered.)
 
 ## Optional fan-out (task-split)
@@ -104,7 +106,7 @@ correct default — fan-out is a speed optimization for genuinely independent wo
    output, retry that one dispatch **once**. On a second failure, abort the pipeline and return
    `{"error": "subagent_json_invalid", "role": "<coder|test_writer>"}`. Never proceed on an empty
    or fabricated manifest (silent-empty is the most dangerous failure — Reviewer 6). Check each
-   role's JSON with `python scripts/validate_implement_output.py --role <coder|test_writer>` and the
+   role's JSON with `python "$CONSILIUM_PATH/scripts/validate_implement_output.py" --role <coder|test_writer>` and the
    final manifest with `--role manifest`; a non-zero exit is schema-invalid (same single retry).
 3. **Red→green gate is mandatory.** A test that passes against a `raise NotImplementedError` stub
    is rejected. Report rejected tests in the manifest under `gate_rejected`.

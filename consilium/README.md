@@ -16,7 +16,7 @@ Ask in a Claude Code session, for example `Review the last commit using the cons
 
 - **Local Python scripts only.** The skill runs the stdlib-only scripts in `scripts/` (Python 3.11+, no third-party packages, nothing installed). Some call `git` read-only (`diff`, `log`, `describe`, `rev-parse`) to size the change under review.
 - **No network access.** No script opens a network connection, and nothing is sent anywhere. The voices run as Claude sub-agents in your own session (`model: sonnet` by default).
-- **State stays in your project.** Reports, the outcome journal and preview pages are written to `.consilium/` in the current working directory, or to `$CONSILIUM_DATA_DIR` when set. Add `.consilium/` to your `.gitignore` if you do not want it versioned.
+- **State stays in your project.** Reports, the outcome journal and preview pages are written to `.consilium/` in the current working directory, or to the directory the `CONSILIUM_DATA_DIR` environment variable names. Add `.consilium/` to your `.gitignore` if you do not want it versioned.
 - **No hooks, no permission changes.** The plugin ships one skill and two sub-agents and does not modify your settings.
 
 ## More

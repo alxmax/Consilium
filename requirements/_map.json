@@ -1176,7 +1176,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "consilium/agents/consilium-implement-subagent.md:167"
+          "loc": "consilium/agents/consilium-implement-subagent.md:169"
         }
       ],
       "test_exempt": "agent spec document — behavioral contract validated by Step 7 auto-dispatch integration and implement-subagent smoke tests",
@@ -2401,7 +2401,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "consilium/agents/consilium-subagent.md:111"
+          "loc": "consilium/agents/consilium-subagent.md:126"
         }
       ],
       "test_exempt": "agent spec document — behavioral contract validated by consilium-subagent smoke tests and Trias/Dialectic integration runs",
@@ -4023,7 +4023,7 @@
     },
     {
       "month": "2026-10",
-      "count": 5,
+      "count": 6,
       "first": "2026-10-13",
       "last": "2026-10-13",
       "versions": [
@@ -4031,11 +4031,20 @@
         "v1.13.1",
         "v1.14.0",
         "v1.15.0",
-        "v1.15.1"
+        "v1.15.1",
+        "v1.15.2"
       ],
       "landmark": "v1.15.0",
       "headline": "",
       "entries": [
+        {
+          "version": "v1.15.2",
+          "date": "2026-10-13",
+          "headline": "",
+          "body": "### Fixed\n- The two sub-agents ran scripts with `cd \"$CONSILIUM_PATH\" && python scripts/...`. Since 1.13.1 the scripts keep state in `.consilium/` under the current directory, so a deliberation or implementation dispatched as a sub-agent wrote its report and journal into the install directory (the plugin cache, replaced on every update), and `implement_pipeline.py --input` could not find a report given relative to the project. Both agents now stay in the project directory and call each script by its full path, `\"$CONSILIUM_PATH/scripts/<name>.py\"`.\n- `consilium-subagent` looked for the skill only in `~/.claude/skills/consilium`, so it failed for a plugin install. It now resolves the path like `consilium-implement-subagent`: an already-set `CONSILIUM_PATH`, the manual skill install, the newest plugin-cache version, then the current directory.\n\n### Changed\n- `SKILL.md` and the plugin README name the `CONSILIUM_DATA_DIR` environment variable in words rather than as `$CONSILIUM_DATA_DIR`, which an install-time scan read as the skill reading a credential from the installer's environment.\n\n### Added\n- `test_plugin_folder.py` fails if an agent `cd`s into `$CONSILIUM_PATH`.",
+          "first_commit": "2026-10-13",
+          "last_commit": "2026-10-13"
+        },
         {
           "version": "v1.15.1",
           "date": "2026-10-13",
