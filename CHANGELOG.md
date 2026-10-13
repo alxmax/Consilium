@@ -1,8 +1,17 @@
 # Changelog
 
 All notable changes to Consilium are recorded here, following
-[Keep a Changelog](https://keepachangelog.com/). This project is source-available
-under the Business Source License 1.1 (see `LICENSE`).
+[Keep a Changelog](https://keepachangelog.com/). This project is licensed under the
+Apache License 2.0 (see `LICENSE`); versions up to 1.14.0 were published under the
+Business Source License 1.1.
+
+## [1.15.0] — 2026-10-13
+
+### Changed
+- License: Apache License 2.0 instead of the Business Source License 1.1, for the repository and the shipped plugin (`LICENSE`, `consilium/LICENSE`, `plugin.json`). Apache-2.0 was already the BSL's Change License; any organization may now use Consilium, commercially included. Versions up to 1.14.0 stay under BSL-1.1.
+
+### Added
+- `scripts/reqmap_engine/LICENSE`: the MIT license of the vendored requirement-map engine (from requirement-manager), kept next to the copied code.
 
 ## [1.14.0] — 2026-10-13
 
