@@ -19,6 +19,8 @@ scripts/make_full_architecture.py
 docs/consilium_full.html
 # Legacy map viewer from the public repo — generated artifact with stale tags
 docs/map.html
+# GitHub Pages redirect stub (no capability)
+docs/index.html
 # CI and hook plumbing: they run the gates the repo-gate requirements describe,
 # and scripts/commit_remind.sh is a local Claude Code Stop hook
 .githooks/**

@@ -12,6 +12,7 @@ can `import aggregator` as before.
     import plugin_paths
     plugin_paths.PLUGIN_SCRIPTS / "aggregator.py"
 """
+# implements: CONSILIUM-PLUGIN-FOLDER-001
 from __future__ import annotations
 
 import sys

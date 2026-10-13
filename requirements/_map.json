@@ -227,6 +227,7 @@
         "CONSILIUM-CHECK-DOC-DRIFT-EXPLAINER-001",
         "CONSILIUM-CHECK-PUBLIC-LEAK-001",
         "CONSILIUM-CHECK-VERSIONS-001",
+        "CONSILIUM-PLUGIN-FOLDER-001",
         "CONSILIUM-RUN-EVALS-001",
         "SKILL-RUN-CONSILIUM-001"
       ],
@@ -2000,6 +2001,55 @@
       "risks": []
     },
     {
+      "id": "CONSILIUM-PLUGIN-FOLDER-001",
+      "layer": "feature",
+      "level": "code",
+      "status": "confirmed",
+      "area": "CONSILIUM",
+      "title": "plugin_folder",
+      "intent": "The plugin ships from `consilium/`, and that folder holds only what the skill runs.",
+      "contract": [
+        "An install (the Claude plugin directory, the marketplace or `apm install alxmax/Consilium/consilium`) receives only `consilium/`, the folder holding `.claude-plugin/plugin.json`.",
+        "`consilium/` holds only `.claude-plugin/plugin.json`, `.claude-plugin/icon.png`, `SKILL.md`, `README.md`, `LICENSE` and the `agents/`, `prompts/`, `modes/`, `scripts/` and `docs/` directories.",
+        "`consilium/scripts/` holds only Python files, and none is a test (`test_*.py`).",
+        "No file in `consilium/` is larger than 256 KiB.",
+        "No text file in `consilium/` runs `git push` or `git commit`, loads a remote `<script src>`, or carries an invisible format character (Unicode category Cf); such a character is written as an escape, e.g. `\"\\ufeff\"`.",
+        "No agent in `consilium/agents/` changes directory into `$CONSILIUM_PATH`: sub-agents call scripts by full path from the project directory, where the scripts keep their state.",
+        "Tests, gates and repo tooling stay in `scripts/`; they reach the plugin through `scripts/plugin_paths.py`.",
+        "`scripts/plugin_paths.py` exposes `REPO_ROOT`, `PLUGIN_DIR`, `PLUGIN_SCRIPTS`; importing it puts `PLUGIN_SCRIPTS` on `sys.path`.",
+        "`scripts/test_plugin_folder.py` enforces these rules over the files git tracks in `consilium/`; it runs in CI and in the run-consilium driver."
+      ],
+      "verify": [
+        "None - all questions resolved."
+      ],
+      "notes": [],
+      "current_impl": [],
+      "accept": "- **CASE-1** — Given the tracked files under `consilium/`, when the allow-list is checked, then every path is one of the allowed files or lies in an allowed directory.\n- **CASE-2** — Given `consilium/scripts/`, when its files are listed, then each is a `.py` file and none is named `test_*.py`.\n- **CASE-3** — Given every tracked file under `consilium/`, when its size is read, then none exceeds 256 KiB.\n- **CASE-4** — Given every text file under `consilium/`, when it is scanned, then none contains `git push`, `git commit` or a remote `<script src>`.\n- **CASE-5** — Given every text file under `consilium/`, when it is scanned, then none contains a Unicode format (Cf) character.\n- **CASE-6** — Given the agent files under `consilium/agents/`, when they are scanned, then none contains `cd \"$CONSILIUM_PATH\"`.\n- **CASE-7** — Given the tracked files under `consilium/`, when they are listed, then `.claude-plugin/plugin.json`, `.claude-plugin/icon.png`, `SKILL.md`, `README.md` and `LICENSE` are present.",
+      "input": "",
+      "output": "",
+      "desc": "",
+      "depends_on": [],
+      "used_by": [],
+      "satisfies": [
+        "ARCH-CONSILIUM-REPO-GATES-001"
+      ],
+      "satisfied_by": [],
+      "members": [
+        {
+          "role": "implements",
+          "loc": "scripts/plugin_paths.py:15"
+        },
+        {
+          "role": "tested-by",
+          "loc": "scripts/test_plugin_folder.py:12"
+        }
+      ],
+      "test_exempt": null,
+      "milestone": "v1.14.0",
+      "priority": "",
+      "risks": []
+    },
+    {
       "id": "CONSILIUM-PRIORS-001",
       "layer": "feature",
       "level": "code",
@@ -3735,6 +3785,10 @@
       "ARCH-CONSILIUM-VOICES-001"
     ],
     [
+      "CONSILIUM-PLUGIN-FOLDER-001",
+      "ARCH-CONSILIUM-REPO-GATES-001"
+    ],
+    [
       "CONSILIUM-PRIORS-001",
       "ARCH-CONSILIUM-LEARNING-001"
     ],
@@ -4042,7 +4096,7 @@
           "date": "2026-10-13",
           "headline": "",
           "body": "### Fixed\n- The two sub-agents ran scripts with `cd \"$CONSILIUM_PATH\" && python scripts/...`. Since 1.13.1 the scripts keep state in `.consilium/` under the current directory, so a deliberation or implementation dispatched as a sub-agent wrote its report and journal into the install directory (the plugin cache, replaced on every update), and `implement_pipeline.py --input` could not find a report given relative to the project. Both agents now stay in the project directory and call each script by its full path, `\"$CONSILIUM_PATH/scripts/<name>.py\"`.\n- `consilium-subagent` looked for the skill only in `~/.claude/skills/consilium`, so it failed for a plugin install. It now resolves the path like `consilium-implement-subagent`: an already-set `CONSILIUM_PATH`, the manual skill install, the newest plugin-cache version, then the current directory.\n\n### Changed\n- `SKILL.md` and the plugin README name the `CONSILIUM_DATA_DIR` environment variable in words rather than as `$CONSILIUM_DATA_DIR`, which an install-time scan read as the skill reading a credential from the installer's environment.\n\n### Added\n- `test_plugin_folder.py` fails if an agent `cd`s into `$CONSILIUM_PATH`.",
-          "first_commit": "2026-10-13",
+          "first_commit": "2026-09-30",
           "last_commit": "2026-10-13"
         },
         {
@@ -4423,14 +4477,14 @@
   },
   "health": {
     "score": 100,
-    "total": 56,
-    "scored": 55,
-    "healthy": 55,
+    "total": 57,
+    "scored": 56,
+    "healthy": 56,
     "exempt": 17,
     "deprecated": 1,
-    "confirmed": 55,
-    "implemented": 46,
-    "tested": 31,
+    "confirmed": 56,
+    "implemented": 47,
+    "tested": 32,
     "drafts": 0,
     "orphans": 0,
     "untested": 0,
