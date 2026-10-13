@@ -856,6 +856,11 @@ function GreenGateSection() {
       cmd: 'check_versions.py + CHANGELOG entry check',
       desc: 'plugin.json and marketplace.json semver must stay coherent, and a plugin.json version bump must ship with a matching CHANGELOG.md entry — manifests that drift apart, or a bump with no changelog note, fail CI.',
     },
+    {
+      name: 'Automatic release',
+      cmd: 'changelog_notes.py → gh release create',
+      desc: 'On a push to main that carries a plugin.json version with no release yet, CI tags vX.Y.Z and publishes a GitHub release whose notes are that version’s CHANGELOG.md section — the same reader the changelog gate uses, so every bump that passes CI has notes to publish.',
+    },
   ];
 
   return (

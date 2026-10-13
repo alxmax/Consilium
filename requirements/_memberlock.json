@@ -117,7 +117,7 @@
       "consilium/scripts/vote_degeneracy.py": "8c3df5b195c20d1bac6d465a8bd8d8a09fa8645755e602035048e04ac69f38dd"
     },
     "SKILL-RUN-CONSILIUM-001": {
-      ".claude/skills/run-consilium/driver.py": "ced9dbfc9e266ad31f6350885fcc4961a53a692d77d9c6bb58d4d1a666664ef0"
+      ".claude/skills/run-consilium/driver.py": "8dcbfb4e2eba30ee48216e0362902a66fad7fcc016a755f2b271fb1a248aca1e"
     }
   }
 }
