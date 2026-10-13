@@ -129,6 +129,10 @@
       "hash": "c1e099421b2d",
       "reason": "sync dev PRs #501-#506 into demo"
     },
+    "CONSILIUM-PLUGIN-FOLDER-001": {
+      "hash": "3755d4df704d",
+      "reason": "new requirement: example escape written as text, not as the invisible character"
+    },
     "CONSILIUM-PRIORS-001": {
       "hash": "c014f260b9d4",
       "reason": "plugin moved to consilium/: runtime scripts, plugin.json and contract paths relocated; behaviour unchanged"

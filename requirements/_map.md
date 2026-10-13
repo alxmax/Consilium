@@ -1,7 +1,7 @@
 ---
 generated: 2026-10-13
 engine: 2026-10-11.3
-nodes: 56
+nodes: 57
 edges: 105
 design pass-rate: 77% (24/31 source files without a design candidate)
 ---
@@ -51,6 +51,7 @@ graph LR
     CONSILIUM_MODE_SKEPTIC_ON_CHOSEN_001["skeptic_on_chosen flag<br><small>CONSILIUM-MODE-SKEPTIC-ON-CHOSEN-001</small>"]
     CONSILIUM_MODE_TRIAS_001["trias mode<br><small>CONSILIUM-MODE-TRIAS-001</small>"]
     CONSILIUM_PERSONALITIES_001["personalities<br><small>CONSILIUM-PERSONALITIES-001</small>"]
+    CONSILIUM_PLUGIN_FOLDER_001["plugin_folder<br><small>CONSILIUM-PLUGIN-FOLDER-001</small>"]
     CONSILIUM_PRIORS_001["priors<br><small>CONSILIUM-PRIORS-001</small>"]
     CONSILIUM_RENDER_FEEDBACK_HTML_001["render_feedback_html<br><small>CONSILIUM-RENDER-FEEDBACK-HTML-001</small>"]
     CONSILIUM_RENDER_IMPL_PREVIEW_001["render_impl_preview<br><small>CONSILIUM-RENDER-IMPL-PREVIEW-001</small>"]
@@ -205,7 +206,7 @@ _Area-level coupling: one box per area (N caps), arrow A->B = some capability in
 ```mermaid
 graph LR
   a_ARCH["ARCH<br><small>6 caps</small>"]
-  a_CONSILIUM["CONSILIUM<br><small>46 caps</small>"]
+  a_CONSILIUM["CONSILIUM<br><small>47 caps</small>"]
   a_SYS["SYS<br><small>3 caps</small>"]
   a_misc["misc<br><small>1 caps</small>"]
   a_ARCH --> a_CONSILIUM
