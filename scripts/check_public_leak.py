@@ -1,10 +1,9 @@
-"""Guard: the published repo must not point back to its private source.
+"""Guard: the public repo must not point at the archived private dev repo.
 
-Fails (exit 1) if any tracked file references the private development
-repository (any `alxmax/[Cc]onsilium…` that is not `…_Demo`) or leaks a
-local absolute dev path. This keeps the public release repo decoupled from
-its private source across rebuilds and dev->demo migrations — a private-repo
-reference becomes un-shippable rather than a silent leak (e.g. the explainer's
+Fails (exit 1) if any tracked file references the former private development
+repository (`alxmax/[Cc]onsilium-[Dd]ev`, archived when development moved into
+this public repo) or leaks a local absolute dev path. A private-repo reference
+becomes un-shippable rather than a silent leak (e.g. the explainer's
 "View repository" link, which once pointed at the private repo).
 
     python scripts/check_public_leak.py
@@ -23,10 +22,10 @@ import sys
 from pathlib import Path
 
 # Owner-qualified repo refs only (the bare project name "consilium" appears in
-# countless legitimate paths/strings). `_Demo` is the allowed public repo.
+# countless legitimate paths/strings). `alxmax/Consilium` itself is this repo.
 PATTERNS = [
     (
-        re.compile(r"alxmax/[Cc]onsilium(?!_[Dd]emo)"),
+        re.compile(r"alxmax/[Cc]onsilium[-_][Dd]ev"),
         "reference to the private dev repo",
     ),
     (

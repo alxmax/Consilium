@@ -36,7 +36,7 @@ PY = [sys.executable, "-X", "utf8"]
 ENV = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8",
        # reqmap gate's map-freshness check needs the public-repo override
        # (memory: omitting it fails CI)
-       "REQMAP_REPO": os.environ.get("REQMAP_REPO", "alxmax/Consilium_Demo")}
+       "REQMAP_REPO": os.environ.get("REQMAP_REPO", "alxmax/Consilium")}
 
 # Baseline of known-failing run_evals scenarios treated as pre-existing (not a
 # regression): smoke() exits non-zero only when failures exceed it. Was 6 —

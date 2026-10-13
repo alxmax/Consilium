@@ -65,17 +65,10 @@ docs/superpowers/specs/
 TODO.md
 .tmp_backup/
 
-# Benchmark harness — regenerable run artifacts (analog of runs/), local only
-benchmark/workspace/
-benchmark/files/
-benchmark/runs/
-benchmark/FEEDBACK.html
-# Generated report embeds oracle answer values (analyze.py output) — regenerable, never commit
-benchmark/report.html
-# Answer keys live ONLY in the EXTERNAL sibling Benchmark-scoring/ repo.
-# Never commit a scoring tree inside benchmark/ — it would defeat the blind benchmark.
-benchmark/scoring/
-benchmark/Benchmark-scoring/
+# Benchmark harness moved to its own repo (alxmax/Consilium-Benchmark). Ignore
+# any leftover local benchmark/ tree (run artifacts, reports embedding answer
+# values) so it can never be re-added here.
+benchmark/
 
 # Source upload for docs/architecture (extracted into docs/architecture/)
 Arhitecture.zip

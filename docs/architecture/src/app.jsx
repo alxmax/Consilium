@@ -177,7 +177,7 @@ function Topbar() {
         </a>
         <a
           className="topbar__repo"
-          href="https://github.com/alxmax/Consilium_Demo"
+          href="https://github.com/alxmax/Consilium"
           target="_blank"
           rel="noopener noreferrer"
         >

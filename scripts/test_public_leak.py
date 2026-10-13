@@ -24,8 +24,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 import check_public_leak
 from check_public_leak import SKIP_SUFFIX, scan_text
 
-PRIVATE_REPO = "alxmax/" + "Consilium"
-PUBLIC_REPO = "alxmax/" + "Consilium_Demo"
+PRIVATE_REPO = "alxmax/" + "Consilium-Dev"
+PUBLIC_REPO = "alxmax/" + "Consilium"
 LOCAL_PATH = "Desktop" + chr(92) + "Doc" + chr(92) + "Consilium"
 
 
@@ -35,7 +35,7 @@ class TestScanText(unittest.TestCase):
         self.assertEqual(len(hits), 1)
         self.assertIn("private dev repo", hits[0])
 
-    def test_public_demo_repo_allowed(self):
+    def test_public_repo_allowed(self):
         self.assertEqual(scan_text("x.md", "install from " + PUBLIC_REPO), [])
 
     def test_local_dev_path_detected(self):

@@ -4,6 +4,15 @@ All notable changes to Consilium are recorded here, following
 [Keep a Changelog](https://keepachangelog.com/). This project is source-available
 under the Business Source License 1.1 (see `LICENSE`).
 
+## [1.13.0] — 2026-10-13
+
+### Changed
+- Development now happens in this public repository, renamed from `Consilium_Demo` to `Consilium`. The former private development repository is archived; `homepage`, `repository`, the README install command, the explainer's repository link and `REQMAP_REPO` now name `alxmax/Consilium`, and the Pages site is at `https://alxmax.github.io/Consilium/`.
+- `scripts/check_public_leak.py` now flags references to the archived dev repository by its own slug, instead of every `alxmax/Consilium` slug that is not the old `_Demo` name.
+
+### Removed
+- `benchmark/`: the mode-vs-baseline harness moved to its own repository, [Consilium-Benchmark](https://github.com/alxmax/Consilium-Benchmark), so installing the plugin no longer ships it. It loads this plugin from a sibling checkout (`--plugin-dir`); `scripts/fix_benchmark_pendings.py` stays here because the harness calls it.
+
 ## [1.12.4] — 2026-09-29
 
 ### Added

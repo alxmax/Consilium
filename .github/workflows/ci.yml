@@ -101,4 +101,4 @@ jobs:
       - name: Requirement map gate + freshness (reqmap, strict)
         run: python -X utf8 scripts/reqmap.py gate --strict
         env:
-          REQMAP_REPO: alxmax/Consilium_Demo
+          REQMAP_REPO: alxmax/Consilium
