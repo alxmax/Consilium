@@ -4023,18 +4023,27 @@
     },
     {
       "month": "2026-10",
-      "count": 4,
+      "count": 5,
       "first": "2026-10-13",
       "last": "2026-10-13",
       "versions": [
         "v1.13.0",
         "v1.13.1",
         "v1.14.0",
-        "v1.15.0"
+        "v1.15.0",
+        "v1.15.1"
       ],
       "landmark": "v1.15.0",
       "headline": "",
       "entries": [
+        {
+          "version": "v1.15.1",
+          "date": "2026-10-13",
+          "headline": "",
+          "body": "### Added\n- `consilium/.claude-plugin/icon.png` (1024 x 1024, 74 KiB): the three voices in their explainer colours (Generator amber, Control blue, Conservator red) converging on one decision, a check on a dark disc, on the explainer's paper background. A plugin-directory listing takes its icon from the first submission and does not change it afterwards, so it is committed before one.\n- `test_plugin_folder.py` allows the icon and skips binary images in its text scans.",
+          "first_commit": "2026-10-13",
+          "last_commit": "2026-10-13"
+        },
         {
           "version": "v1.15.0",
           "date": "2026-10-13",

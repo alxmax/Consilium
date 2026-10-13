@@ -19,7 +19,9 @@ sys.path.insert(0, str(Path(__file__).parent))
 import plugin_paths  # noqa: E402
 
 PLUGIN = plugin_paths.PLUGIN_DIR
-ALLOWED_FILES = {".claude-plugin/plugin.json", "SKILL.md", "README.md", "LICENSE"}
+ALLOWED_FILES = {".claude-plugin/plugin.json", ".claude-plugin/icon.png",
+                 "SKILL.md", "README.md", "LICENSE"}
+IMAGES = (".png",)  # binary: size-checked, not text-scanned
 ALLOWED_DIRS = {"agents", "prompts", "modes", "scripts", "docs"}
 MAX_BYTES = 256 * 1024  # directory: larger non-image files are held for review
 
@@ -53,6 +55,8 @@ class TestPluginFolder(unittest.TestCase):
     def test_no_git_automation_or_remote_scripts(self):
         hits = []
         for f in self.files:
+            if f.endswith(IMAGES):
+                continue
             text = (PLUGIN / f).read_text(encoding="utf-8", errors="ignore")
             if re.search(r"\bgit\s+(push|commit)\b", text):
                 hits.append(f"{f}: git push/commit")
@@ -66,13 +70,16 @@ class TestPluginFolder(unittest.TestCase):
         import unicodedata
         hits = []
         for f in self.files:
+            if f.endswith(IMAGES):
+                continue
             text = (PLUGIN / f).read_text(encoding="utf-8", errors="ignore")
             hits += [f"{f}: U+{ord(c):04X}" for c in set(text)
                      if unicodedata.category(c) == "Cf"]
         self.assertEqual(hits, [])
 
     def test_manifest_and_skill_present(self):
-        for f in (".claude-plugin/plugin.json", "SKILL.md", "README.md", "LICENSE"):
+        for f in (".claude-plugin/plugin.json", ".claude-plugin/icon.png",
+                  "SKILL.md", "README.md", "LICENSE"):
             self.assertIn(f, self.files)
 
 
