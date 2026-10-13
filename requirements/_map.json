@@ -4288,15 +4288,15 @@
     }
   ],
   "design": {
-    "files": 31,
+    "files": 32,
     "clean_files": 24,
-    "score": 77,
+    "score": 75,
     "candidates": {
       "encapsulation": 0,
       "abstraction": 2,
       "inheritance": 0,
       "polymorphism": 0,
-      "standards": 8
+      "standards": 9
     },
     "findings": [
       {
@@ -4354,6 +4354,14 @@
         "line": 107,
         "name": "version.py",
         "detail": "2 line(s) wider than 80 columns, first at line 107"
+      },
+      {
+        "pillar": "standards",
+        "kind": "line-too-long",
+        "file": "scripts/changelog_notes.py",
+        "line": 30,
+        "name": "changelog_notes.py",
+        "detail": "3 line(s) wider than 80 columns, first at line 30"
       },
       {
         "pillar": "standards",

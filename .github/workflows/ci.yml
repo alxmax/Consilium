@@ -36,8 +36,9 @@ jobs:
         run: |
           if git rev-parse HEAD~1 >/dev/null 2>&1 && ! git diff --quiet HEAD~1 -- consilium/.claude-plugin/plugin.json; then
             VERSION=$(python -c "import json; print(json.load(open('consilium/.claude-plugin/plugin.json'))['version'])")
-            if ! grep -qF "[$VERSION]" CHANGELOG.md; then
-              echo "::error::plugin.json version bumped to $VERSION but CHANGELOG.md has no matching '[$VERSION]' heading — add one before merging."
+            # Same reader as the release job, so a bump that passes here always has notes.
+            if ! python scripts/changelog_notes.py "$VERSION" >/dev/null; then
+              echo "::error::plugin.json version bumped to $VERSION but CHANGELOG.md has no non-empty '## [$VERSION]' section — add one before merging."
               exit 1
             fi
           fi
@@ -91,6 +92,8 @@ jobs:
         run: python scripts/test_render_impl_preview.py
       - name: Plugin folder ships only the runtime (allow-list)
         run: python scripts/test_plugin_folder.py
+      - name: Release-notes reader tests
+        run: python scripts/test_changelog_notes.py
       - name: Doc-drift invariant unit tests
         run: python scripts/test_check_doc_drift.py
       - name: Mode-doc drift invariants (check_doc_drift)
@@ -104,3 +107,36 @@ jobs:
         run: python -X utf8 scripts/reqmap.py gate --strict
         env:
           REQMAP_REPO: alxmax/Consilium
+
+  # Cut a GitHub release when the plugin's version has no release yet. plugin.json
+  # is the single source of truth (check_versions.py keeps marketplace.json equal
+  # to it), so the release tracks the version a `/plugin update` installs.
+  # Runs only on pushes to main, after green-gate passes. Idempotent: a push that
+  # does not bump the version finds the release already present and exits 0, so
+  # only a version-bumping merge produces a tag. Notes come from the matching
+  # CHANGELOG.md section (scripts/changelog_notes.py), the same reader the
+  # version-bump step above uses. Mirrors requirement-manager's release job.
+  release:
+    needs: green-gate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # create the tag + GitHub release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Release plugin.json version if untagged
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(python -c "import json; print(json.load(open('consilium/.claude-plugin/plugin.json'))['version'])")
+          TAG="v$VERSION"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "release $TAG already exists — nothing to cut."
+            exit 0
+          fi
+          python -X utf8 scripts/changelog_notes.py "$VERSION" > RELEASE_NOTES.md
+          gh release create "$TAG" --target "$GITHUB_SHA" --title "$TAG" --notes-file RELEASE_NOTES.md
+          echo "cut release $TAG" >> "$GITHUB_STEP_SUMMARY"

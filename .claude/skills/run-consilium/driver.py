@@ -120,6 +120,7 @@ TEST_SUITES = (
     "test_check_versions.py",
     "test_check_doc_drift.py",
     "test_plugin_folder.py",
+    "test_changelog_notes.py",
 )
 
 
