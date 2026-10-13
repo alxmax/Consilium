@@ -5,6 +5,18 @@ All notable changes to Consilium are recorded here, following
 Apache License 2.0 (see `LICENSE`); versions up to 1.14.0 were published under the
 Business Source License 1.1.
 
+## [1.15.2] — 2026-10-13
+
+### Fixed
+- The two sub-agents ran scripts with `cd "$CONSILIUM_PATH" && python scripts/...`. Since 1.13.1 the scripts keep state in `.consilium/` under the current directory, so a deliberation or implementation dispatched as a sub-agent wrote its report and journal into the install directory (the plugin cache, replaced on every update), and `implement_pipeline.py --input` could not find a report given relative to the project. Both agents now stay in the project directory and call each script by its full path, `"$CONSILIUM_PATH/scripts/<name>.py"`.
+- `consilium-subagent` looked for the skill only in `~/.claude/skills/consilium`, so it failed for a plugin install. It now resolves the path like `consilium-implement-subagent`: an already-set `CONSILIUM_PATH`, the manual skill install, the newest plugin-cache version, then the current directory.
+
+### Changed
+- `SKILL.md` and the plugin README name the `CONSILIUM_DATA_DIR` environment variable in words rather than as `$CONSILIUM_DATA_DIR`, which an install-time scan read as the skill reading a credential from the installer's environment.
+
+### Added
+- `test_plugin_folder.py` fails if an agent `cd`s into `$CONSILIUM_PATH`.
+
 ## [1.15.1] — 2026-10-13
 
 ### Added

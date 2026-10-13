@@ -77,6 +77,15 @@ class TestPluginFolder(unittest.TestCase):
                      if unicodedata.category(c) == "Cf"]
         self.assertEqual(hits, [])
 
+    def test_agents_run_scripts_from_the_project(self):
+        # State lives in .consilium/ under the current directory, so a sub-agent
+        # that cd's into the install dir writes the journal into the plugin
+        # cache, which every update replaces.
+        hits = [f for f in self.files if f.startswith("agents/")
+                and re.search(r'cd\s+"?\$\{?CONSILIUM_PATH',
+                              (PLUGIN / f).read_text(encoding="utf-8"))]
+        self.assertEqual(hits, [])
+
     def test_manifest_and_skill_present(self):
         for f in (".claude-plugin/plugin.json", ".claude-plugin/icon.png",
                   "SKILL.md", "README.md", "LICENSE"):
