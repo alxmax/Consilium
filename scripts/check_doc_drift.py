@@ -740,7 +740,7 @@ def check_test_suite_coverage() -> list[str]:
 # are deliberately excluded (historical context may cite retired scripts).
 SCRIPT_REF_DOCS = [
     "SKILL.md",
-    "CLAUDE.md",
+    ".claude/CLAUDE.md",
     "README.md",
     "docs/runs-schema.md",
     ".claude/skills/run-consilium/SKILL.md",
@@ -1103,11 +1103,11 @@ def _trias_claude_md_failures(
     stale_count_by_cost: dict[float, str] = {4.0: '3', 3.0: '9', 2.67: '6'}
     stale_count = stale_count_by_cost.get(cost_multiplier)
     if stale_count:
-        claude = _read("CLAUDE.md")
+        claude = _read(".claude/CLAUDE.md")
         trias_line = re.search(r'\*\*Trias\*\*.*', claude)
         if trias_line and f'({stale_count} sub-agents)' in trias_line.group(0):
             failures.append(
-                f"[trias_spec_alignment] CLAUDE.md: Trias entry has stale "
+                f"[trias_spec_alignment] .claude/CLAUDE.md: Trias entry has stale "
                 f"'({stale_count} sub-agents)' — must reflect {subagents} "
                 f"sub-agents\n"
                 f"  fix: update the Trias bullet in the 'Available modes' "

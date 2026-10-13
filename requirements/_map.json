@@ -4278,7 +4278,7 @@
       "abstraction": 2,
       "inheritance": 0,
       "polymorphism": 0,
-      "standards": 5
+      "standards": 6
     },
     "findings": [
       {
@@ -4304,6 +4304,14 @@
         "line": 364,
         "name": "check",
         "detail": "13 top-level functions start with `check`: check_ci_checks_completeness, check_confidence_floor_completeness, check_implement_pipeline_spec_alignment, check_legacy_mode_milestone, check_referenced_contracts_exist, check_referenced_scripts_exist"
+      },
+      {
+        "pillar": "standards",
+        "kind": "line-too-long",
+        "file": "scripts/check_doc_drift.py",
+        "line": 1110,
+        "name": "check_doc_drift.py",
+        "detail": "1 line(s) wider than 80 columns, first at line 1110"
       },
       {
         "pillar": "standards",
@@ -4340,6 +4348,7 @@
     ],
     "advice": {
       "file-too-long": "a file this long is several modules sharing a name: split it along the prefix families it already shows",
+      "line-too-long": "lines wider than the limit hide their tail in every diff and side-by-side view: wrap them",
       "prefix-family": "functions sharing a prefix are a namespace: a class (or module) with that name makes the boundary explicit"
     }
   },

@@ -43,6 +43,7 @@ FEEDBACK.html
 # Claude Code session metadata (permissions, local settings)
 .claude/*
 !.claude/settings.json
+!.claude/CLAUDE.md
 !.claude/skills/
 
 # Local bug tracking / agent reports (anchored to repo root — an unanchored
