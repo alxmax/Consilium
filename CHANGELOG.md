@@ -5,6 +5,12 @@ All notable changes to Consilium are recorded here, following
 Apache License 2.0 (see `LICENSE`); versions up to 1.14.0 were published under the
 Business Source License 1.1.
 
+## [1.15.1] — 2026-10-13
+
+### Added
+- `consilium/.claude-plugin/icon.png` (1024 x 1024, 74 KiB): the three voices in their explainer colours (Generator amber, Control blue, Conservator red) converging on one decision, a check on a dark disc, on the explainer's paper background. A plugin-directory listing takes its icon from the first submission and does not change it afterwards, so it is committed before one.
+- `test_plugin_folder.py` allows the icon and skips binary images in its text scans.
+
 ## [1.15.0] — 2026-10-13
 
 ### Changed
