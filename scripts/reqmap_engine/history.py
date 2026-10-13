@@ -181,8 +181,14 @@ def _spans_from_git(root, versions):  # implements: REQ-HISTORY-1003
 
     A release runs from the commit after the previous tagged release
     through its own tag. Both dates are committer dates, `YYYY-MM-DD`.
-    Empty when git cannot answer — the caller keeps the changelog date."""
-    raw = _git(["-C", root, "log", "--first-parent",
+    Empty when git cannot answer — the caller keeps the changelog date.
+
+    The walk starts at the tags (`--tags`), not at HEAD: on a branch that
+    merged main, the newest tag is the merge's second parent and HEAD's
+    first-parent line never reaches it, so the span depended on which
+    commit was checked out and a map committed on the branch went stale
+    on CI's merge commit."""
+    raw = _git(["-C", root, "log", "--first-parent", "--tags",
                 "--format=%cs%x09%D", "--decorate-refs=refs/tags"],
                timeout=60)
     if not raw or not versions:
