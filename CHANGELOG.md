@@ -1,8 +1,35 @@
 # Changelog
 
 All notable changes to Consilium are recorded here, following
-[Keep a Changelog](https://keepachangelog.com/). This project is source-available
-under the Business Source License 1.1 (see `LICENSE`).
+[Keep a Changelog](https://keepachangelog.com/). This project is licensed under the
+Apache License 2.0 (see `LICENSE`); versions up to 1.14.0 were published under the
+Business Source License 1.1.
+
+## [1.15.2] — 2026-10-13
+
+### Fixed
+- The two sub-agents ran scripts with `cd "$CONSILIUM_PATH" && python scripts/...`. Since 1.13.1 the scripts keep state in `.consilium/` under the current directory, so a deliberation or implementation dispatched as a sub-agent wrote its report and journal into the install directory (the plugin cache, replaced on every update), and `implement_pipeline.py --input` could not find a report given relative to the project. Both agents now stay in the project directory and call each script by its full path, `"$CONSILIUM_PATH/scripts/<name>.py"`.
+- `consilium-subagent` looked for the skill only in `~/.claude/skills/consilium`, so it failed for a plugin install. It now resolves the path like `consilium-implement-subagent`: an already-set `CONSILIUM_PATH`, the manual skill install, the newest plugin-cache version, then the current directory.
+
+### Changed
+- `SKILL.md` and the plugin README name the `CONSILIUM_DATA_DIR` environment variable in words rather than as `$CONSILIUM_DATA_DIR`, which an install-time scan read as the skill reading a credential from the installer's environment.
+
+### Added
+- `test_plugin_folder.py` fails if an agent `cd`s into `$CONSILIUM_PATH`.
+
+## [1.15.1] — 2026-10-13
+
+### Added
+- `consilium/.claude-plugin/icon.png` (1024 x 1024, 74 KiB): the three voices in their explainer colours (Generator amber, Control blue, Conservator red) converging on one decision, a check on a dark disc, on the explainer's paper background. A plugin-directory listing takes its icon from the first submission and does not change it afterwards, so it is committed before one.
+- `test_plugin_folder.py` allows the icon and skips binary images in its text scans.
+
+## [1.15.0] — 2026-10-13
+
+### Changed
+- License: Apache License 2.0 instead of the Business Source License 1.1, for the repository and the shipped plugin (`LICENSE`, `consilium/LICENSE`, `plugin.json`). Apache-2.0 was already the BSL's Change License; any organization may now use Consilium, commercially included. Versions up to 1.14.0 stay under BSL-1.1.
+
+### Added
+- `scripts/reqmap_engine/LICENSE`: the MIT license of the vendored requirement-map engine (from requirement-manager), kept next to the copied code.
 
 ## [1.14.0] — 2026-10-13
 

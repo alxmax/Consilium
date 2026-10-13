@@ -35,7 +35,7 @@
       "consilium/scripts/implement_pipeline.py": "e57a78da34041757c4702e01317d96b7f997a99f36600f36e4a4eac919a7c37d"
     },
     "CONSILIUM-IMPLEMENT-SUBAGENT-001": {
-      "consilium/agents/consilium-implement-subagent.md": "35d4b4e4a57e4ae9a25ced46f2f9a94524f4052c5a6f148ff141911a594a5c8d"
+      "consilium/agents/consilium-implement-subagent.md": "e92c61d413b1cb83c1a3f0241ab816488770838a1fd765ff6e9e0cd5369509be"
     },
     "CONSILIUM-IMPLEMENT-TEST-WRITER-001": {
       "consilium/prompts/implement/test_writer.md": "3b14bef70c77157ce06d6aa600700be903bb729754e786b6f75b8efc2fc8e608"
@@ -84,7 +84,7 @@
       "consilium/scripts/strip_context.py": "8b972df97806958f27acaf6d694f24d61849c6a532ecee8746dfc0f760c1262e"
     },
     "CONSILIUM-SUBAGENT-001": {
-      "consilium/agents/consilium-subagent.md": "cb70f5ebe4542c2b3db68d5ae6de8c2d403122bc9063fac7649f4b6235a6703a"
+      "consilium/agents/consilium-subagent.md": "6ec27d4231a2d607196815760bef770a5c55710ebe453f367c9ee1a1ab86a135"
     },
     "CONSILIUM-UTILS-001": {
       "consilium/scripts/utils.py": "d90c6dda6301b6b46dca89a6ee3dd62c4cc4e48905efb9a25692ac8e4615aafe"

@@ -1176,7 +1176,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "consilium/agents/consilium-implement-subagent.md:167"
+          "loc": "consilium/agents/consilium-implement-subagent.md:169"
         }
       ],
       "test_exempt": "agent spec document — behavioral contract validated by Step 7 auto-dispatch integration and implement-subagent smoke tests",
@@ -2401,7 +2401,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "consilium/agents/consilium-subagent.md:111"
+          "loc": "consilium/agents/consilium-subagent.md:126"
         }
       ],
       "test_exempt": "agent spec document — behavioral contract validated by consilium-subagent smoke tests and Trias/Dialectic integration runs",
@@ -4023,17 +4023,44 @@
     },
     {
       "month": "2026-10",
-      "count": 3,
+      "count": 6,
       "first": "2026-10-13",
       "last": "2026-10-13",
       "versions": [
         "v1.13.0",
         "v1.13.1",
-        "v1.14.0"
+        "v1.14.0",
+        "v1.15.0",
+        "v1.15.1",
+        "v1.15.2"
       ],
-      "landmark": "v1.14.0",
+      "landmark": "v1.15.0",
       "headline": "",
       "entries": [
+        {
+          "version": "v1.15.2",
+          "date": "2026-10-13",
+          "headline": "",
+          "body": "### Fixed\n- The two sub-agents ran scripts with `cd \"$CONSILIUM_PATH\" && python scripts/...`. Since 1.13.1 the scripts keep state in `.consilium/` under the current directory, so a deliberation or implementation dispatched as a sub-agent wrote its report and journal into the install directory (the plugin cache, replaced on every update), and `implement_pipeline.py --input` could not find a report given relative to the project. Both agents now stay in the project directory and call each script by its full path, `\"$CONSILIUM_PATH/scripts/<name>.py\"`.\n- `consilium-subagent` looked for the skill only in `~/.claude/skills/consilium`, so it failed for a plugin install. It now resolves the path like `consilium-implement-subagent`: an already-set `CONSILIUM_PATH`, the manual skill install, the newest plugin-cache version, then the current directory.\n\n### Changed\n- `SKILL.md` and the plugin README name the `CONSILIUM_DATA_DIR` environment variable in words rather than as `$CONSILIUM_DATA_DIR`, which an install-time scan read as the skill reading a credential from the installer's environment.\n\n### Added\n- `test_plugin_folder.py` fails if an agent `cd`s into `$CONSILIUM_PATH`.",
+          "first_commit": "2026-10-13",
+          "last_commit": "2026-10-13"
+        },
+        {
+          "version": "v1.15.1",
+          "date": "2026-10-13",
+          "headline": "",
+          "body": "### Added\n- `consilium/.claude-plugin/icon.png` (1024 x 1024, 74 KiB): the three voices in their explainer colours (Generator amber, Control blue, Conservator red) converging on one decision, a check on a dark disc, on the explainer's paper background. A plugin-directory listing takes its icon from the first submission and does not change it afterwards, so it is committed before one.\n- `test_plugin_folder.py` allows the icon and skips binary images in its text scans.",
+          "first_commit": "2026-10-13",
+          "last_commit": "2026-10-13"
+        },
+        {
+          "version": "v1.15.0",
+          "date": "2026-10-13",
+          "headline": "",
+          "body": "### Changed\n- License: Apache License 2.0 instead of the Business Source License 1.1, for the repository and the shipped plugin (`LICENSE`, `consilium/LICENSE`, `plugin.json`). Apache-2.0 was already the BSL's Change License; any organization may now use Consilium, commercially included. Versions up to 1.14.0 stay under BSL-1.1.\n\n### Added\n- `scripts/reqmap_engine/LICENSE`: the MIT license of the vendored requirement-map engine (from requirement-manager), kept next to the copied code.",
+          "first_commit": "2026-10-13",
+          "last_commit": "2026-10-13"
+        },
         {
           "version": "v1.14.0",
           "date": "2026-10-13",
