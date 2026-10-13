@@ -34,8 +34,8 @@ jobs:
       # gate (adopted 2026-07-06).
       - name: Version bump has a matching CHANGELOG entry
         run: |
-          if git rev-parse HEAD~1 >/dev/null 2>&1 && ! git diff --quiet HEAD~1 -- .claude-plugin/plugin.json; then
-            VERSION=$(python -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
+          if git rev-parse HEAD~1 >/dev/null 2>&1 && ! git diff --quiet HEAD~1 -- consilium/.claude-plugin/plugin.json; then
+            VERSION=$(python -c "import json; print(json.load(open('consilium/.claude-plugin/plugin.json'))['version'])")
             if ! grep -qF "[$VERSION]" CHANGELOG.md; then
               echo "::error::plugin.json version bumped to $VERSION but CHANGELOG.md has no matching '[$VERSION]' heading — add one before merging."
               exit 1
