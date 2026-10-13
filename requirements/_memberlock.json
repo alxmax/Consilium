@@ -64,6 +64,9 @@
     "CONSILIUM-MODE-TRIAS-001": {
       "consilium/modes/trias.md": "601a84a96560c6b32fd55a2dd5f179378acd2120c96d5c628a78a1baf0e22300"
     },
+    "CONSILIUM-PLUGIN-FOLDER-001": {
+      "scripts/plugin_paths.py": "18b9bae7249c9868058a12a9d9b87c6857d3dbd92f1abaf97cdbb0f5983b0f74"
+    },
     "CONSILIUM-PRIORS-001": {
       "consilium/scripts/priors.py": "323e37aa81684364ccee7e4806bbc800bbbe9219af6d9e6d8cd95058273ac444"
     },

@@ -9,6 +9,7 @@ git automation, CDN-loading pages and oversize files stay outside.
 Run:
     python scripts/test_plugin_folder.py
 """
+# tested-by: CONSILIUM-PLUGIN-FOLDER-001
 import re
 import subprocess
 import sys
@@ -39,20 +40,24 @@ class TestPluginFolder(unittest.TestCase):
         self.assertTrue(self.files, "no tracked files under consilium/")
 
     def test_only_allowed_paths(self):
+        # verifies: CONSILIUM-PLUGIN-FOLDER-001#CASE-1
         bad = [f for f in self.files
                if f not in ALLOWED_FILES and f.split("/", 1)[0] not in ALLOWED_DIRS]
         self.assertEqual(bad, [])
 
     def test_no_tests_or_dev_tools_in_scripts(self):
+        # verifies: CONSILIUM-PLUGIN-FOLDER-001#CASE-2
         bad = [f for f in self.files if f.startswith("scripts/")
                and (not f.endswith(".py") or Path(f).name.startswith("test_"))]
         self.assertEqual(bad, [])
 
     def test_no_file_over_256_kib(self):
+        # verifies: CONSILIUM-PLUGIN-FOLDER-001#CASE-3
         big = [f for f in self.files if (PLUGIN / f).stat().st_size > MAX_BYTES]
         self.assertEqual(big, [])
 
     def test_no_git_automation_or_remote_scripts(self):
+        # verifies: CONSILIUM-PLUGIN-FOLDER-001#CASE-4
         hits = []
         for f in self.files:
             if f.endswith(IMAGES):
@@ -65,6 +70,7 @@ class TestPluginFolder(unittest.TestCase):
         self.assertEqual(hits, [])
 
     def test_no_hidden_format_characters(self):
+        # verifies: CONSILIUM-PLUGIN-FOLDER-001#CASE-5
         # Invisible format characters (BOM, zero-width, bidi) are flagged by
         # install-time scanners; write them as escapes, e.g. "﻿".
         import unicodedata
@@ -78,6 +84,7 @@ class TestPluginFolder(unittest.TestCase):
         self.assertEqual(hits, [])
 
     def test_agents_run_scripts_from_the_project(self):
+        # verifies: CONSILIUM-PLUGIN-FOLDER-001#CASE-6
         # State lives in .consilium/ under the current directory, so a sub-agent
         # that cd's into the install dir writes the journal into the plugin
         # cache, which every update replaces.
@@ -87,6 +94,7 @@ class TestPluginFolder(unittest.TestCase):
         self.assertEqual(hits, [])
 
     def test_manifest_and_skill_present(self):
+        # verifies: CONSILIUM-PLUGIN-FOLDER-001#CASE-7
         for f in (".claude-plugin/plugin.json", ".claude-plugin/icon.png",
                   "SKILL.md", "README.md", "LICENSE"):
             self.assertIn(f, self.files)
