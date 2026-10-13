@@ -11,21 +11,36 @@ Isolated-context wrapper over the `consilium` skill. Runs the full 8-step delibe
 
 ## Working directory
 
-Your CWD on dispatch is the orchestrator's project, **not** the skill install directory. Before any script call or `Read prompts/*.md`, set the skill path:
+Your CWD on dispatch is the orchestrator's project, **not** the skill install directory. Before
+any script call or `Read prompts/*.md`, resolve the skill path. Try, in order: an already-set
+`CONSILIUM_PATH`, the manual skill install, the newest plugin-cache version, and finally the
+CWD itself (when dispatched inside the Consilium repo):
 
 ```bash
 # Unix / Git Bash on Windows
-export CONSILIUM_PATH="$HOME/.claude/skills/consilium"
-test -f "$CONSILIUM_PATH/SKILL.md" || { echo "consilium skill not found at $CONSILIUM_PATH" >&2; exit 1; }
+if [ -z "$CONSILIUM_PATH" ] || [ ! -f "$CONSILIUM_PATH/SKILL.md" ]; then
+  for c in "$HOME/.claude/skills/consilium" \
+           "$(ls -d "$HOME"/.claude/plugins/cache/consilium/consilium/*/ 2>/dev/null | sort -V | tail -1)" \
+           "$PWD"; do
+    if [ -n "$c" ] && [ -f "$c/SKILL.md" ]; then export CONSILIUM_PATH="${c%/}"; break; fi
+  done
+fi
+test -f "$CONSILIUM_PATH/SKILL.md" || { echo "consilium skill not found (tried skills dir, plugin cache, CWD)" >&2; exit 1; }
 ```
 
 ```powershell
 # Windows — PowerShell native
-$env:CONSILIUM_PATH = "$env:USERPROFILE\.claude\skills\consilium"
-if (-not (Test-Path "$env:CONSILIUM_PATH\SKILL.md")) { throw "consilium skill not found at $env:CONSILIUM_PATH" }
+if (-not $env:CONSILIUM_PATH -or -not (Test-Path "$env:CONSILIUM_PATH\SKILL.md")) {
+  $candidates = @("$env:USERPROFILE\.claude\skills\consilium")
+  $cache = Get-ChildItem "$env:USERPROFILE\.claude\plugins\cache\consilium\consilium" -Directory -ErrorAction SilentlyContinue | Sort-Object { [version]($_.Name) } | Select-Object -Last 1
+  if ($cache) { $candidates += $cache.FullName }
+  $candidates += (Get-Location).Path
+  $env:CONSILIUM_PATH = $candidates | Where-Object { Test-Path "$_\SKILL.md" } | Select-Object -First 1
+}
+if (-not $env:CONSILIUM_PATH) { throw "consilium skill not found (tried skills dir, plugin cache, CWD)" }
 ```
 
-All subsequent script calls use `cd "$CONSILIUM_PATH" && python -X utf8 scripts/<name>.py ...`. Prompt reads use `"$CONSILIUM_PATH/prompts/<voice>.md"`.
+Run every script by its full path and stay in the project directory: `python -X utf8 "$CONSILIUM_PATH/scripts/<name>.py" ...`. Never `cd` into `$CONSILIUM_PATH`: the scripts keep deliberation state in `.consilium/` under the current directory (or under the `CONSILIUM_DATA_DIR` environment variable), so running them from the install directory would write the journal into the plugin cache, which every update replaces. Prompt reads use `"$CONSILIUM_PATH/prompts/<voice>.md"`.
 
 If `CONSILIUM_PATH/SKILL.md` is missing, return a single-line error JSON `{"error": "consilium skill not installed at expected path", "expected": "<path>"}` and stop — do not fabricate a report.
 
@@ -88,7 +103,7 @@ Agent(subagent_type="consilium-subagent",
 Pass criteria:
 1. Final message parses as JSON.
 2. `python scripts/validate_report.py < <that_json>` exits 0.
-3. Exactly one new file appears under `$CONSILIUM_PATH/.consilium/runs/` matching `YYYY-MM-DD_HHMM_*.json` with contents equal to the final message.
+3. Exactly one new file appears under `.consilium/runs/` in the orchestrator's project matching `YYYY-MM-DD_HHMM_*.json` with contents equal to the final message.
 4. Low-confidence input (3+ close candidates) does not stall — completes within bounded turn count, outcome=PEND_HEADLESS in `.consilium/FEEDBACK.html`.
 
 ## Install
