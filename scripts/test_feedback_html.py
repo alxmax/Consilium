@@ -14,7 +14,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent / "consilium"  # the shipped plugin (SKILL.md, modes/, prompts/, scripts/)
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import render_feedback_html as rfh  # noqa: E402

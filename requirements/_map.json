@@ -324,7 +324,7 @@
         "Generator proposes the candidate approaches, Conservator scores each candidate's risk, and Control validates each candidate's correctness and goal-fit. [[CONSILIUM-VOICE-GENERATOR-001]] [[CONSILIUM-VOICE-CONSERVATOR-001]] [[CONSILIUM-VOICE-CONTROL-001]]",
         "The Skeptic challenges only the chosen candidate, after selection, and never proposes a new one. [[CONSILIUM-VOICE-SKEPTIC-001]]",
         "Each voice reads its prompt from `prompts/voices/<name>.md` and emits JSON in the shape its requirement defines.",
-        "The three Trias personalities (Essentialist, Verifier, Sentinel) are defined once in `scripts/personalities.py`, and each lens is prepended to the core voices, never substituted for them. [[CONSILIUM-PERSONALITIES-001]] [[CONSILIUM-LENS-ESSENTIALIST-001]] [[CONSILIUM-LENS-VERIFIER-001]] [[CONSILIUM-LENS-SENTINEL-001]]"
+        "The three Trias personalities (Essentialist, Verifier, Sentinel) are defined once in `consilium/scripts/personalities.py`, and each lens is prepended to the core voices, never substituted for them. [[CONSILIUM-PERSONALITIES-001]] [[CONSILIUM-LENS-ESSENTIALIST-001]] [[CONSILIUM-LENS-VERIFIER-001]] [[CONSILIUM-LENS-SENTINEL-001]]"
       ],
       "verify": [
         "None - contract confirmed by the owner on 2026-09-21."
@@ -420,11 +420,11 @@
       "members": [
         {
           "role": "implements",
-          "loc": "modes/aggregator_schemes.md:55"
+          "loc": "consilium/modes/aggregator_schemes.md:55"
         },
         {
           "role": "implements",
-          "loc": "scripts/aggregator.py:34"
+          "loc": "consilium/scripts/aggregator.py:34"
         },
         {
           "role": "tested-by",
@@ -496,7 +496,7 @@
       ],
       "notes": [],
       "current_impl": [
-        "scripts/audit_feedback.py"
+        "consilium/scripts/audit_feedback.py"
       ],
       "accept": "- Given a run file with no FEEDBACK row, `audit_feedback.py` lists it; `--backfill` appends a PEND row; re-run lists nothing (idempotent).\n- Given a run file with an existing row, `--backfill` does not duplicate it.\n- Given `--dry-run`, no write occurs to FEEDBACK.html.",
       "input": "",
@@ -516,7 +516,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/audit_feedback.py:30"
+          "loc": "consilium/scripts/audit_feedback.py:30"
         }
       ],
       "test_exempt": "integration-only — depends on live FEEDBACK.html + runs/; acceptance-tested via --dry-run and manual backfill",
@@ -569,7 +569,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/build_report.py:46"
+          "loc": "consilium/scripts/build_report.py:46"
         },
         {
           "role": "tested-by",
@@ -594,7 +594,7 @@
       "title": "check_doc_drift",
       "intent": "Enforces parity between authoritative behavior (SKILL.md, confidence.py) and the docs/diagrams.",
       "contract": [
-        "`check_doc_drift.py` enforces parity between the authoritative behavior (`SKILL.md`, `scripts/confidence.py`) and the human-readable documentation (`modes/*.md`, `docs/architecture/src/*.jsx`).",
+        "`check_doc_drift.py` enforces parity between the authoritative behavior (`SKILL.md`, `consilium/scripts/confidence.py`) and the human-readable documentation (`modes/*.md`, `docs/architecture/src/*.jsx`).",
         "This prevents the class of silent drift found in the design audit of 2026-05-28, where four discrepancies had accumulated undetected.",
         "`check_doc_drift.py` runs seven independent check families.",
         "The first family is text-based regex invariants: required/forbidden patterns in specific files.",
@@ -602,23 +602,23 @@
         "The third family is legacy MODE alias removal milestone enforcement: dated removal comments accompany deprecated aliases in `validate_report.py`.",
         "The fourth family is test-suite coverage: every `scripts/test_*.py` file appears in both `ci.yml` and the run-consilium driver.",
         "The fifth family, CI_CHECKS completeness, requires every non-test `ci.yml` step to be represented in the architecture explainer's `CI_CHECKS` card list, matched by exact script basename; it was added 2026-07-06 after a Trias self-audit found the explainer's own \"what CI runs\" section had silently fallen behind `ci.yml` itself.",
-        "The sixth family, Trias personality-name parity, requires `scripts/personalities.py`'s `PERSONALITIES` names to match the explainer's `trias.jsx`/`modes.jsx` and the `make_full_architecture.py` poster generator; it was added 2026-07-06 after the v3 lens rename (PR #482) was found to have never touched those three files.",
+        "The sixth family, Trias personality-name parity, requires `consilium/scripts/personalities.py`'s `PERSONALITIES` names to match the explainer's `trias.jsx`/`modes.jsx` and the `make_full_architecture.py` poster generator; it was added 2026-07-06 after the v3 lens rename (PR #482) was found to have never touched those three files.",
         "The seventh family, implement-pipeline spec alignment, requires `modes/implement_pipeline.md`'s `subagents`/`cost_multiplier` frontmatter to be stated explicitly in the \"Code integration pipeline\" explainer section's `GATE_ITEMS`; it was added 2026-07-06 after that section was found to be the only mode/flag whose headline sub-agent count and cost multiplier weren't shown anywhere in its own text.",
         "The CI_CHECKS completeness, personality-name parity, and implement-pipeline alignment families are specified in [[CONSILIUM-CHECK-DOC-DRIFT-EXPLAINER-001]].",
-        "`check_doc_drift.py` is intended to run before any commit that touches `modes/`, `docs/architecture/src/`, `scripts/confidence.py`, `scripts/personalities.py`, `.github/workflows/ci.yml`, or `scripts/test_*.py`.",
+        "`check_doc_drift.py` is intended to run before any commit that touches `modes/`, `docs/architecture/src/`, `consilium/scripts/confidence.py`, `consilium/scripts/personalities.py`, `.github/workflows/ci.yml`, or `scripts/test_*.py`.",
         "`check_doc_drift.py` reads `modes/trias.md` for the `trias_parallel_dispatch` and `trias_parallelism_runtime_audit` invariants.",
         "`check_doc_drift.py` reads `modes/sequential.md` for the `sequential_scale_down_skips_control` and `sequential_generator_first` invariants.",
         "`check_doc_drift.py` reads `docs/architecture/src/modes.jsx` for the `trias_tally_caption_confidence` and `explainer_modes_voices_generator_first` invariants, and for the Trias spec-alignment worst-case check.",
         "`check_doc_drift.py` reads `docs/architecture/src/trias.jsx` for the `TRIAS_OUTCOMES` confidence parity check.",
         "`check_doc_drift.py` reads `docs/architecture/src/extras.jsx` for the Trias spec-alignment check (the CostScatter TRI entry and the CostBars trias row).",
         "`check_doc_drift.py` reads `SKILL.md` for the `skill_templates_have_pipeline_executed` invariant.",
-        "`check_doc_drift.py` reads `scripts/build_report.py` for the `build_report_emits_pipeline_executed` invariant.",
-        "`check_doc_drift.py` AST-parses `scripts/confidence.py` for the `VOTE_PATTERN_CONFIDENCE` dict values.",
-        "`check_doc_drift.py` reads `scripts/validate_report.py` for the legacy MODE alias removal milestone check.",
+        "`check_doc_drift.py` reads `consilium/scripts/build_report.py` for the `build_report_emits_pipeline_executed` invariant.",
+        "`check_doc_drift.py` AST-parses `consilium/scripts/confidence.py` for the `VOTE_PATTERN_CONFIDENCE` dict values.",
+        "`check_doc_drift.py` reads `consilium/scripts/validate_report.py` for the legacy MODE alias removal milestone check.",
         "`check_doc_drift.py` reads `.github/workflows/ci.yml` and `.claude/skills/run-consilium/driver.py` for the test-suite coverage check.",
         "`check_doc_drift.py` globs `scripts/test_*.py` to enumerate all test suites requiring coverage.",
         "`check_doc_drift.py` parses `.github/workflows/ci.yml` and `docs/architecture/src/extras.jsx` for the `ci_checks_completeness` check.",
-        "`check_doc_drift.py` AST-parses `scripts/personalities.py` for the `PERSONALITIES` list (name SSOT), used by the `trias_personality_name_parity` check.",
+        "`check_doc_drift.py` AST-parses `consilium/scripts/personalities.py` for the `PERSONALITIES` list (name SSOT), used by the `trias_personality_name_parity` check.",
         "`check_doc_drift.py` regex-scans `docs/architecture/src/trias.jsx`, `docs/architecture/src/modes.jsx`, and `scripts/make_full_architecture.py` for Trias personality names, comparing them against `personalities.py`.",
         "`check_doc_drift.py` regex-parses `modes/implement_pipeline.md` for the `subagents`/`cost_multiplier` frontmatter (SSOT), used by the `implement_pipeline_spec_alignment` check.",
         "`check_doc_drift.py` scans `docs/architecture/src/extras.jsx`'s `GATE_ITEMS` array (ImplementSection) for the matching sub-agent-count / cost-multiplier strings.",
@@ -673,7 +673,7 @@
         "**CI_CHECKS completeness** (`check_ci_checks_completeness`): every named non-test `ci.yml` step is represented by a card in the explainer's `CI_CHECKS` list (`extras.jsx`), or by a named `ALLOWED_OUT_OF_SCOPE_CI_STEPS` entry.",
         "The completeness check matches on the invoked script's exact basename (e.g. `reqmap.py`), not the full run-line. Two steps that share one script under different flags therefore resolve to one card.",
         "`scripts/test_*.py` steps are always skipped, because the \"Unit suites\" card covers them generically. A step with no `scripts/*.py` or `docs/architecture/build.py` reference needs an `ALLOWED_OUT_OF_SCOPE_CI_STEPS` entry, or the check fails.",
-        "**Trias personality-name parity** (`check_trias_personality_name_parity`): the `PERSONALITIES` names in `scripts/personalities.py` (the single source of truth) match `trias.jsx`'s `LENSES`, `modes.jsx`'s personalities array and `make_full_architecture.py`'s `personalities_row`.",
+        "**Trias personality-name parity** (`check_trias_personality_name_parity`): the `PERSONALITIES` names in `consilium/scripts/personalities.py` (the single source of truth) match `trias.jsx`'s `LENSES`, `modes.jsx`'s personalities array and `make_full_architecture.py`'s `personalities_row`.",
         "The name comparison is case-insensitive, since `personalities.py` uses lowercase and the explainer uses Title Case. Each of the three sources is compared separately, so a drift in one is reported for that file alone.",
         "**Implement-pipeline spec alignment** (`check_implement_pipeline_spec_alignment`): the `subagents` and `cost_multiplier` frontmatter of `modes/implement_pipeline.md` both appear in `extras.jsx`'s `GATE_ITEMS` (the ImplementSection).",
         "The alignment check formats the multiplier through `check_trias_spec_alignment`'s explicit `_COST_FMT` float→string map, never `f'{v}×'`. A missing count and a missing multiplier are reported as two independent failures."
@@ -698,15 +698,15 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/check_doc_drift.py:454"
+          "loc": "scripts/check_doc_drift.py:469"
         },
         {
           "role": "implements",
-          "loc": "scripts/check_doc_drift.py:880"
+          "loc": "scripts/check_doc_drift.py:899"
         },
         {
           "role": "implements",
-          "loc": "scripts/check_doc_drift.py:1125"
+          "loc": "scripts/check_doc_drift.py:1144"
         },
         {
           "role": "tested-by",
@@ -782,7 +782,7 @@
       "title": "check_versions",
       "intent": "Fails CI if `plugin.json` and `marketplace.json` semver drift apart, or if the vendored engine's MAP_ENGINE_VERSION (`scripts/reqmap_engine/__init__.py`) is not a valid dated engine version.",
       "contract": [
-        "`check_versions.py` is the single point that asserts the plugin's semver stays aligned across `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`, since Claude Code reads both as static data and neither manifest can import the other to stay in sync automatically; drift fails the build instead of shipping silently.",
+        "`check_versions.py` is the single point that asserts the plugin's semver stays aligned across `consilium/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`, since Claude Code reads both as static data and neither manifest can import the other to stay in sync automatically; drift fails the build instead of shipping silently.",
         "`check_versions.py` mirrors `requirement-manager`'s `scripts/check_versions.py` (same mechanism, adopted 2026-07-06 after `marketplace.json` was found to have no `version` field at all while `plugin.json` had already drifted from an orphan `v1.4.0` git tag).",
         "`MAP_ENGINE_VERSION` (in `scripts/reqmap_engine/__init__.py`) is checked independently: it is a staleness-compare date stamp for the requirement-map engine, not a semver, and it is never compared against the plugin version.",
         "`plugin.json`'s `version` field is the canonical source; every `version` occurrence in `marketplace.json` (top-level and each `plugins[]` entry) equals it exactly, by string equality with no semver-range logic.",
@@ -880,11 +880,11 @@
       "members": [
         {
           "role": "implements",
-          "loc": "modes/confidence.md:60"
+          "loc": "consilium/modes/confidence.md:60"
         },
         {
           "role": "implements",
-          "loc": "scripts/confidence.py:57"
+          "loc": "consilium/scripts/confidence.py:57"
         },
         {
           "role": "tested-by",
@@ -935,7 +935,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/confidence_calibration.py:29"
+          "loc": "consilium/scripts/confidence_calibration.py:29"
         },
         {
           "role": "tested-by",
@@ -993,7 +993,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/feedback.py:12"
+          "loc": "consilium/scripts/feedback.py:12"
         },
         {
           "role": "tested-by",
@@ -1026,7 +1026,7 @@
       "notes": [],
       "current_impl": [
         "prompts/implement/coder.md",
-        "scripts/validate_implement_output.py"
+        "consilium/scripts/validate_implement_output.py"
       ],
       "accept": "AC-1\n  Given a well-formed chosen_approach and success_criterion\n  When  the Coder completes\n  Then  output parses as JSON with non-empty files_written, non-empty maps_to_criterion, and blocked = false\n\nAC-2\n  Given a chosen_approach with an incomplete sketch (insufficient to implement without guessing)\n  When  the Coder processes the input\n  Then  blocked = true and blocked_reason is a non-null, non-empty string; no files are written\n\nAC-3\n  Given a task that would require touching a path outside files_touched\n  When  the Coder detects the scope escape\n  Then  the out-of-scope path appears in scope_escapes[], the Coder stops before writing it, and the path does not appear in files_written",
       "input": "",
@@ -1045,7 +1045,11 @@
       "members": [
         {
           "role": "implements",
-          "loc": "prompts/implement/coder.md:54"
+          "loc": "consilium/prompts/implement/coder.md:54"
+        },
+        {
+          "role": "implements",
+          "loc": "consilium/scripts/validate_implement_output.py:31"
         },
         {
           "role": "tested-by",
@@ -1054,10 +1058,6 @@
         {
           "role": "tested-by",
           "loc": "scripts/test_validate_implement_output.py:7"
-        },
-        {
-          "role": "implements",
-          "loc": "scripts/validate_implement_output.py:31"
         }
       ],
       "test_exempt": null,
@@ -1117,11 +1117,11 @@
       "members": [
         {
           "role": "implements",
-          "loc": "modes/implement_pipeline.md:89"
+          "loc": "consilium/modes/implement_pipeline.md:89"
         },
         {
           "role": "implements",
-          "loc": "scripts/implement_pipeline.py:43"
+          "loc": "consilium/scripts/implement_pipeline.py:43"
         },
         {
           "role": "tested-by",
@@ -1176,7 +1176,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "agents/consilium-implement-subagent.md:167"
+          "loc": "consilium/agents/consilium-implement-subagent.md:167"
         }
       ],
       "test_exempt": "agent spec document — behavioral contract validated by Step 7 auto-dispatch integration and implement-subagent smoke tests",
@@ -1204,7 +1204,7 @@
       "notes": [],
       "current_impl": [
         "prompts/implement/test_writer.md",
-        "scripts/validate_implement_output.py"
+        "consilium/scripts/validate_implement_output.py"
       ],
       "accept": "AC-1\n  Given a well-formed success_criterion and files_written from the Coder\n  When  the Test Writer completes\n  Then  output parses as JSON, test_files_written is non-empty (every path starts with test_), and every test in tests[] has fails_on_empty_impl = true\n\nAC-2\n  Given a test emitted by the Test Writer\n  When  the implement-subagent runs the Red→Green gate\n  Then  the test is RED against a stub implementation and GREEN against the real one; any test that is green under the stub appears in gate_rejected\n\nAC-3  <!-- verifiable by: inspection -->\n  Given a behavior that cannot be covered by automated tests\n  When  the Test Writer identifies it\n  Then  it appears in uncoverable[] with a reason and no test is emitted for it",
       "input": "",
@@ -1223,7 +1223,11 @@
       "members": [
         {
           "role": "implements",
-          "loc": "prompts/implement/test_writer.md:60"
+          "loc": "consilium/prompts/implement/test_writer.md:60"
+        },
+        {
+          "role": "implements",
+          "loc": "consilium/scripts/validate_implement_output.py:32"
         },
         {
           "role": "tested-by",
@@ -1232,10 +1236,6 @@
         {
           "role": "tested-by",
           "loc": "scripts/test_validate_implement_output.py:8"
-        },
-        {
-          "role": "implements",
-          "loc": "scripts/validate_implement_output.py:32"
         }
       ],
       "test_exempt": null,
@@ -1267,7 +1267,7 @@
       ],
       "notes": [],
       "current_impl": [
-        "scripts/infer_pipeline.py"
+        "consilium/scripts/infer_pipeline.py"
       ],
       "accept": "- Given a report with `magnitude=moderate, reversibility=irreversible`, inferred steps are `[implement, compile, review, test]`.\n- Given `chosen_approach=do_nothing`, exits 1.\n- Given `--dry-run`, prints steps and exits 0 without writing any file.\n- Given invalid JSON input, exits 2.\n- `recommend_implement_mode` returns `\"pipeline\"` for `moderate×irreversible`; `\"single_shot\"` for `trivial×complete`.",
       "input": "",
@@ -1287,7 +1287,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/infer_pipeline.py:31"
+          "loc": "consilium/scripts/infer_pipeline.py:31"
         },
         {
           "role": "tested-by",
@@ -1340,7 +1340,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "prompts/voices/essentialist_lens.md:37"
+          "loc": "consilium/prompts/voices/essentialist_lens.md:37"
         }
       ],
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
@@ -1388,7 +1388,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "prompts/voices/sentinel_lens.md:39"
+          "loc": "consilium/prompts/voices/sentinel_lens.md:39"
         }
       ],
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
@@ -1437,7 +1437,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "prompts/voices/verifier_lens.md:51"
+          "loc": "consilium/prompts/voices/verifier_lens.md:51"
         }
       ],
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
@@ -1494,7 +1494,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/log_feedback.py:47"
+          "loc": "consilium/scripts/log_feedback.py:47"
         },
         {
           "role": "tested-by",
@@ -1555,7 +1555,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/mark_outcome.py:36"
+          "loc": "consilium/scripts/mark_outcome.py:36"
         },
         {
           "role": "tested-by",
@@ -1612,7 +1612,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/memory.py:35"
+          "loc": "consilium/scripts/memory.py:35"
         },
         {
           "role": "tested-by",
@@ -1671,7 +1671,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "modes/dialectic.md:57"
+          "loc": "consilium/modes/dialectic.md:57"
         }
       ],
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
@@ -1704,7 +1704,7 @@
         "modes/sequential.md",
         "modes/dialectic.md",
         "prompts/voices/verifier_lens.md",
-        "scripts/validate_report.py",
+        "consilium/scripts/validate_report.py",
         "scripts/test_lens_bias.py"
       ],
       "accept": "AC-1\n  Given  a Dialectic report whose telemetry.lens_applied has decider == skeptic (e.g. both \"verifier\")\n  When   validate_report._validate_telemetry runs\n  Then   it returns a problem stating decider and skeptic must differ\n\nAC-2\n  Given  prompts/voices/verifier_lens.md\n  When   scripts/test_lens_bias.py runs\n  Then   it asserts the \"skeptic carve-out\" keyword is present (the Verifier lens is coherent when tinted onto the Skeptic voice)\n\nAC-3\n  Given  a telemetry.lens_applied naming a lens that is not a known personality (e.g. \"essentailist\")\n  When   validate_report._validate_telemetry runs\n  Then   it returns a problem naming the valid personality lenses",
@@ -1728,23 +1728,23 @@
       "members": [
         {
           "role": "implements",
-          "loc": "modes/dialectic.md:60"
+          "loc": "consilium/modes/dialectic.md:60"
         },
         {
           "role": "implements",
-          "loc": "modes/sequential.md:89"
+          "loc": "consilium/modes/sequential.md:89"
         },
         {
           "role": "implements",
-          "loc": "prompts/voices/verifier_lens.md:53"
+          "loc": "consilium/prompts/voices/verifier_lens.md:53"
+        },
+        {
+          "role": "implements",
+          "loc": "consilium/scripts/validate_report.py:808"
         },
         {
           "role": "tested-by",
           "loc": "scripts/test_lens_bias.py:230"
-        },
-        {
-          "role": "implements",
-          "loc": "scripts/validate_report.py:808"
         }
       ],
       "test_exempt": null,
@@ -1806,7 +1806,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "modes/sequential.md:86"
+          "loc": "consilium/modes/sequential.md:86"
         }
       ],
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
@@ -1858,7 +1858,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "modes/skeptic_on_chosen.md:70"
+          "loc": "consilium/modes/skeptic_on_chosen.md:70"
         }
       ],
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
@@ -1928,7 +1928,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "modes/trias.md:196"
+          "loc": "consilium/modes/trias.md:196"
         },
         {
           "role": "tested-by",
@@ -1987,7 +1987,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/personalities.py:20"
+          "loc": "consilium/scripts/personalities.py:20"
         },
         {
           "role": "tested-by",
@@ -2006,7 +2006,7 @@
       "status": "confirmed",
       "area": "CONSILIUM",
       "title": "priors",
-      "intent": "Describes observed behavior, verified against scripts/priors.py source.",
+      "intent": "Describes observed behavior, verified against consilium/scripts/priors.py source.",
       "contract": [
         "`priors.py` computes advisory soft-prior signals from past deliberation history and emits them as a JSON object to stdout.",
         "The signal block is pasted into the deliberation at step 0 so voices can calibrate toward patterns that have caused past problems.",
@@ -2027,7 +2027,7 @@
       ],
       "notes": [],
       "current_impl": [],
-      "accept": "- **CASE-1** — Given a valid `FEEDBACK.html` and `runs/` directory, when `python scripts/priors.py` runs, then it completes without error.\n- **CASE-2** — Given the `--no-runs` flag, when `priors.py` runs, then `missing_feedback_runs` is suppressed from the output.\n- **CASE-3** — Given FEEDBACK entries with outcome PEND older than `STALE_PEND_DAYS`, when `priors.py` runs, then those entries appear in `stale_pendings`.\n- **CASE-4** — Given `runs/` files with no matching FEEDBACK row, when `priors.py` runs, then those files appear in `missing_feedback_runs`.",
+      "accept": "- **CASE-1** — Given a valid `FEEDBACK.html` and `runs/` directory, when `python consilium/scripts/priors.py` runs, then it completes without error.\n- **CASE-2** — Given the `--no-runs` flag, when `priors.py` runs, then `missing_feedback_runs` is suppressed from the output.\n- **CASE-3** — Given FEEDBACK entries with outcome PEND older than `STALE_PEND_DAYS`, when `priors.py` runs, then those entries appear in `stale_pendings`.\n- **CASE-4** — Given `runs/` files with no matching FEEDBACK row, when `priors.py` runs, then those files appear in `missing_feedback_runs`.",
       "input": "",
       "output": "",
       "desc": "",
@@ -2045,7 +2045,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/priors.py:28"
+          "loc": "consilium/scripts/priors.py:28"
         },
         {
           "role": "tested-by",
@@ -2109,7 +2109,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/render_feedback_html.py:12"
+          "loc": "consilium/scripts/render_feedback_html.py:12"
         },
         {
           "role": "tested-by",
@@ -2172,7 +2172,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/render_impl_preview.py:31"
+          "loc": "consilium/scripts/render_impl_preview.py:31"
         },
         {
           "role": "tested-by",
@@ -2282,11 +2282,11 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/probe_change.py:214"
+          "loc": "consilium/scripts/probe_change.py:214"
         },
         {
           "role": "implements",
-          "loc": "scripts/scope_gate.py:75"
+          "loc": "consilium/scripts/scope_gate.py:75"
         },
         {
           "role": "tested-by",
@@ -2294,7 +2294,7 @@
         },
         {
           "role": "tested-by",
-          "loc": "scripts/test_probe_change.py:75"
+          "loc": "scripts/test_probe_change.py:76"
         },
         {
           "role": "tested-by",
@@ -2349,7 +2349,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/strip_context.py:47"
+          "loc": "consilium/scripts/strip_context.py:47"
         },
         {
           "role": "tested-by",
@@ -2383,7 +2383,7 @@
       "current_impl": [
         "agents/consilium-subagent.md"
       ],
-      "accept": "AC-1\n  Given a dispatch prompt with a diff and a success_criterion\n  When  the subagent runs\n  Then  the final message parses as valid JSON, `python scripts/validate_report.py < <output>` exits 0, and exactly one new file appears under `.consilium/runs/`\n\nAC-2\n  Given a dispatch with `mode: dialectic` hint in the prompt\n  When  the subagent processes the input\n  Then  it logs the mode hint as ignored in `subagent_notes` and completes as Sequential\n\nAC-3\n  Given a low-confidence deliberation (3+ close candidates)\n  When  the subagent completes\n  Then  it does not stall — completes within a bounded turn count with outcome=PEND in FEEDBACK.html",
+      "accept": "AC-1\n  Given a dispatch prompt with a diff and a success_criterion\n  When  the subagent runs\n  Then  the final message parses as valid JSON, `python consilium/scripts/validate_report.py < <output>` exits 0, and exactly one new file appears under `.consilium/runs/`\n\nAC-2\n  Given a dispatch with `mode: dialectic` hint in the prompt\n  When  the subagent processes the input\n  Then  it logs the mode hint as ignored in `subagent_notes` and completes as Sequential\n\nAC-3\n  Given a low-confidence deliberation (3+ close candidates)\n  When  the subagent completes\n  Then  it does not stall — completes within a bounded turn count with outcome=PEND in FEEDBACK.html",
       "input": "",
       "output": "",
       "desc": "",
@@ -2401,7 +2401,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "agents/consilium-subagent.md:111"
+          "loc": "consilium/agents/consilium-subagent.md:111"
         }
       ],
       "test_exempt": "agent spec document — behavioral contract validated by consilium-subagent smoke tests and Trias/Dialectic integration runs",
@@ -2418,7 +2418,7 @@
       "title": "trias-model-assignment",
       "intent": "Trias uniform model assignment: all 3 personalities (essentialist, verifier, sentinel) use sonnet. No per-personality schema workarounds needed.",
       "contract": [
-        "`scripts/personalities.py` exposes a `PERSONALITIES` list where every entry carries a `model` field whose value controls which Claude model tier the Trias orchestrator dispatches for that sub-agent.",
+        "`consilium/scripts/personalities.py` exposes a `PERSONALITIES` list where every entry carries a `model` field whose value controls which Claude model tier the Trias orchestrator dispatches for that sub-agent.",
         "Model assignments are uniform: essentialist → `sonnet`, verifier → `sonnet`, sentinel → `sonnet`.",
         "No personality entry carries `schema_less: True`; all personalities use standard StructuredOutput dispatch.",
         "The `personalities.py` CLI emits a valid JSON array of exactly 3 objects, each with at minimum a `model` field, for use by the Trias orchestrator at runtime."
@@ -2446,7 +2446,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/personalities.py:21"
+          "loc": "consilium/scripts/personalities.py:21"
         },
         {
           "role": "tested-by",
@@ -2467,11 +2467,11 @@
       "title": "utils",
       "intent": "Shared stdlib-only utilities: canonical paths, atomic writes, stdin JSON, headless detection.",
       "contract": [
-        "`scripts/utils.py` provides shared stdlib-only utilities that every other Consilium script imports instead of defining its own copies.",
+        "`consilium/scripts/utils.py` provides shared stdlib-only utilities that every other Consilium script imports instead of defining its own copies.",
         "`DATA_DIR` resolves to `$CONSILIUM_DATA_DIR` (made absolute) when that variable is set to a non-blank value, and otherwise to `.consilium/` under the current working directory, which is the project the orchestrator writes its reports to.",
         "`RUNS_DIR` resolves to `runs/` under `DATA_DIR`.",
         "`FEEDBACK_PATH` resolves to `FEEDBACK.html` under `DATA_DIR`.",
-        "`DATA_DIR` never depends on where `scripts/utils.py` is installed: a plugin cache or an APM-deployed skill folder is replaced on every update, so state kept there would reset each version.",
+        "`DATA_DIR` never depends on where `consilium/scripts/utils.py` is installed: a plugin cache or an APM-deployed skill folder is replaced on every update, so state kept there would reset each version.",
         "`atomic_write_text(path, content)` writes the given string content to `path` atomically, through a sibling `.tmp` file with fsync and rename.",
         "A read-only parent directory makes `atomic_write_text` raise `OSError`, which propagates to the caller.",
         "`atomic_write_text` deletes the temp file on any error path, so no stale `.tmp` file persists across crashes.",
@@ -2518,12 +2518,12 @@
       "satisfied_by": [],
       "members": [
         {
-          "role": "tested-by",
-          "loc": "scripts/test_utils.py:10"
+          "role": "implements",
+          "loc": "consilium/scripts/utils.py:6"
         },
         {
-          "role": "implements",
-          "loc": "scripts/utils.py:6"
+          "role": "tested-by",
+          "loc": "scripts/test_utils.py:10"
         }
       ],
       "test_exempt": null,
@@ -2538,7 +2538,7 @@
       "status": "confirmed",
       "area": "CONSILIUM",
       "title": "validate_report",
-      "intent": "Describes observed behavior, verified against scripts/validate_report.py source.",
+      "intent": "Describes observed behavior, verified against consilium/scripts/validate_report.py source.",
       "contract": [
         "`validate_report.py` reads a deliberation report JSON from stdin, produced by `build_report.py`.",
         "`validate_report.py` validates report *shape*, not deliberation *substance* — confirming required fields exist and are well-formed. This is the Constitution Principle #4 gate.",
@@ -2580,12 +2580,12 @@
       "satisfied_by": [],
       "members": [
         {
-          "role": "tested-by",
-          "loc": "scripts/test_round2.py:8"
+          "role": "implements",
+          "loc": "consilium/scripts/validate_report.py:55"
         },
         {
-          "role": "implements",
-          "loc": "scripts/validate_report.py:55"
+          "role": "tested-by",
+          "loc": "scripts/test_round2.py:8"
         }
       ],
       "test_exempt": null,
@@ -2600,7 +2600,7 @@
       "status": "confirmed",
       "area": "CONSILIUM",
       "title": "validate_skeptic",
-      "intent": "Describes observed behavior, verified against scripts/validate_skeptic.py source.",
+      "intent": "Describes observed behavior, verified against consilium/scripts/validate_skeptic.py source.",
       "contract": [
         "`validate_skeptic.py` reads a Skeptic voice output JSON from stdin, produced by the Skeptic voice per `prompts/voices/skeptic.md`.",
         "`validate_skeptic.py` is a structural validation gate for Skeptic output, enforcing the machine-checkable subset of the gate described in `prompts/voices/skeptic.md` and `modes/skeptic_on_chosen.md` — shape and evidence rules only, not semantic correctness.",
@@ -2636,12 +2636,12 @@
       "satisfied_by": [],
       "members": [
         {
-          "role": "tested-by",
-          "loc": "scripts/test_skeptic.py:11"
+          "role": "implements",
+          "loc": "consilium/scripts/validate_skeptic.py:49"
         },
         {
-          "role": "implements",
-          "loc": "scripts/validate_skeptic.py:49"
+          "role": "tested-by",
+          "loc": "scripts/test_skeptic.py:11"
         }
       ],
       "test_exempt": null,
@@ -2658,7 +2658,7 @@
       "title": "version",
       "intent": "Repo version provenance: git-describe display stamp, resolvable committed-HEAD ref, and a guarded prompt-drift counter — the primitives every report producer stamps into telemetry.",
       "contract": [
-        "`scripts/version.py` is the single home for version provenance, separated from report assembly (`build_report.py`, which only consumes these values).",
+        "`consilium/scripts/version.py` is the single home for version provenance, separated from report assembly (`build_report.py`, which only consumes these values).",
         "`consilium_version()` returns the human display stamp from `git describe --tags --always --dirty`, and fails open to `\"unknown\"` when git is absent or errors — it never raises.",
         "`consilium_ref()` returns the resolvable diff operand: the committed HEAD sha on a clean tree.",
         "`consilium_ref()` returns `\"\"` on a dirty or unknown tree — by contract, never a `<sha>-dirty` string — so a recorded ref is always `git checkout`-able.",
@@ -2687,12 +2687,12 @@
       "satisfied_by": [],
       "members": [
         {
-          "role": "tested-by",
-          "loc": "scripts/test_version.py:103"
+          "role": "implements",
+          "loc": "consilium/scripts/version.py:141"
         },
         {
-          "role": "implements",
-          "loc": "scripts/version.py:141"
+          "role": "tested-by",
+          "loc": "scripts/test_version.py:103"
         }
       ],
       "test_exempt": null,
@@ -2709,7 +2709,7 @@
       "title": "vocabulary_map",
       "intent": "Single source of truth for field-value translations and the per-voice token budget table.",
       "contract": [
-        "`scripts/vocabulary_map.py` is the single source of truth for all user-facing natural-language translations of structured deliberation field values, and for the per-voice token budget table.",
+        "`consilium/scripts/vocabulary_map.py` is the single source of truth for all user-facing natural-language translations of structured deliberation field values, and for the per-voice token budget table.",
         "`VOCABULARY_MAP` maps categories (`reversibility`, `magnitude`, `meta_recommendation`, `verdict`) to their human-readable labels, used by the renderer and aggregator to produce consistent output strings.",
         "`translate` falls back silently: an unknown category or value returns `str(value)`, with no logging; callers cannot assume a human-readable label is always returned.",
         "All `VOCABULARY_MAP` labels are hardcoded Romanian strings, except `meta_recommendation` values, which are English; no i18n hook exists or is planned.",
@@ -2739,12 +2739,12 @@
       "satisfied_by": [],
       "members": [
         {
-          "role": "tested-by",
-          "loc": "scripts/test_round2.py:9"
+          "role": "implements",
+          "loc": "consilium/scripts/vocabulary_map.py:11"
         },
         {
-          "role": "implements",
-          "loc": "scripts/vocabulary_map.py:11"
+          "role": "tested-by",
+          "loc": "scripts/test_round2.py:9"
         }
       ],
       "test_exempt": null,
@@ -2794,7 +2794,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "prompts/voices/conservator.md:218"
+          "loc": "consilium/prompts/voices/conservator.md:218"
         }
       ],
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
@@ -2846,7 +2846,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "prompts/voices/control.md:131"
+          "loc": "consilium/prompts/voices/control.md:131"
         }
       ],
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
@@ -2899,7 +2899,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "prompts/voices/generator.md:147"
+          "loc": "consilium/prompts/voices/generator.md:147"
         }
       ],
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
@@ -2951,7 +2951,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "prompts/voices/skeptic.md:139"
+          "loc": "consilium/prompts/voices/skeptic.md:139"
         }
       ],
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
@@ -2981,7 +2981,7 @@
       ],
       "notes": [],
       "current_impl": [
-        "scripts/vote_degeneracy.py"
+        "consilium/scripts/vote_degeneracy.py"
       ],
       "accept": "- Given 20+ Trias runs all with 3-0, `vote_degenerate: true` is returned.\n- Given 20+ Trias runs with 50% 3-0, `vote_degenerate: false`.\n- Given fewer than min-n Trias runs, result is `\"insufficient\"`.\n- Given `--json`, output parses as valid JSON with `vote_degenerate`, `three_zero_rate`, `n` fields.\n- Non-Trias runs are excluded even if they reference `vote_pattern` in their body.",
       "input": "",
@@ -2997,12 +2997,12 @@
       "satisfied_by": [],
       "members": [
         {
-          "role": "tested-by",
-          "loc": "scripts/test_vote_degeneracy.py:11"
+          "role": "implements",
+          "loc": "consilium/scripts/vote_degeneracy.py:34"
         },
         {
-          "role": "implements",
-          "loc": "scripts/vote_degeneracy.py:34"
+          "role": "tested-by",
+          "loc": "scripts/test_vote_degeneracy.py:11"
         }
       ],
       "test_exempt": null,
@@ -3105,7 +3105,7 @@
       "title": "A repository that stays consistent with itself",
       "intent": "The skill's docs, diagrams, manifests and public tree stay in step with the code that defines its behaviour, so a reader of any of them is not misled.",
       "contract": [
-        "CI fails when the mode docs or the architecture explainer contradict `SKILL.md` or `scripts/confidence.py`.",
+        "CI fails when the mode docs or the architecture explainer contradict `SKILL.md` or `consilium/scripts/confidence.py`.",
         "CI fails when a tracked file names the private repository or a local developer path.",
         "CI fails when the plugin manifests disagree on the version, or a version bump ships without a CHANGELOG entry.",
         "The regression scenarios and every unit suite run on each push, and a single local command reproduces what CI checks."
@@ -4023,16 +4023,25 @@
     },
     {
       "month": "2026-10",
-      "count": 2,
+      "count": 3,
       "first": "2026-10-13",
       "last": "2026-10-13",
       "versions": [
         "v1.13.0",
-        "v1.13.1"
+        "v1.13.1",
+        "v1.14.0"
       ],
-      "landmark": "v1.13.0",
+      "landmark": "v1.14.0",
       "headline": "",
       "entries": [
+        {
+          "version": "v1.14.0",
+          "date": "2026-10-13",
+          "headline": "",
+          "body": "### Changed\n- The plugin now lives in `consilium/` (manifest, `SKILL.md`, agents, prompts, modes, the 25 runtime scripts and the three docs they cite, a plugin README and `LICENSE`). An install receives only this folder: about 50 files instead of the whole repository, with no tests, repo tooling, hooks, generated HTML or contributor guidance. The marketplace at the repo root points at it (`source: ./consilium`), so `/plugin marketplace add alxmax/Consilium` keeps working; with APM, install `alxmax/Consilium/consilium`.\n- Tests, gates and repo tooling stay in `scripts/` and reach the plugin through `scripts/plugin_paths.py`. `check_doc_drift.py` resolves each normative doc's references against its own location, so a repo-root doc that names a moved script fails instead of passing.\n- `version.py --drift` lists changed prompt and mode files relative to the plugin folder (`git diff --relative`).\n- Five runtime scripts wrote the byte-order mark they strip from stdin as a literal invisible character; it is now the escape `\"﻿\"` (same behaviour).\n\n### Added\n- `scripts/test_plugin_folder.py`: the plugin folder holds only allowed paths, no tests, no file over 256 KiB, no `git push`/`git commit`, no remote `<script src>`, and no invisible format characters.",
+          "first_commit": "2026-10-13",
+          "last_commit": "2026-10-13"
+        },
         {
           "version": "v1.13.1",
           "date": "2026-10-13",
@@ -4279,21 +4288,29 @@
     }
   ],
   "design": {
-    "files": 30,
-    "clean_files": 25,
-    "score": 83,
+    "files": 31,
+    "clean_files": 24,
+    "score": 77,
     "candidates": {
       "encapsulation": 0,
       "abstraction": 2,
       "inheritance": 0,
       "polymorphism": 0,
-      "standards": 6
+      "standards": 8
     },
     "findings": [
       {
         "pillar": "standards",
+        "kind": "line-too-long",
+        "file": ".claude/skills/run-consilium/driver.py",
+        "line": 91,
+        "name": "driver.py",
+        "detail": "1 line(s) wider than 80 columns, first at line 91"
+      },
+      {
+        "pillar": "standards",
         "kind": "file-too-long",
-        "file": "scripts/aggregator.py",
+        "file": "consilium/scripts/aggregator.py",
         "line": 1,
         "name": "aggregator.py",
         "detail": "765 lines (over 500)"
@@ -4301,31 +4318,7 @@
       {
         "pillar": "standards",
         "kind": "file-too-long",
-        "file": "scripts/check_doc_drift.py",
-        "line": 1,
-        "name": "check_doc_drift.py",
-        "detail": "1283 lines (over 500)"
-      },
-      {
-        "pillar": "abstraction",
-        "kind": "prefix-family",
-        "file": "scripts/check_doc_drift.py",
-        "line": 364,
-        "name": "check",
-        "detail": "13 top-level functions start with `check`: check_ci_checks_completeness, check_confidence_floor_completeness, check_implement_pipeline_spec_alignment, check_legacy_mode_milestone, check_referenced_contracts_exist, check_referenced_scripts_exist"
-      },
-      {
-        "pillar": "standards",
-        "kind": "line-too-long",
-        "file": "scripts/check_doc_drift.py",
-        "line": 1110,
-        "name": "check_doc_drift.py",
-        "detail": "1 line(s) wider than 80 columns, first at line 1110"
-      },
-      {
-        "pillar": "standards",
-        "kind": "file-too-long",
-        "file": "scripts/log_feedback.py",
+        "file": "consilium/scripts/log_feedback.py",
         "line": 1,
         "name": "log_feedback.py",
         "detail": "536 lines (over 500)"
@@ -4333,7 +4326,7 @@
       {
         "pillar": "standards",
         "kind": "file-too-long",
-        "file": "scripts/render_impl_preview.py",
+        "file": "consilium/scripts/render_impl_preview.py",
         "line": 1,
         "name": "render_impl_preview.py",
         "detail": "522 lines (over 500)"
@@ -4341,7 +4334,7 @@
       {
         "pillar": "standards",
         "kind": "file-too-long",
-        "file": "scripts/validate_report.py",
+        "file": "consilium/scripts/validate_report.py",
         "line": 1,
         "name": "validate_report.py",
         "detail": "809 lines (over 500)"
@@ -4349,10 +4342,42 @@
       {
         "pillar": "abstraction",
         "kind": "prefix-family",
-        "file": "scripts/validate_report.py",
+        "file": "consilium/scripts/validate_report.py",
         "line": 90,
         "name": "validate",
         "detail": "7 top-level functions start with `validate`: _validate_deliberation_log, _validate_pipeline_executed, _validate_regression_risk, _validate_sequential_fields, _validate_telemetry, _validate_telemetry_required"
+      },
+      {
+        "pillar": "standards",
+        "kind": "line-too-long",
+        "file": "consilium/scripts/version.py",
+        "line": 107,
+        "name": "version.py",
+        "detail": "2 line(s) wider than 80 columns, first at line 107"
+      },
+      {
+        "pillar": "standards",
+        "kind": "file-too-long",
+        "file": "scripts/check_doc_drift.py",
+        "line": 1,
+        "name": "check_doc_drift.py",
+        "detail": "1302 lines (over 500)"
+      },
+      {
+        "pillar": "abstraction",
+        "kind": "prefix-family",
+        "file": "scripts/check_doc_drift.py",
+        "line": 379,
+        "name": "check",
+        "detail": "13 top-level functions start with `check`: check_ci_checks_completeness, check_confidence_floor_completeness, check_implement_pipeline_spec_alignment, check_legacy_mode_milestone, check_referenced_contracts_exist, check_referenced_scripts_exist"
+      },
+      {
+        "pillar": "standards",
+        "kind": "line-too-long",
+        "file": "scripts/check_doc_drift.py",
+        "line": 1129,
+        "name": "check_doc_drift.py",
+        "detail": "1 line(s) wider than 80 columns, first at line 1129"
       }
     ],
     "advice": {

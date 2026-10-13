@@ -104,7 +104,7 @@ def prompts_changed_since(ref: str) -> int:
     """
     if not ref_resolves(ref):
         return 0
-    out = _git(["diff", "--name-only", ref, "HEAD", "--", "prompts/", "modes/"])
+    out = _git(["diff", "--relative", "--name-only", ref, "HEAD", "--", "prompts/", "modes/"])
     if not out:
         return 0
     return len([line for line in out.splitlines() if line.strip()])
@@ -113,7 +113,7 @@ def prompts_changed_since(ref: str) -> int:
 def _drift_report(ref: str) -> str:
     if not ref_resolves(ref):
         return f"ref {ref!r} does not resolve to a commit — no drift computed."
-    out = _git(["diff", "--stat", ref, "HEAD", "--", "prompts/", "modes/"])
+    out = _git(["diff", "--relative", "--stat", ref, "HEAD", "--", "prompts/", "modes/"])
     return out or f"no prompt/mode changes since {ref}."
 
 

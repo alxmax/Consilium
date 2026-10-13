@@ -85,7 +85,10 @@ def eval_failures(proc):
 
 
 def script(rel):
-    return PY + [str(REPO / "scripts" / rel)]
+    # Dev tools and tests live in scripts/; the runtime scripts ship in the
+    # plugin folder consilium/scripts/.
+    dev = REPO / "scripts" / rel
+    return PY + [str(dev if dev.exists() else REPO / "consilium" / "scripts" / rel)]
 
 
 # All scripts/test_*.py unit suites — kept in lockstep with
@@ -116,6 +119,7 @@ TEST_SUITES = (
     "test_render_impl_preview.py",
     "test_check_versions.py",
     "test_check_doc_drift.py",
+    "test_plugin_folder.py",
 )
 
 

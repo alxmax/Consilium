@@ -22,8 +22,8 @@
       "reason": "confirm SYS/ARCH/calibration; wikilink ARCH children"
     },
     "ARCH-CONSILIUM-VOICES-001": {
-      "hash": "b976f2753670",
-      "reason": "confirm SYS/ARCH/calibration; wikilink ARCH children"
+      "hash": "88e5788c8038",
+      "reason": "plugin moved to consilium/: runtime scripts, plugin.json and contract paths relocated; behaviour unchanged"
     },
     "CONSILIUM-AGGREGATOR-001": {
       "hash": "749c82dbe716",
@@ -38,16 +38,20 @@
       "reason": "sync dev PRs #501-#506 into demo"
     },
     "CONSILIUM-CHECK-DOC-DRIFT-001": {
-      "hash": "b82c7e09d89b",
-      "reason": "sync dev PRs #501-#506 into demo"
+      "hash": "2a06d7cecbda",
+      "reason": "plugin moved to consilium/: runtime scripts, plugin.json and contract paths relocated; behaviour unchanged"
+    },
+    "CONSILIUM-CHECK-DOC-DRIFT-EXPLAINER-001": {
+      "hash": "e22ebeaac2dc",
+      "reason": "plugin moved to consilium/: runtime scripts, plugin.json and contract paths relocated; behaviour unchanged"
     },
     "CONSILIUM-CHECK-PUBLIC-LEAK-001": {
       "hash": "55e2336ec45c",
       "reason": "sync dev PRs #501-#506 into demo"
     },
     "CONSILIUM-CHECK-VERSIONS-001": {
-      "hash": "c38414be3dbf",
-      "reason": "sync dev PRs #501-#506 into demo"
+      "hash": "ccba5b488b35",
+      "reason": "plugin moved to consilium/: runtime scripts, plugin.json and contract paths relocated; behaviour unchanged"
     },
     "CONSILIUM-CONFIDENCE-001": {
       "hash": "388c5bbc3c77",
@@ -126,8 +130,8 @@
       "reason": "sync dev PRs #501-#506 into demo"
     },
     "CONSILIUM-PRIORS-001": {
-      "hash": "b989df36e305",
-      "reason": "sync dev PRs #501-#506 into demo"
+      "hash": "c014f260b9d4",
+      "reason": "plugin moved to consilium/: runtime scripts, plugin.json and contract paths relocated; behaviour unchanged"
     },
     "CONSILIUM-RENDER-FEEDBACK-HTML-001": {
       "hash": "e679f0713963",
@@ -150,16 +154,16 @@
       "reason": "sync dev PRs #501-#506 into demo"
     },
     "CONSILIUM-SUBAGENT-001": {
-      "hash": "e1955851dbd6",
-      "reason": "sync dev PRs #501-#506 into demo"
+      "hash": "afc5da819f79",
+      "reason": "plugin moved to consilium/: runtime scripts, plugin.json and contract paths relocated; behaviour unchanged"
     },
     "CONSILIUM-TRIAS-MODEL-SCHEMA-001": {
-      "hash": "ff06dc0ebcfc",
-      "reason": "sync dev PRs #501-#506 into demo"
+      "hash": "45907dec0833",
+      "reason": "plugin moved to consilium/: runtime scripts, plugin.json and contract paths relocated; behaviour unchanged"
     },
     "CONSILIUM-UTILS-001": {
-      "hash": "adb7b7ced563",
-      "reason": "state dir follows the project (cwd) or CONSILIUM_DATA_DIR instead of the install dir"
+      "hash": "c3523b5710c3",
+      "reason": "plugin moved to consilium/: runtime scripts, plugin.json and contract paths relocated; behaviour unchanged"
     },
     "CONSILIUM-VALIDATE-REPORT-001": {
       "hash": "1c84b371d725",
@@ -170,12 +174,12 @@
       "reason": "sync dev PRs #501-#506 into demo"
     },
     "CONSILIUM-VERSION-001": {
-      "hash": "b1554b02d6fb",
-      "reason": "sync dev PRs #501-#506 into demo"
+      "hash": "dde4d9266fcf",
+      "reason": "plugin moved to consilium/: runtime scripts, plugin.json and contract paths relocated; behaviour unchanged"
     },
     "CONSILIUM-VOCABULARY-MAP-001": {
-      "hash": "251bc8cdb9b9",
-      "reason": "sync dev PRs #501-#506 into demo"
+      "hash": "1038324a4c1e",
+      "reason": "plugin moved to consilium/: runtime scripts, plugin.json and contract paths relocated; behaviour unchanged"
     },
     "CONSILIUM-VOICE-CONSERVATOR-001": {
       "hash": "2d5d70ffd024",
@@ -200,6 +204,10 @@
     "SKILL-RUN-CONSILIUM-001": {
       "hash": "c365da752e46",
       "reason": "sync dev PRs #501-#506 into demo"
+    },
+    "SYS-CONSILIUM-INTEGRITY-001": {
+      "hash": "4b6804e0ebb5",
+      "reason": "plugin moved to consilium/: runtime scripts, plugin.json and contract paths relocated; behaviour unchanged"
     }
   }
 }

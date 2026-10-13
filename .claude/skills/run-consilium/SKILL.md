@@ -85,7 +85,7 @@ python docs/architecture/build.py --check         # "outputs up to date" (exit 1
 The full deterministic pipeline, end to end:
 
 ```bash
-cat bundle_smoke_tests.json | python scripts/build_report.py | python scripts/validate_report.py
+cat bundle_smoke_tests.json | python consilium/scripts/build_report.py | python consilium/scripts/validate_report.py
 ```
 
 Exit 0 = the assembled report satisfies the Constitution gate. `bundle_smoke_tests.json`,
@@ -95,7 +95,7 @@ The aggregator and confidence scripts take their **own** shape (a `candidates` l
 **not** a `build_report` bundle):
 
 ```bash
-echo '{"candidates":[{"id":"a","scores":{"generator":0.9,"control":0.9,"conservator":0.2}},{"id":"b","scores":{"generator":0.5,"control":0.5,"conservator":0.5}}]}' | python scripts/aggregator.py --scheme conservative_override
+echo '{"candidates":[{"id":"a","scores":{"generator":0.9,"control":0.9,"conservator":0.2}},{"id":"b","scores":{"generator":0.5,"control":0.5,"conservator":0.5}}]}' | python consilium/scripts/aggregator.py --scheme conservative_override
 ```
 
 ## Architecture explainer (human path)

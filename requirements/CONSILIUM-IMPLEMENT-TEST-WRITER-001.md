@@ -40,4 +40,4 @@ AC-3  <!-- verifiable by: inspection -->
 
 ## WHERE — Current implementation
 - prompts/implement/test_writer.md
-- scripts/validate_implement_output.py
+- consilium/scripts/validate_implement_output.py

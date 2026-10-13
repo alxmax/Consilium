@@ -19,7 +19,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parent.parent / "consilium"  # the shipped plugin (SKILL.md, modes/, prompts/, scripts/)
 PERSONALITIES_PATH = REPO_ROOT / "scripts" / "personalities.py"
 
 EXPECTED = {

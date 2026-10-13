@@ -13,6 +13,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+import plugin_paths  # noqa: E402,F401 — puts consilium/scripts on sys.path
 
 from strip_context import strip_for_control, strip_for_conservator, strip_for_trias
 

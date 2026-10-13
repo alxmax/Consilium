@@ -45,5 +45,5 @@ AC-3
 - modes/sequential.md
 - modes/dialectic.md
 - prompts/voices/verifier_lens.md
-- scripts/validate_report.py
+- consilium/scripts/validate_report.py
 - scripts/test_lens_bias.py

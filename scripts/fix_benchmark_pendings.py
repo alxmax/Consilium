@@ -31,7 +31,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--dry-run", action="store_true", help="print actions, don't write")
     args = ap.parse_args(argv)
 
-    mark = Path(__file__).resolve().parent / "mark_outcome.py"
+    mark = (Path(__file__).resolve().parent.parent / "consilium" / "scripts"
+            / "mark_outcome.py")
     errors = 0
     for run_path in args.run_paths:
         cmd = [sys.executable, "-X", "utf8", str(mark),

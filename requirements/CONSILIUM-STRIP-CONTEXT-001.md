@@ -46,4 +46,4 @@ Every line in this section is binding.
 
 **Notes** — None beyond the Description above.
 
-**Current implementation** — `scripts/strip_context.py`
+**Current implementation** — `consilium/scripts/strip_context.py`

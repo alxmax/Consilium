@@ -27,6 +27,8 @@ scripts/commit_remind.sh
 # Prose, templates and styles: about the capabilities, never a member of one
 README.md
 docs/*.md
+consilium/README.md
+consilium/docs/*.md
 docs/architecture/README.md
 docs/architecture/styles.css
 templates/requirement.md

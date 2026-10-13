@@ -21,6 +21,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+import plugin_paths  # noqa: E402,F401 — puts consilium/scripts on sys.path
 
 from scope_gate import DEFAULT_CONFIG, decide  # noqa: E402
 

@@ -15,7 +15,7 @@ satisfies: [ARCH-CONSILIUM-MODES-001]
 > Trias uniform model assignment: all 3 personalities (essentialist, verifier, sentinel) use sonnet. No per-personality schema workarounds needed.
 
 ## WHAT — Contract (normative)
-- `scripts/personalities.py` exposes a `PERSONALITIES` list where every entry carries a `model` field whose value controls which Claude model tier the Trias orchestrator dispatches for that sub-agent.
+- `consilium/scripts/personalities.py` exposes a `PERSONALITIES` list where every entry carries a `model` field whose value controls which Claude model tier the Trias orchestrator dispatches for that sub-agent.
 - Model assignments are uniform: essentialist → `sonnet`, verifier → `sonnet`, sentinel → `sonnet`.
 - No personality entry carries `schema_less: True`; all personalities use standard StructuredOutput dispatch.
 - The `personalities.py` CLI emits a valid JSON array of exactly 3 objects, each with at minimum a `model` field, for use by the Trias orchestrator at runtime.

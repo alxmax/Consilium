@@ -12,6 +12,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
+import plugin_paths  # noqa: E402,F401 — puts consilium/scripts on sys.path
 from infer_pipeline import infer_steps, recommend_implement_mode  # noqa: E402
 
 

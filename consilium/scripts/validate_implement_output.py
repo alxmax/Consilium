@@ -261,7 +261,7 @@ def main() -> None:
     try:
         raw = (pathlib.Path(args.input).read_text(encoding="utf-8")
                if args.input else sys.stdin.read())
-        out = json.loads(raw.lstrip("﻿"))
+        out = json.loads(raw.lstrip("\ufeff"))
     except (OSError, ValueError) as exc:
         print(f"not valid JSON: {exc}", file=sys.stderr)
         sys.exit(2)

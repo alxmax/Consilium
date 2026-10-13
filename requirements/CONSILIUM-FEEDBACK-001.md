@@ -43,4 +43,4 @@ Every line in this section is binding.
 
 **Notes** — Input: `.consilium/FEEDBACK.html` (path from `utils.FEEDBACK_PATH`); `.consilium/runs/*.json` read only when `--runs` is passed. Exists to give the developer a human-readable health check on the skill's real-world usefulness without opening the HTML journal manually.
 
-**Current implementation** — `scripts/feedback.py`.
+**Current implementation** — `consilium/scripts/feedback.py`.

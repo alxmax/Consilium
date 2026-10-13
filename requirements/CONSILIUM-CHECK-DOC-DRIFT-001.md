@@ -19,7 +19,7 @@ satisfies: [ARCH-CONSILIUM-REPO-GATES-001]
 
 Every line in this section is binding.
 
-- `check_doc_drift.py` enforces parity between the authoritative behavior (`SKILL.md`, `scripts/confidence.py`) and the human-readable documentation (`modes/*.md`, `docs/architecture/src/*.jsx`).
+- `check_doc_drift.py` enforces parity between the authoritative behavior (`SKILL.md`, `consilium/scripts/confidence.py`) and the human-readable documentation (`modes/*.md`, `docs/architecture/src/*.jsx`).
 - This prevents the class of silent drift found in the design audit of 2026-05-28, where four discrepancies had accumulated undetected.
 - `check_doc_drift.py` runs seven independent check families.
 - The first family is text-based regex invariants: required/forbidden patterns in specific files.
@@ -27,23 +27,23 @@ Every line in this section is binding.
 - The third family is legacy MODE alias removal milestone enforcement: dated removal comments accompany deprecated aliases in `validate_report.py`.
 - The fourth family is test-suite coverage: every `scripts/test_*.py` file appears in both `ci.yml` and the run-consilium driver.
 - The fifth family, CI_CHECKS completeness, requires every non-test `ci.yml` step to be represented in the architecture explainer's `CI_CHECKS` card list, matched by exact script basename; it was added 2026-07-06 after a Trias self-audit found the explainer's own "what CI runs" section had silently fallen behind `ci.yml` itself.
-- The sixth family, Trias personality-name parity, requires `scripts/personalities.py`'s `PERSONALITIES` names to match the explainer's `trias.jsx`/`modes.jsx` and the `make_full_architecture.py` poster generator; it was added 2026-07-06 after the v3 lens rename (PR #482) was found to have never touched those three files.
+- The sixth family, Trias personality-name parity, requires `consilium/scripts/personalities.py`'s `PERSONALITIES` names to match the explainer's `trias.jsx`/`modes.jsx` and the `make_full_architecture.py` poster generator; it was added 2026-07-06 after the v3 lens rename (PR #482) was found to have never touched those three files.
 - The seventh family, implement-pipeline spec alignment, requires `modes/implement_pipeline.md`'s `subagents`/`cost_multiplier` frontmatter to be stated explicitly in the "Code integration pipeline" explainer section's `GATE_ITEMS`; it was added 2026-07-06 after that section was found to be the only mode/flag whose headline sub-agent count and cost multiplier weren't shown anywhere in its own text.
 - The CI_CHECKS completeness, personality-name parity, and implement-pipeline alignment families are specified in [[CONSILIUM-CHECK-DOC-DRIFT-EXPLAINER-001]].
-- `check_doc_drift.py` is intended to run before any commit that touches `modes/`, `docs/architecture/src/`, `scripts/confidence.py`, `scripts/personalities.py`, `.github/workflows/ci.yml`, or `scripts/test_*.py`.
+- `check_doc_drift.py` is intended to run before any commit that touches `modes/`, `docs/architecture/src/`, `consilium/scripts/confidence.py`, `consilium/scripts/personalities.py`, `.github/workflows/ci.yml`, or `scripts/test_*.py`.
 - `check_doc_drift.py` reads `modes/trias.md` for the `trias_parallel_dispatch` and `trias_parallelism_runtime_audit` invariants.
 - `check_doc_drift.py` reads `modes/sequential.md` for the `sequential_scale_down_skips_control` and `sequential_generator_first` invariants.
 - `check_doc_drift.py` reads `docs/architecture/src/modes.jsx` for the `trias_tally_caption_confidence` and `explainer_modes_voices_generator_first` invariants, and for the Trias spec-alignment worst-case check.
 - `check_doc_drift.py` reads `docs/architecture/src/trias.jsx` for the `TRIAS_OUTCOMES` confidence parity check.
 - `check_doc_drift.py` reads `docs/architecture/src/extras.jsx` for the Trias spec-alignment check (the CostScatter TRI entry and the CostBars trias row).
 - `check_doc_drift.py` reads `SKILL.md` for the `skill_templates_have_pipeline_executed` invariant.
-- `check_doc_drift.py` reads `scripts/build_report.py` for the `build_report_emits_pipeline_executed` invariant.
-- `check_doc_drift.py` AST-parses `scripts/confidence.py` for the `VOTE_PATTERN_CONFIDENCE` dict values.
-- `check_doc_drift.py` reads `scripts/validate_report.py` for the legacy MODE alias removal milestone check.
+- `check_doc_drift.py` reads `consilium/scripts/build_report.py` for the `build_report_emits_pipeline_executed` invariant.
+- `check_doc_drift.py` AST-parses `consilium/scripts/confidence.py` for the `VOTE_PATTERN_CONFIDENCE` dict values.
+- `check_doc_drift.py` reads `consilium/scripts/validate_report.py` for the legacy MODE alias removal milestone check.
 - `check_doc_drift.py` reads `.github/workflows/ci.yml` and `.claude/skills/run-consilium/driver.py` for the test-suite coverage check.
 - `check_doc_drift.py` globs `scripts/test_*.py` to enumerate all test suites requiring coverage.
 - `check_doc_drift.py` parses `.github/workflows/ci.yml` and `docs/architecture/src/extras.jsx` for the `ci_checks_completeness` check.
-- `check_doc_drift.py` AST-parses `scripts/personalities.py` for the `PERSONALITIES` list (name SSOT), used by the `trias_personality_name_parity` check.
+- `check_doc_drift.py` AST-parses `consilium/scripts/personalities.py` for the `PERSONALITIES` list (name SSOT), used by the `trias_personality_name_parity` check.
 - `check_doc_drift.py` regex-scans `docs/architecture/src/trias.jsx`, `docs/architecture/src/modes.jsx`, and `scripts/make_full_architecture.py` for Trias personality names, comparing them against `personalities.py`.
 - `check_doc_drift.py` regex-parses `modes/implement_pipeline.md` for the `subagents`/`cost_multiplier` frontmatter (SSOT), used by the `implement_pipeline_spec_alignment` check.
 - `check_doc_drift.py` scans `docs/architecture/src/extras.jsx`'s `GATE_ITEMS` array (ImplementSection) for the matching sub-agent-count / cost-multiplier strings.

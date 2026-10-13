@@ -46,4 +46,4 @@ Every line in this section is binding.
 
 ## Context (non-binding)
 
-**Current implementation** — `scripts/build_report.py`.
+**Current implementation** — `consilium/scripts/build_report.py`.

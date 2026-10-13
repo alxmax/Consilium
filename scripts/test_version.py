@@ -16,7 +16,7 @@ from __future__ import annotations
 import pathlib
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+ROOT = pathlib.Path(__file__).resolve().parent.parent / "consilium"  # the shipped plugin (SKILL.md, modes/, prompts/, scripts/)
 sys.path.insert(0, str(ROOT / "scripts"))
 import version  # noqa: E402
 from build_report import build  # noqa: E402

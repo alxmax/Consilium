@@ -494,7 +494,7 @@ def main(argv: list[str] | None = None) -> int:
         # leading U+FEFF defeats the `diff --git ` header match,
         # mislabeling the first file's card. Same idiom as
         # utils.load_json_stdin / confidence.py / strip_context.py.
-        diff_text = sys.stdin.read().lstrip("﻿")
+        diff_text = sys.stdin.read().lstrip("\ufeff")
     elif args.diff_file:
         try:
             diff_text = Path(args.diff_file).read_text(encoding="utf-8-sig")

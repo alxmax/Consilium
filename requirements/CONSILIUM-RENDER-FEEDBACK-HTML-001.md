@@ -53,4 +53,4 @@ Every line in this section is binding.
 
 **Notes** — None beyond the Description above.
 
-**Current implementation** — `scripts/render_feedback_html.py`
+**Current implementation** — `consilium/scripts/render_feedback_html.py`

@@ -49,4 +49,4 @@ Every line in this section is binding.
 
 **Notes** — Input: deliberation report JSON via `--input <path>` or stdin; CLI flags `--dry-run`, `--verify-gate`, `--test-cmd`, `--target`, `--stub-marker`. The gate only needs the suite to go RED, not a clean AST rewrite — hence the line-scanner heuristic rather than an AST rewrite.
 
-**Current implementation** — `scripts/implement_pipeline.py`.
+**Current implementation** — `consilium/scripts/implement_pipeline.py`.

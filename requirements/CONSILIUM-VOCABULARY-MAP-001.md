@@ -18,7 +18,7 @@ satisfies: [ARCH-CONSILIUM-REPORT-001]
 
 Every line in this section is binding.
 
-- `scripts/vocabulary_map.py` is the single source of truth for all user-facing natural-language translations of structured deliberation field values, and for the per-voice token budget table.
+- `consilium/scripts/vocabulary_map.py` is the single source of truth for all user-facing natural-language translations of structured deliberation field values, and for the per-voice token budget table.
 - `VOCABULARY_MAP` maps categories (`reversibility`, `magnitude`, `meta_recommendation`, `verdict`) to their human-readable labels, used by the renderer and aggregator to produce consistent output strings.
 - `translate` falls back silently: an unknown category or value returns `str(value)`, with no logging; callers cannot assume a human-readable label is always returned.
 - All `VOCABULARY_MAP` labels are hardcoded Romanian strings, except `meta_recommendation` values, which are English; no i18n hook exists or is planned.
@@ -43,4 +43,4 @@ Every line in this section is binding.
 
 ## Context (non-binding)
 
-**Current implementation** — `scripts/vocabulary_map.py`.
+**Current implementation** — `consilium/scripts/vocabulary_map.py`.

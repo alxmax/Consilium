@@ -12,7 +12,7 @@ satisfies: [ARCH-CONSILIUM-REPORT-001]
 
 # validate_report
 
-> Describes observed behavior, verified against scripts/validate_report.py source.
+> Describes observed behavior, verified against consilium/scripts/validate_report.py source.
 
 ## Description
 
@@ -48,4 +48,4 @@ Every line in this section is binding.
 
 ## Context (non-binding)
 
-**Current implementation** — `scripts/validate_report.py`.
+**Current implementation** — `consilium/scripts/validate_report.py`.

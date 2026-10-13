@@ -389,7 +389,7 @@ def main(argv: list[str] | None = None) -> int:
     # scripts (build_report.py / validate_report.py exit 2 on JSONDecodeError).
     # PowerShell 5.1 pipes prepend a BOM on stdin — strip it before parsing.
     try:
-        data = json.loads(args.input.read().lstrip("﻿"))
+        data = json.loads(args.input.read().lstrip("\ufeff"))
     except json.JSONDecodeError as exc:
         print(f"confidence: invalid JSON input: {exc}", file=sys.stderr)
         return 2

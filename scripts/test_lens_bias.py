@@ -37,7 +37,7 @@ import re
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parent.parent / "consilium"  # the shipped plugin (SKILL.md, modes/, prompts/, scripts/)
 
 # Load personalities module via importlib so this script does not require
 # being run from scripts/ on PYTHONPATH.

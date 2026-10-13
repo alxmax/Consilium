@@ -51,4 +51,4 @@ Every line in this section is binding.
 
 **Notes** — Input: deliberation report JSON via stdin (required); `.consilium/FEEDBACK.html` (created if absent, overridable via `--feedback`); `.consilium/runs/.run_path_map.json` read and updated; CLI flags `--outcome OK|BAD|OVR|PEND|PEND_HEADLESS`, `--override-target`, `--user-note`, `--run-path`, `--dry-run`, `--force-override`. Contract addenda derive from a code audit dated 2026-06-04.
 
-**Current implementation** — `scripts/log_feedback.py`.
+**Current implementation** — `consilium/scripts/log_feedback.py`.

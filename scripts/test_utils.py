@@ -14,6 +14,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+import plugin_paths  # noqa: E402,F401 — puts consilium/scripts on sys.path
 
 from utils import canonical_run_path, is_headless, issue_penalty, validate_keys
 
@@ -118,7 +119,7 @@ class TestDataDir(unittest.TestCase):
     """DATA_DIR follows the project (cwd) or $CONSILIUM_DATA_DIR, never the
     install dir — an install is replaced on every plugin/APM update."""
 
-    SCRIPTS = str(Path(__file__).resolve().parent)
+    SCRIPTS = str(Path(__file__).resolve().parent.parent / "consilium" / "scripts")
     PROBE = ("import sys; sys.path.insert(0, sys.argv[1]); import utils, "
              "vote_degeneracy as v; print(utils.DATA_DIR); "
              "print(utils.RUNS_DIR); print(utils.FEEDBACK_PATH); "

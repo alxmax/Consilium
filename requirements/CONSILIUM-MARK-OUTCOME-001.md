@@ -50,4 +50,4 @@ Every line in this section is binding.
 
 **Notes** — Input: `--run-path` (relative or absolute path to a `runs/*.json` file); `--date YYYY-MM-DD` + `--chosen <id>` as an alternative direct-match strategy; `--outcome` one of `OK | BAD | OVR | PEND | PEND_HEADLESS` (required); `--reason`; `--dry-run`; `--benchmark` (required guard for `--outcome PEND_HEADLESS`); `--feedback` override path. Reads and rewrites `.consilium/FEEDBACK.html` in place and reads the `.consilium/runs/.run_path_map.json` sidecar populated by `log_feedback.py`. Rationale: the initial outcome logged at Step 6 is a subjective gut-feel, and production reality can contradict it days later (a chosen approach may break production, or a risky override may prove correct); `[confirmed]` lets `priors.py` weight confirmed-outcome rows higher than purely subjective ones.
 
-**Current implementation** — `scripts/mark_outcome.py`.
+**Current implementation** — `consilium/scripts/mark_outcome.py`.

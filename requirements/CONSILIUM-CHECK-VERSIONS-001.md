@@ -18,7 +18,7 @@ satisfies: [ARCH-CONSILIUM-REPO-GATES-001]
 
 Every line in this section is binding.
 
-- `check_versions.py` is the single point that asserts the plugin's semver stays aligned across `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`, since Claude Code reads both as static data and neither manifest can import the other to stay in sync automatically; drift fails the build instead of shipping silently.
+- `check_versions.py` is the single point that asserts the plugin's semver stays aligned across `consilium/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`, since Claude Code reads both as static data and neither manifest can import the other to stay in sync automatically; drift fails the build instead of shipping silently.
 - `check_versions.py` mirrors `requirement-manager`'s `scripts/check_versions.py` (same mechanism, adopted 2026-07-06 after `marketplace.json` was found to have no `version` field at all while `plugin.json` had already drifted from an orphan `v1.4.0` git tag).
 - `MAP_ENGINE_VERSION` (in `scripts/reqmap_engine/__init__.py`) is checked independently: it is a staleness-compare date stamp for the requirement-map engine, not a semver, and it is never compared against the plugin version.
 - `plugin.json`'s `version` field is the canonical source; every `version` occurrence in `marketplace.json` (top-level and each `plugins[]` entry) equals it exactly, by string equality with no semver-range logic.

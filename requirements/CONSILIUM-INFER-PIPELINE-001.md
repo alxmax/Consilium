@@ -37,5 +37,5 @@ satisfies: [ARCH-CONSILIUM-IMPLEMENT-001]
 
 ## WHERE — Current implementation
 
-- scripts/infer_pipeline.py
+- consilium/scripts/infer_pipeline.py
 <!-- implements: CONSILIUM-INFER-PIPELINE-001 -->

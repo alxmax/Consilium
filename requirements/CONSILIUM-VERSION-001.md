@@ -18,7 +18,7 @@ satisfies: [ARCH-CONSILIUM-REPORT-001]
 
 Every line in this section is binding.
 
-- `scripts/version.py` is the single home for version provenance, separated from report assembly (`build_report.py`, which only consumes these values).
+- `consilium/scripts/version.py` is the single home for version provenance, separated from report assembly (`build_report.py`, which only consumes these values).
 - `consilium_version()` returns the human display stamp from `git describe --tags --always --dirty`, and fails open to `"unknown"` when git is absent or errors — it never raises.
 - `consilium_ref()` returns the resolvable diff operand: the committed HEAD sha on a clean tree.
 - `consilium_ref()` returns `""` on a dirty or unknown tree — by contract, never a `<sha>-dirty` string — so a recorded ref is always `git checkout`-able.
@@ -43,6 +43,6 @@ Every line in this section is binding.
 
 **Notes** — Reads the git repository state via subprocess (`git describe`, `git status --porcelain`, `git rev-parse`).
 
-**Current implementation** — `scripts/version.py`.
+**Current implementation** — `consilium/scripts/version.py`.
 
 <!-- verified-by: scripts/test_version.py -->

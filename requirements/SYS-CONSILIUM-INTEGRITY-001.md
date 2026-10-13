@@ -17,7 +17,7 @@ risk: 1
 
 Every line in this section is binding.
 
-- CI fails when the mode docs or the architecture explainer contradict `SKILL.md` or `scripts/confidence.py`.
+- CI fails when the mode docs or the architecture explainer contradict `SKILL.md` or `consilium/scripts/confidence.py`.
 - CI fails when a tracked file names the private repository or a local developer path.
 - CI fails when the plugin manifests disagree on the version, or a version bump ships without a CHANGELOG entry.
 - The regression scenarios and every unit suite run on each push, and a single local command reproduces what CI checks.

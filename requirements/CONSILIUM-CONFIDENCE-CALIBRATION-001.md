@@ -39,4 +39,4 @@ Every line in this section is binding.
 
 ## Context (non-binding)
 
-**Current implementation** — `scripts/confidence_calibration.py`, tested in `scripts/test_confidence_calibration.py`.
+**Current implementation** — `consilium/scripts/confidence_calibration.py`, tested in `scripts/test_confidence_calibration.py`.

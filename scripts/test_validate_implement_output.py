@@ -14,11 +14,12 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+import plugin_paths  # noqa: E402,F401 — puts consilium/scripts on sys.path
 
 import validate_implement_output as vio
 
-ROOT = Path(__file__).parent.parent
-SCRIPT = Path(__file__).parent / "validate_implement_output.py"
+ROOT = Path(__file__).parent.parent / "consilium"  # the shipped plugin (SKILL.md, modes/, prompts/, scripts/)
+SCRIPT = Path(__file__).resolve().parent.parent / "consilium" / "scripts" / "validate_implement_output.py"
 
 
 def coder_out(**over):

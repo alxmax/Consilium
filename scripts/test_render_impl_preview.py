@@ -18,7 +18,7 @@ import subprocess
 import sys
 import tempfile
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+ROOT = pathlib.Path(__file__).resolve().parent.parent / "consilium"  # the shipped plugin (SKILL.md, modes/, prompts/, scripts/)
 sys.path.insert(0, str(ROOT / "scripts"))
 from render_impl_preview import render_preview_html, split_diff_sections  # noqa: E402
 

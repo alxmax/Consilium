@@ -16,8 +16,10 @@ import importlib.util
 from collections import Counter
 from pathlib import Path
 
+import plugin_paths  # puts consilium/scripts on sys.path (vote_degeneracy imports utils)
+
 _spec = importlib.util.spec_from_file_location(
-    "vote_degeneracy", Path(__file__).resolve().parent / "vote_degeneracy.py"
+    "vote_degeneracy", plugin_paths.PLUGIN_SCRIPTS / "vote_degeneracy.py"
 )
 assert _spec and _spec.loader
 vd = importlib.util.module_from_spec(_spec)

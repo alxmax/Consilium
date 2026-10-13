@@ -4,6 +4,17 @@ All notable changes to Consilium are recorded here, following
 [Keep a Changelog](https://keepachangelog.com/). This project is source-available
 under the Business Source License 1.1 (see `LICENSE`).
 
+## [1.14.0] — 2026-10-13
+
+### Changed
+- The plugin now lives in `consilium/` (manifest, `SKILL.md`, agents, prompts, modes, the 25 runtime scripts and the three docs they cite, a plugin README and `LICENSE`). An install receives only this folder: about 50 files instead of the whole repository, with no tests, repo tooling, hooks, generated HTML or contributor guidance. The marketplace at the repo root points at it (`source: ./consilium`), so `/plugin marketplace add alxmax/Consilium` keeps working; with APM, install `alxmax/Consilium/consilium`.
+- Tests, gates and repo tooling stay in `scripts/` and reach the plugin through `scripts/plugin_paths.py`. `check_doc_drift.py` resolves each normative doc's references against its own location, so a repo-root doc that names a moved script fails instead of passing.
+- `version.py --drift` lists changed prompt and mode files relative to the plugin folder (`git diff --relative`).
+- Five runtime scripts wrote the byte-order mark they strip from stdin as a literal invisible character; it is now the escape `"﻿"` (same behaviour).
+
+### Added
+- `scripts/test_plugin_folder.py`: the plugin folder holds only allowed paths, no tests, no file over 256 KiB, no `git push`/`git commit`, no remote `<script src>`, and no invisible format characters.
+
 ## [1.13.1] — 2026-10-13
 
 ### Fixed
