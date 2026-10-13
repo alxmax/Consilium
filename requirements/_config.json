@@ -1,3 +1,4 @@
 {
-  "DESIGN_LINE_MAX": 80
+  "DESIGN_LINE_MAX": 80,
+  "DOC_CLAIM_FILES": [".claude/CLAUDE.md"]
 }
