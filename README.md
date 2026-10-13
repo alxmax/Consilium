@@ -51,7 +51,7 @@ Deliberation state (run reports, the feedback journal, preview pages) is written
 
 This is a preference, not a requirement: if you *want* the deliberation trail versioned alongside your code (e.g. for team review of past decisions), simply don't ignore it — everything under `.consilium/` is plain JSON/HTML and diffs cleanly.
 
-> **Releases:** clean, tagged releases (currently **v1.1**) are published here for installation and review.
+> **Releases:** clean, tagged releases are published here for installation and review; the latest is always at the top of [Tags](https://github.com/alxmax/Consilium/tags).
 
 ## Example
 

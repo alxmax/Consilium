@@ -4167,8 +4167,8 @@
           "date": "2026-10-18",
           "headline": "",
           "body": "### Fixed\n- `build_report.py` now marks a non-skipped report `telemetry_incomplete: true` (with `telemetry_gaps`) when its telemetry has no integer `dispatch_count` or no measured latency, so a cost rollup can tell which reports to distrust. Marked, not rejected: older runs stay readable.\n- Published cost and variance figures overstated what was measured. The README mode table's \"Cost\" column is a nominal sub-agent ratio, not token or dollar cost, and Trias can reach 7 dispatches on a deadlock retry. The skill reference described a 40% categorical flip rate and a 0.12–0.18 score spread as findings; the experiment saw 2 flips in 5 paired runs and a 0.038 mean spread, in a region that excluded the 0.7–0.9 veto band.",
-          "first_commit": "2026-10-18",
-          "last_commit": "2026-10-18"
+          "first_commit": "2026-10-19",
+          "last_commit": "2026-10-19"
         },
         {
           "version": "v1.15.8",
