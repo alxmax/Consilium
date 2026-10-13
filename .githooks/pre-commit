@@ -18,5 +18,5 @@ fi
 # after edits is the recurring red-CI cause). Moved here 2026-07-02 from
 # .git/hooks/pre-commit, which core.hooksPath=.githooks had silently disabled.
 # engine >= 8.0.0: gate also checks map freshness (the `map` command was removed)
-REQMAP_REPO=alxmax/Consilium_Demo python -X utf8 scripts/reqmap.py gate --strict || exit 1
+REQMAP_REPO=alxmax/Consilium python -X utf8 scripts/reqmap.py gate --strict || exit 1
 exit 0

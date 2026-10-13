@@ -19,8 +19,8 @@ satisfies: [ARCH-CONSILIUM-REPO-GATES-001]
 Every line in this section is binding.
 
 - `check_public_leak.py` scans all files tracked by `git ls-files` in the current working directory; it takes no CLI flags and runs unconditionally.
-- `check_public_leak.py` guards the public release repository against accidentally referencing the private development repository, or leaking local developer paths.
-- `check_public_leak.py` scans every git-tracked text file for two compiled regex patterns: a reference to the private dev repo (the owner/name slug, excluding the public `_Demo` mirror), and an absolute local path under the author's working tree.
+- `check_public_leak.py` guards the public repository against accidentally referencing the archived private development repository, or leaking local developer paths.
+- `check_public_leak.py` scans every git-tracked text file for two compiled regex patterns: a reference to the archived private dev repo (its owner/name slug; the public repo's own slug is allowed), and an absolute local path under the author's working tree.
 - The exact patterns live in the source; this doc deliberately does not quote them, because doing so would itself trip the guard.
 - Binary and image file extensions are skipped.
 - The guard file itself is excluded from its own scan.
@@ -38,8 +38,8 @@ Every line in this section is binding.
 
 ## Cases
 
-- **CASE-1** — Given a repo with no private-repo (non-Demo) or local-path references, when `check_public_leak.py` runs, then it exits 0 and prints `clean`.
-- **CASE-2** — Given a tracked file containing a non-Demo private-repo reference, when `check_public_leak.py` runs, then it exits 1 with the file and line number printed to stderr.
+- **CASE-1** — Given a repo with no private-repo or local-path references, when `check_public_leak.py` runs, then it exits 0 and prints `clean`.
+- **CASE-2** — Given a tracked file containing a private-repo reference, when `check_public_leak.py` runs, then it exits 1 with the file and line number printed to stderr.
 - **CASE-3** — Given a tracked file containing an absolute local developer path, when `check_public_leak.py` runs, then it exits 1 with the offending location reported.
 - **CASE-4** — Given binary and image files (`.png`, `.woff`) that match the patterns byte-for-byte, when `check_public_leak.py` runs, then those files are skipped.
 - **CASE-5** — Given the guard script itself (`check_public_leak.py`), when it scans the repo, then it excludes itself from the scan and never self-reports.

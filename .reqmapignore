@@ -17,7 +17,7 @@ docs/architecture/build.py
 # Complete-architecture poster: generator + its generated output (poster dropped in a 2026-07-03 backlog review)
 scripts/make_full_architecture.py
 docs/consilium_full.html
-# Legacy map viewer from Consilium_Demo public repo — generated artifact with stale tags
+# Legacy map viewer from the public repo — generated artifact with stale tags
 docs/map.html
 # CI and hook plumbing: they run the gates the repo-gate requirements describe,
 # and scripts/commit_remind.sh is a local Claude Code Stop hook

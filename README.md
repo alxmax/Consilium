@@ -16,7 +16,7 @@ The three core voices:
 - **An 8-component veto cascade** (`scripts/aggregator.py`) that turns three voice outputs into one decision with 7 distinct routing outcomes (block / rework / adapt / escalate / aggregate).
 - **A self-calibrating feedback loop** — every run lands as canonical JSON in `.consilium/runs/`, outcomes are logged to `.consilium/FEEDBACK.html`, and the next deliberation reads those priors. Confidence below a per-mode floor is flagged.
 - **Cost-aware modes** — from a 1× single-context pass up to a ~2.67× three-personality vote (Trias), with a scope gate that auto-skips trivial diffs.
-- **Measured, not asserted** — a benchmark harness (`benchmark/`) compares each mode against bare-model baselines on real coding/reasoning tasks with a hidden oracle. See [Benchmark results](#benchmark-results) below.
+- **Measured, not asserted** — a benchmark harness ([Consilium-Benchmark](https://github.com/alxmax/Consilium-Benchmark), a separate repo) compares each mode against bare-model baselines on real coding/reasoning tasks with a hidden oracle. See [Benchmark results](#benchmark-results) below.
 - **A CI green-gate** — every push and PR runs every unit suite, the deterministic regression scenarios (`evals/`), doc-drift invariants (`scripts/check_doc_drift.py` — the architecture explainer is parsed and checked against the code it describes), a public-leak guard, and a strict requirements-map gate. All stdlib; the CI has no `pip install` step.
 - **Stdlib-only Python** — no external dependencies; each script is a small, standalone CLI with JSON I/O.
 
@@ -37,7 +37,7 @@ An interactive, single-page walkthrough of the voices, pipeline, modes, voting, 
 ### As a plugin (one step)
 
 ```
-/plugin marketplace add alxmax/Consilium_Demo
+/plugin marketplace add alxmax/Consilium
 /plugin install consilium@consilium
 ```
 
@@ -119,7 +119,6 @@ consilium/
 ├── modes/           # per-mode workflow + machine-readable config (cost, sub-agents, floors)
 ├── scripts/         # stdlib-only CLIs: aggregator, confidence, priors, scope_gate, …
 ├── agents/          # consilium-subagent — isolated dispatch via the Agent tool
-├── benchmark/       # mode-vs-baseline benchmark harness (oracle kept in an external sibling repo)
 ├── experiments/     # benchmarking-discipline notes + validation write-ups
 ├── docs/            # architecture.html explainer + its React source under docs/architecture/
 ├── evals/           # deterministic regression scenarios for the scripts
@@ -169,7 +168,7 @@ What this project concretely shows, in Agentic-AI / LLMOps terms. Rated **Full**
 | Agent memory | **Partial** | 3 tiers via `memory.py` — session context, `.consilium/runs/*.json` episodic logs, `.consilium/FEEDBACK.html` outcome journal. This is **journaling + run logs, not vector / retrieval-augmented memory** |
 | Token-cost telemetry | Full (instrumentation) | per-dispatch telemetry (`telemetry.voices.<name>`) recorded in every run. The explainer's tokens-per-dispatch figures are **measured** from real run telemetry (frozen snapshot, 2026-05-30 — the rollup script was retired in the 2026-06-04 dead-code triage) |
 | Regression testing | Full | `evals/scenarios.json` + `run_evals.py` — deterministic subprocess tests of the scripts (not LLM-output evals) |
-| Benchmarking vs baselines | Full | `benchmark/` compares each mode against bare-model baselines with a hidden oracle kept out-of-tree |
+| Benchmarking vs baselines | Full | [Consilium-Benchmark](https://github.com/alxmax/Consilium-Benchmark) compares each mode against bare-model baselines with a hidden oracle kept out-of-tree |
 | Fabrication / hallucination discipline | **Partial** | a documented independent-oracle rule for any quantitative claim (`experiments/README.md`) — a review process, not an automated metric |
 | Version provenance | Full | every run stamps `telemetry.consilium_version` (`git describe`) + `consilium_ref` (the committed sha, blank on a dirty tree) — any `.consilium/runs/*.json` is reproducible via `git checkout`, and `scripts/version.py --drift <ref>` shows which prompts/modes changed since. Git is the version system — no bespoke registry |
 | Framework orchestration (LangGraph / CrewAI) | n/a | evaluated and deliberately rejected — see below |

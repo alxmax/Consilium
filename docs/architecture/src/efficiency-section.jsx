@@ -8,7 +8,7 @@ const MODES_DATA = [
   { mode: 'skeptic_on_chosen', costMultiplier: 'base +1', dispatches: 1, note: 'composable flag over any base' },
 ];
 
-// SNAPSHOT 2026-05-29 (benchmark/RESULTS.md) — SUPERSEDED, see note below. These
+// SNAPSHOT 2026-05-29 (Consilium-Benchmark/RESULTS.md) — SUPERSEDED, see note below. These
 // figures predate the 2026-06-23 fix that made the consilium modes actually run the
 // deliberation pipeline; at capture time those modes had collapsed to a bare-model
 // pass, so the consilium rows UNDERCOUNT real deliberation cost. A post-fix n=1

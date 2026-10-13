@@ -122,8 +122,8 @@ to capture it headlessly.
   forces this via `PYTHONUTF8=1` for every child process.
 - **`docs/architecture.html` is not offline-safe.** It pulls React 18, Babel, and
   Google Fonts from a CDN, so `file://` rendering (and the screenshot) needs internet.
-  The other repo HTML (`experiments/*.html`, `.consilium/FEEDBACK.html`,
-  `benchmark/report.html`) *is* self-contained.
+  The other repo HTML (`experiments/*.html`, `.consilium/FEEDBACK.html`)
+  *is* self-contained.
 - **No `chromium-cli` on this box.** The driver looks for Chrome then Edge at their
   standard Windows install paths and shells out with `--headless=new --screenshot=...`.
 - **Aggregator input ≠ build_report bundle.** Feeding a `bundle_*.json` to

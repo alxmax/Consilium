@@ -1,6 +1,6 @@
 {
   "engine_version": "2026-10-11.3",
-  "repo": "alxmax/Consilium_Demo",
+  "repo": "alxmax/Consilium",
   "nodes": [
     {
       "id": "ARCH-CONSILIUM-IMPLEMENT-001",
@@ -728,8 +728,8 @@
       "intent": "Fails CI if any git-tracked file references the private repo or a local developer path.",
       "contract": [
         "`check_public_leak.py` scans all files tracked by `git ls-files` in the current working directory; it takes no CLI flags and runs unconditionally.",
-        "`check_public_leak.py` guards the public release repository against accidentally referencing the private development repository, or leaking local developer paths.",
-        "`check_public_leak.py` scans every git-tracked text file for two compiled regex patterns: a reference to the private dev repo (the owner/name slug, excluding the public `_Demo` mirror), and an absolute local path under the author's working tree.",
+        "`check_public_leak.py` guards the public repository against accidentally referencing the archived private development repository, or leaking local developer paths.",
+        "`check_public_leak.py` scans every git-tracked text file for two compiled regex patterns: a reference to the archived private dev repo (its owner/name slug; the public repo's own slug is allowed), and an absolute local path under the author's working tree.",
         "The exact patterns live in the source; this doc deliberately does not quote them, because doing so would itself trip the guard.",
         "Binary and image file extensions are skipped.",
         "The guard file itself is excluded from its own scan.",
@@ -746,7 +746,7 @@
       ],
       "notes": [],
       "current_impl": [],
-      "accept": "- **CASE-1** — Given a repo with no private-repo (non-Demo) or local-path references, when `check_public_leak.py` runs, then it exits 0 and prints `clean`.\n- **CASE-2** — Given a tracked file containing a non-Demo private-repo reference, when `check_public_leak.py` runs, then it exits 1 with the file and line number printed to stderr.\n- **CASE-3** — Given a tracked file containing an absolute local developer path, when `check_public_leak.py` runs, then it exits 1 with the offending location reported.\n- **CASE-4** — Given binary and image files (`.png`, `.woff`) that match the patterns byte-for-byte, when `check_public_leak.py` runs, then those files are skipped.\n- **CASE-5** — Given the guard script itself (`check_public_leak.py`), when it scans the repo, then it excludes itself from the scan and never self-reports.",
+      "accept": "- **CASE-1** — Given a repo with no private-repo or local-path references, when `check_public_leak.py` runs, then it exits 0 and prints `clean`.\n- **CASE-2** — Given a tracked file containing a private-repo reference, when `check_public_leak.py` runs, then it exits 1 with the file and line number printed to stderr.\n- **CASE-3** — Given a tracked file containing an absolute local developer path, when `check_public_leak.py` runs, then it exits 1 with the offending location reported.\n- **CASE-4** — Given binary and image files (`.png`, `.woff`) that match the patterns byte-for-byte, when `check_public_leak.py` runs, then those files are skipped.\n- **CASE-5** — Given the guard script itself (`check_public_leak.py`), when it scans the repo, then it excludes itself from the scan and never self-reports.",
       "input": "",
       "output": "",
       "desc": "",
@@ -761,7 +761,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "scripts/check_public_leak.py:16"
+          "loc": "scripts/check_public_leak.py:15"
         },
         {
           "role": "tested-by",
@@ -4018,6 +4018,27 @@
           "body": "### Removed\n- **`trias_split` legacy mode alias.** Its dated removal milestone (2026-08-21) had passed, which turned the `legacy_mode_milestone` doc-drift check red on `main`. `validate_report.py` no longer maps `trias_split` to `trias`; historical `trias_split` runs still validate, because `telemetry.mode` is an open string, but they skip the per-voice telemetry check. `vote_degeneracy.py` still counts them as Trias runs.",
           "first_commit": "2026-09-21",
           "last_commit": "2026-09-21"
+        }
+      ]
+    },
+    {
+      "month": "2026-10",
+      "count": 1,
+      "first": "2026-10-13",
+      "last": "2026-10-13",
+      "versions": [
+        "v1.13.0"
+      ],
+      "landmark": "v1.13.0",
+      "headline": "",
+      "entries": [
+        {
+          "version": "v1.13.0",
+          "date": "2026-10-13",
+          "headline": "",
+          "body": "### Changed\n- Development now happens in this public repository, renamed from `Consilium_Demo` to `Consilium`. The former private development repository is archived; `homepage`, `repository`, the README install command, the explainer's repository link and `REQMAP_REPO` now name `alxmax/Consilium`, and the Pages site is at `https://alxmax.github.io/Consilium/`.\n- `scripts/check_public_leak.py` now flags references to the archived dev repository by its own slug, instead of every `alxmax/Consilium` slug that is not the old `_Demo` name.\n\n### Removed\n- `benchmark/`: the mode-vs-baseline harness moved to its own repository, [Consilium-Benchmark](https://github.com/alxmax/Consilium-Benchmark), so installing the plugin no longer ships it. It loads this plugin from a sibling checkout (`--plugin-dir`); `scripts/fix_benchmark_pendings.py` stays here because the harness calls it.",
+          "first_commit": "2026-10-13",
+          "last_commit": "2026-10-13"
         }
       ]
     }
