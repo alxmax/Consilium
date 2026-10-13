@@ -4,6 +4,11 @@ All notable changes to Consilium are recorded here, following
 [Keep a Changelog](https://keepachangelog.com/). This project is source-available
 under the Business Source License 1.1 (see `LICENSE`).
 
+## [1.13.1] — 2026-10-13
+
+### Fixed
+- Deliberation state (`runs/`, `FEEDBACK.html`, `preview/`) was resolved next to the installed scripts, not in the user's project. For a plugin install the journal lived in the versioned plugin cache, so every update started an empty journal and `priors.py` lost its history, while the orchestrator wrote reports to the project's `.consilium/runs/`. `scripts/utils.py` now resolves `DATA_DIR` to `$CONSILIUM_DATA_DIR` when set, otherwise `.consilium/` in the current working directory; `scripts/vote_degeneracy.py` uses the same rule. The development checkout is unchanged (its cwd is the repo root). Journals left in old plugin cache directories are not migrated: point `CONSILIUM_DATA_DIR` at one, or copy it into a project's `.consilium/`, to keep its history.
+
 ## [1.13.0] — 2026-10-13
 
 ### Changed

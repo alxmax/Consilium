@@ -42,8 +42,9 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_RUNS = ROOT / ".consilium" / "runs"
+from utils import RUNS_DIR
+
+DEFAULT_RUNS = RUNS_DIR
 
 # A vote_pattern is "N-N" (2-personality / legacy) or "N-N-N" (3-personality).
 _VOTE_PATTERN_RE = re.compile(r'"vote_pattern"\s*:\s*"(\d-\d(?:-\d)?)"')

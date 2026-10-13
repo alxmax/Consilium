@@ -87,7 +87,7 @@
       "agents/consilium-subagent.md": "cb70f5ebe4542c2b3db68d5ae6de8c2d403122bc9063fac7649f4b6235a6703a"
     },
     "CONSILIUM-UTILS-001": {
-      "scripts/utils.py": "6ee17dbdce4a2c5cc6cd522e593a53ec6864da06de58a924a859a02c6526b294"
+      "scripts/utils.py": "69fdd46ccdbb5e0221ef216d0708e07d22632a253268cf3ef8293daecc6c9324"
     },
     "CONSILIUM-VALIDATE-SKEPTIC-001": {
       "scripts/validate_skeptic.py": "3c54be066cffb61c2fc899b0a86d26c08e87ebbd9baf3031d74194b13e1d166f"
@@ -111,7 +111,7 @@
       "prompts/voices/skeptic.md": "bf0031cdf099a97b04e6657946c92c83ec5746175c91504e319ad5a019747aa4"
     },
     "CONSILIUM-VOTE-DEGENERACY-001": {
-      "scripts/vote_degeneracy.py": "38481f5fd61a49a4bbeb1099f6789d4e57607aed3a62607ba1bca6f8af38ff62"
+      "scripts/vote_degeneracy.py": "8c3df5b195c20d1bac6d465a8bd8d8a09fa8645755e602035048e04ac69f38dd"
     },
     "SKILL-RUN-CONSILIUM-001": {
       ".claude/skills/run-consilium/driver.py": "7ceda38ffb0c833bbcc163b320b5585862d7d9a43e3d8d24b72e9a3ef3b13093"
