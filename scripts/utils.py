@@ -17,10 +17,14 @@ from typing import Any
 # ---------------------------------------------------------------------------
 # Canonical data locations (single source of truth).
 #
-# All deliberation state lives under .consilium/ at the repo root:
+# All deliberation state lives under .consilium/ in the project being worked on
+# (the current working directory — where SKILL.md has the orchestrator write
+# its reports), or under $CONSILIUM_DATA_DIR when that is set:
 #   .consilium/runs/*.json              — one file per deliberation (episodic)
 #   .consilium/runs/.run_path_map.json  — fingerprint -> run-path sidecar
 #   .consilium/FEEDBACK.html            — append-only outcome journal (long)
+# Never the install directory: a plugin cache or an APM-deployed skill folder
+# is replaced on every update, which would reset the journal each version.
 #
 # Scripts import these as their DEFAULT; CLI flags (--runs-dir/--feedback)
 # still override. run-path strings stored in the sidecar / FEEDBACK rows are
@@ -28,7 +32,9 @@ from typing import Any
 # long as runs/ and FEEDBACK.html stay siblings under DATA_DIR.
 # ---------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = ROOT / ".consilium"
+_DATA_DIR_ENV = os.environ.get("CONSILIUM_DATA_DIR", "").strip()
+DATA_DIR = (Path(_DATA_DIR_ENV).resolve() if _DATA_DIR_ENV
+            else Path.cwd() / ".consilium")
 RUNS_DIR = DATA_DIR / "runs"
 FEEDBACK_PATH = DATA_DIR / "FEEDBACK.html"
 

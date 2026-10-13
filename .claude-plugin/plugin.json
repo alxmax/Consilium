@@ -1,7 +1,7 @@
 {
   "name": "consilium",
   "displayName": "Consilium",
-  "version": "1.13.0",
+  "version": "1.13.1",
   "description": "Multi-voice deliberation for code changes — Generator/Control/Conservator evaluate a change before you commit, with confidence scoring, modes (Sequential/Dialectic/Trias), and a post-deliberation implement pipeline. Stdlib-only, zero external dependencies.",
   "author": { "name": "Schipor Alexandru" },
   "homepage": "https://alxmax.github.io/Consilium/",
