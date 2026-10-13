@@ -14,7 +14,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parent.parent
+REPO = Path(__file__).resolve().parent.parent / "consilium"  # the shipped plugin (SKILL.md, modes/, prompts/, scripts/)
 TRIAS = (REPO / "modes" / "trias.md").read_text(encoding="utf-8")
 
 _fails: list[str] = []

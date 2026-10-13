@@ -33,10 +33,25 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+# The shipped plugin (SKILL.md, modes/, prompts/, agents/, runtime scripts/).
+# Paths below stay written as the plugin sees them ("modes/trias.md",
+# "scripts/confidence.py"); _resolve maps them into this folder.
+PLUGIN_ROOT = REPO_ROOT / "consilium"
+
+
+def _resolve(rel_path: str) -> Path:
+    """Repo-root file if it exists there, else the same path in the plugin."""
+    p = REPO_ROOT / rel_path
+    return p if p.exists() else PLUGIN_ROOT / rel_path
+
+
+def _base_of(doc_rel: str) -> Path:
+    """Directory a doc's relative references resolve against."""
+    return PLUGIN_ROOT if doc_rel.startswith("consilium/") else REPO_ROOT
 
 
 def _read(rel_path: str) -> str:
-    p = REPO_ROOT / rel_path
+    p = _resolve(rel_path)
     if not p.exists():
         print(f"check_doc_drift: missing file {rel_path}", file=sys.stderr)
         sys.exit(2)
@@ -580,7 +595,7 @@ def check_confidence_floor_completeness() -> list[str]:
     updated in lockstep — by design (the fallback is the canonical
     complete set); the failure message names the offending mode.
     """
-    scripts_dir = str(Path(__file__).resolve().parent)
+    scripts_dir = str(PLUGIN_ROOT / "scripts")
     if scripts_dir not in sys.path:
         sys.path.insert(0, scripts_dir)
     try:
@@ -739,17 +754,20 @@ def check_test_suite_coverage() -> list[str]:
 # orchestrator executes, not historical mentions. CHANGELOG.md and docs/archive/
 # are deliberately excluded (historical context may cite retired scripts).
 SCRIPT_REF_DOCS = [
-    "SKILL.md",
+    "consilium/SKILL.md",
+    "consilium/README.md",
+    "consilium/docs/runs-schema.md",
     ".claude/CLAUDE.md",
     "README.md",
-    "docs/runs-schema.md",
     ".claude/skills/run-consilium/SKILL.md",
 ]
 
-# Literal scripts/<name>.py paths (subdirs like deprecated/ allowed). The
+# Literal scripts/<name>.py paths (subdirs like deprecated/ allowed), optionally
+# prefixed by the plugin folder (consilium/scripts/...) in repo-root docs. The
 # lookbehind rejects benchmark/scripts/... and other prefixed paths; wildcard
 # patterns like scripts/test_*.py never match because '*' is outside the class.
-_SCRIPT_REF_RE = re.compile(r"(?<![\w/\-.])scripts/[A-Za-z0-9_/]+\.py")
+_SCRIPT_REF_RE = re.compile(
+    r"(?<![\w/\-.])(?:consilium/)?scripts/[A-Za-z0-9_/]+\.py")
 
 
 def check_referenced_scripts_exist() -> list[str]:
@@ -764,12 +782,13 @@ def check_referenced_scripts_exist() -> list[str]:
     failures: list[str] = []
     doc_files = list(SCRIPT_REF_DOCS) + sorted(
         str(p.relative_to(REPO_ROOT)).replace("\\", "/")
-        for p in (REPO_ROOT / "modes").glob("*.md")
+        for p in (PLUGIN_ROOT / "modes").glob("*.md")
     )
     for rel in doc_files:
         content = _read(rel)
         for ref in sorted(set(_SCRIPT_REF_RE.findall(content))):
-            if not (REPO_ROOT / ref).exists():
+            base = REPO_ROOT if ref.startswith("consilium/") else _base_of(rel)
+            if not (base / ref).exists():
                 failures.append(
                     f"[referenced_script_exists] {rel}: references {ref} which "
                     f"does not exist\n"
@@ -802,7 +821,7 @@ def check_referenced_contracts_exist() -> list[str]:
     doc_files = list(SCRIPT_REF_DOCS) + sorted(
         str(p.relative_to(REPO_ROOT)).replace("\\", "/")
         for d in ("modes", "agents", "prompts/voices")
-        for p in (REPO_ROOT / d).glob("*.md")
+        for p in (PLUGIN_ROOT / d).glob("*.md")
     )
     for rel in doc_files:
         content = _read(rel)
@@ -811,7 +830,7 @@ def check_referenced_contracts_exist() -> list[str]:
             f"prompts/voices/{name}" for name in _LENS_REF_RE.findall(content)
         }
         for ref in sorted(refs):
-            if not (REPO_ROOT / ref).exists():
+            if not (PLUGIN_ROOT / ref).exists():
                 failures.append(
                     f"[referenced_contract_exists] {rel}: references {ref} "
                     f"which does not exist\n"
@@ -1212,7 +1231,7 @@ def check_validate_report_vote_pattern_parity() -> list[str]:
     conf_all = set(conf)
     conf_null = {k for k, v in conf.items() if v is None}
 
-    scripts_dir = str(Path(__file__).resolve().parent)
+    scripts_dir = str(PLUGIN_ROOT / "scripts")
     if scripts_dir not in sys.path:
         sys.path.insert(0, scripts_dir)
     try:

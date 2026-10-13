@@ -13,7 +13,7 @@ The three core voices:
 ## What's interesting here
 
 - **Adversarial-by-design deliberation** — roles with conflicting incentives, not one model agreeing with itself.
-- **An 8-component veto cascade** (`scripts/aggregator.py`) that turns three voice outputs into one decision with 7 distinct routing outcomes (block / rework / adapt / escalate / aggregate).
+- **An 8-component veto cascade** (`consilium/scripts/aggregator.py`) that turns three voice outputs into one decision with 7 distinct routing outcomes (block / rework / adapt / escalate / aggregate).
 - **A self-calibrating feedback loop** — every run lands as canonical JSON in `.consilium/runs/`, outcomes are logged to `.consilium/FEEDBACK.html`, and the next deliberation reads those priors. Confidence below a per-mode floor is flagged.
 - **Cost-aware modes** — from a 1× single-context pass up to a ~2.67× three-personality vote (Trias), with a scope gate that auto-skips trivial diffs.
 - **Measured, not asserted** — a benchmark harness ([Consilium-Benchmark](https://github.com/alxmax/Consilium-Benchmark), a separate repo) compares each mode against bare-model baselines on real coding/reasoning tasks with a hidden oracle. See [Benchmark results](#benchmark-results) below.
@@ -41,7 +41,7 @@ An interactive, single-page walkthrough of the voices, pipeline, modes, voting, 
 /plugin install consilium@consilium
 ```
 
-This installs the `consilium` skill plus its sub-agents in a single step. Then, in a new Claude Code session: `Review the last commit using the consilium skill`.
+This installs the `consilium` skill plus its sub-agents in a single step. The plugin is the `consilium/` folder of this repository; other agent tools can install it with [APM](https://github.com/microsoft/apm): `apm install alxmax/Consilium/consilium`. Then, in a new Claude Code session: `Review the last commit using the consilium skill`.
 
 Deliberation state (run reports, the feedback journal, preview pages) is written to **`.consilium/`** at your project root. We recommend adding it to your `.gitignore` — it is local working state:
 
@@ -104,7 +104,7 @@ GitHub renders Mermaid natively — paste the `--fence` output directly into any
 One command turns a deliberation report (+ your working-tree diff) into a single self-contained HTML review page — spec, rationale, rejected alternatives, verification and per-file coloured diff, with a light/dark toggle:
 
 ```bash
-git diff | python scripts/render_impl_preview.py --input .consilium/runs/<run>.json --diff-file -
+git diff | python consilium/scripts/render_impl_preview.py --input .consilium/runs/<run>.json --diff-file -
 ```
 
 The page lands under `.consilium/preview/` as a plain file: it survives the session and is safe to attach to a PR or hand off for review outside the CLI. In interactive Claude sessions the orchestrator also publishes it as a shareable Artifact link by default; headless/CI runs produce the file only. Opt-in only — it never gates the pipeline.
@@ -112,17 +112,21 @@ The page lands under `.consilium/preview/` as a plain file: it survives the sess
 ## Structure
 
 ```
-consilium/
-├── SKILL.md         # the contract: Constitution (4 principles) + 8-step workflow
-├── .claude-plugin/  # plugin manifest + marketplace (one-step install)
-├── prompts/voices/  # per-voice role prompts (generator, control, conservator, skeptic, lenses)
-├── modes/           # per-mode workflow + machine-readable config (cost, sub-agents, floors)
-├── scripts/         # stdlib-only CLIs: aggregator, confidence, priors, scope_gate, …
-├── agents/          # consilium-subagent — isolated dispatch via the Agent tool
-├── experiments/     # benchmarking-discipline notes + validation write-ups
-├── docs/            # architecture.html explainer + its React source under docs/architecture/
-├── evals/           # deterministic regression scenarios for the scripts
-└── .consilium/      # local deliberation state (gitignored): runs/*.json + FEEDBACK.html
+Consilium/
+├── consilium/           # the plugin — the only folder an install receives
+│   ├── .claude-plugin/  # plugin manifest
+│   ├── SKILL.md         # the contract: Constitution (4 principles) + 8-step workflow
+│   ├── prompts/voices/  # per-voice role prompts (generator, control, conservator, skeptic, lenses)
+│   ├── modes/           # per-mode workflow + machine-readable config (cost, sub-agents, floors)
+│   ├── scripts/         # stdlib-only runtime CLIs: aggregator, confidence, priors, scope_gate, …
+│   ├── agents/          # consilium-subagent — isolated dispatch via the Agent tool
+│   └── docs/            # skill reference, runs schema, memory tiers
+├── .claude-plugin/      # marketplace (source: ./consilium)
+├── scripts/             # tests, gates and repo tooling (test_*.py, check_*.py, reqmap)
+├── experiments/         # benchmarking-discipline notes + validation write-ups
+├── docs/                # architecture.html explainer + its React source under docs/architecture/
+├── evals/               # deterministic regression scenarios for the scripts
+└── .consilium/          # local deliberation state (gitignored): runs/*.json + FEEDBACK.html
 ```
 
 ## Modes
@@ -136,7 +140,7 @@ consilium/
 
 For changes that are both `critical` and `irreversible`, select **Trias** explicitly — there is no automatic escalation. All dispatched voices run on Sonnet; the orchestrator runs on Opus.
 
-**Canonical output** (validated by `scripts/validate_report.py`): JSON with `success_criterion`, `chosen_approach`, `verification`, `alternatives`, `voice_scores`, `confidence`, and a `deliberation_log`.
+**Canonical output** (validated by `consilium/scripts/validate_report.py`): JSON with `success_criterion`, `chosen_approach`, `verification`, `alternatives`, `voice_scores`, `confidence`, and a `deliberation_log`.
 
 ## Benchmark results
 
@@ -160,7 +164,7 @@ What this project concretely shows, in Agentic-AI / LLMOps terms. Rated **Full**
 
 | Capability | Status | Where / honest caveat |
 |---|---|---|
-| Multi-agent orchestration | Full | 3 voices + 3 Trias personalities + Skeptic, dispatched as isolated sub-agents (`agents/`, `scripts/personalities.py`) |
+| Multi-agent orchestration | Full | 3 voices + 3 Trias personalities + Skeptic, dispatched as isolated sub-agents (`consilium/agents/`, `consilium/scripts/personalities.py`) |
 | Planner / executor split | Full | orchestrator selects the mode and scope-gates, then dispatches voice executors |
 | Deterministic orchestration | Full | `scope_gate → voices → aggregator → validate_report → implementation pipeline`, all stdlib scripts |
 | Retry / reflection / self-healing | Full | Step 5d low-confidence retry (the orchestrator gathers discriminating evidence and re-runs the voices once), sub-agent-crash fallback, malformed-JSON retry, red→green test gate |
@@ -170,7 +174,7 @@ What this project concretely shows, in Agentic-AI / LLMOps terms. Rated **Full**
 | Regression testing | Full | `evals/scenarios.json` + `run_evals.py` — deterministic subprocess tests of the scripts (not LLM-output evals) |
 | Benchmarking vs baselines | Full | [Consilium-Benchmark](https://github.com/alxmax/Consilium-Benchmark) compares each mode against bare-model baselines with a hidden oracle kept out-of-tree |
 | Fabrication / hallucination discipline | **Partial** | a documented independent-oracle rule for any quantitative claim (`experiments/README.md`) — a review process, not an automated metric |
-| Version provenance | Full | every run stamps `telemetry.consilium_version` (`git describe`) + `consilium_ref` (the committed sha, blank on a dirty tree) — any `.consilium/runs/*.json` is reproducible via `git checkout`, and `scripts/version.py --drift <ref>` shows which prompts/modes changed since. Git is the version system — no bespoke registry |
+| Version provenance | Full | every run stamps `telemetry.consilium_version` (`git describe`) + `consilium_ref` (the committed sha, blank on a dirty tree) — any `.consilium/runs/*.json` is reproducible via `git checkout`, and `consilium/scripts/version.py --drift <ref>` shows which prompts/modes changed since. Git is the version system — no bespoke registry |
 | Framework orchestration (LangGraph / CrewAI) | n/a | evaluated and deliberately rejected — see below |
 | RAG / embeddings / vector search · web backend · cloud deploy | n/a | out of scope by design — see below; targeted by a separate showcase project |
 

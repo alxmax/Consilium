@@ -34,5 +34,5 @@ satisfies: [ARCH-CONSILIUM-LEARNING-001]
 
 ## WHERE — Current implementation
 
-- scripts/audit_feedback.py
+- consilium/scripts/audit_feedback.py
 <!-- implements: CONSILIUM-AUDIT-FEEDBACK-001 -->

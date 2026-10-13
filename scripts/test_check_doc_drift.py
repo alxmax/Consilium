@@ -15,6 +15,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+import plugin_paths  # noqa: E402,F401 — puts consilium/scripts on sys.path
 
 import check_doc_drift as cdd
 
@@ -225,7 +226,7 @@ class ReferencedContractsExist(unittest.TestCase):
         stale = real.replace("`essentialist_lens.md`", "`pioneer_lens.md`")
         self.assertNotEqual(stale, real)
         orig = cdd._read
-        cdd._read = lambda rel: stale if rel == "SKILL.md" else orig(rel)
+        cdd._read = lambda rel: stale if rel == "consilium/SKILL.md" else orig(rel)
         try:
             fails = cdd.check_referenced_contracts_exist()
             self.assertTrue(any("prompts/voices/pioneer_lens.md" in f for f in fails))
@@ -236,7 +237,7 @@ class ReferencedContractsExist(unittest.TestCase):
         real = cdd._read("SKILL.md")
         stale = real + "\nSee `modes/parallel.md`.\n"
         orig = cdd._read
-        cdd._read = lambda rel: stale if rel == "SKILL.md" else orig(rel)
+        cdd._read = lambda rel: stale if rel == "consilium/SKILL.md" else orig(rel)
         try:
             fails = cdd.check_referenced_contracts_exist()
             self.assertTrue(any("modes/parallel.md" in f for f in fails))

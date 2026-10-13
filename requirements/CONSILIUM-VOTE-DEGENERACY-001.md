@@ -37,5 +37,5 @@ satisfies: [ARCH-CONSILIUM-MODES-001]
 
 ## WHERE — Current implementation
 
-- scripts/vote_degeneracy.py
+- consilium/scripts/vote_degeneracy.py
 <!-- implements: CONSILIUM-VOTE-DEGENERACY-001 -->

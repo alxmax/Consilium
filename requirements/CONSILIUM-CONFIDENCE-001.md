@@ -53,4 +53,4 @@ Every line in this section is binding.
 
 ## Context (non-binding)
 
-**Current implementation** — `scripts/confidence.py`.
+**Current implementation** — `consilium/scripts/confidence.py`.

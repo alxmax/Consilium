@@ -47,4 +47,4 @@ Every line in this section is binding.
 
 **Notes** — Input: `--tier` one of `short | medium | long | all` (default `all`); `--n` maximum entries per tier (default 10); `--query` optional substring filter; `--feedback-file` / `--runs-dir` override paths. Reads `.consilium/runs/*.json` for the medium tier and `.consilium/FEEDBACK.html` for the long tier. Contract derived from code, 2026-06-04.
 
-**Current implementation** — `scripts/memory.py`.
+**Current implementation** — `consilium/scripts/memory.py`.

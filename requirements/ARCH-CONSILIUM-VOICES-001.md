@@ -21,7 +21,7 @@ Every line in this section is binding.
 - Generator proposes the candidate approaches, Conservator scores each candidate's risk, and Control validates each candidate's correctness and goal-fit. [[CONSILIUM-VOICE-GENERATOR-001]] [[CONSILIUM-VOICE-CONSERVATOR-001]] [[CONSILIUM-VOICE-CONTROL-001]]
 - The Skeptic challenges only the chosen candidate, after selection, and never proposes a new one. [[CONSILIUM-VOICE-SKEPTIC-001]]
 - Each voice reads its prompt from `prompts/voices/<name>.md` and emits JSON in the shape its requirement defines.
-- The three Trias personalities (Essentialist, Verifier, Sentinel) are defined once in `scripts/personalities.py`, and each lens is prepended to the core voices, never substituted for them. [[CONSILIUM-PERSONALITIES-001]] [[CONSILIUM-LENS-ESSENTIALIST-001]] [[CONSILIUM-LENS-VERIFIER-001]] [[CONSILIUM-LENS-SENTINEL-001]]
+- The three Trias personalities (Essentialist, Verifier, Sentinel) are defined once in `consilium/scripts/personalities.py`, and each lens is prepended to the core voices, never substituted for them. [[CONSILIUM-PERSONALITIES-001]] [[CONSILIUM-LENS-ESSENTIALIST-001]] [[CONSILIUM-LENS-VERIFIER-001]] [[CONSILIUM-LENS-SENTINEL-001]]
 
 ## Verify intent
 

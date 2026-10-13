@@ -20,6 +20,7 @@ from pathlib import Path
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).parent))
+import plugin_paths  # noqa: E402,F401 — puts consilium/scripts on sys.path
 
 import check_public_leak
 from check_public_leak import SKIP_SUFFIX, scan_text

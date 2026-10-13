@@ -13,7 +13,7 @@ distinct_from: [CONSILIUM-MODE-DIALECTIC-001, CONSILIUM-MODE-SKEPTIC-ON-CHOSEN-0
 
 # validate_skeptic
 
-> Describes observed behavior, verified against scripts/validate_skeptic.py source.
+> Describes observed behavior, verified against consilium/scripts/validate_skeptic.py source.
 
 ## Description
 
@@ -47,7 +47,7 @@ Every line in this section is binding.
 
 ## Context (non-binding)
 
-**Current implementation** — `scripts/validate_skeptic.py`.
+**Current implementation** — `consilium/scripts/validate_skeptic.py`.
 
 **Not a duplicate** — CONSILIUM-MODE-DIALECTIC-001 and
 CONSILIUM-MODE-SKEPTIC-ON-CHOSEN-001 are the modes that dispatch a Skeptic;

@@ -9,7 +9,7 @@ instead of shipping silently. Mirrors requirement-manager's
 scripts/check_versions.py (same mechanism, adopted 2026-07-06).
 
 Two independent axes are checked:
-  - semver  — canonical source is .claude-plugin/plugin.json
+  - semver  — canonical source is consilium/.claude-plugin/plugin.json
               `version`. Every occurrence in
               .claude-plugin/marketplace.json must equal it
               (top-level `version` + each `plugins[].version`).
@@ -38,7 +38,7 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-PLUGIN_JSON = REPO_ROOT / ".claude-plugin" / "plugin.json"
+PLUGIN_JSON = REPO_ROOT / "consilium" / ".claude-plugin" / "plugin.json"
 MARKETPLACE_JSON = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 # engine >= 8.0.0 keeps MAP_ENGINE_VERSION in the package, not the reqmap.py CLI
 ENGINE_VERSION_PY = REPO_ROOT / "scripts" / "reqmap_engine" / "__init__.py"

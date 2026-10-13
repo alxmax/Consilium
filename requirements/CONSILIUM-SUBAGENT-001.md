@@ -28,7 +28,7 @@ satisfies: [ARCH-CONSILIUM-MODES-001]
 AC-1
   Given a dispatch prompt with a diff and a success_criterion
   When  the subagent runs
-  Then  the final message parses as valid JSON, `python scripts/validate_report.py < <output>` exits 0, and exactly one new file appears under `.consilium/runs/`
+  Then  the final message parses as valid JSON, `python consilium/scripts/validate_report.py < <output>` exits 0, and exactly one new file appears under `.consilium/runs/`
 
 AC-2
   Given a dispatch with `mode: dialectic` hint in the prompt

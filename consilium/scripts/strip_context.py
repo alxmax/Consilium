@@ -154,7 +154,7 @@ def main(argv: list[str] | None = None) -> int:
     # on stdin) — one stderr line + exit 2, matching
     # build_report/validate_report.
     try:
-        data = json.loads(args.input.read().lstrip("﻿"))
+        data = json.loads(args.input.read().lstrip("\ufeff"))
     except json.JSONDecodeError as exc:
         print(f"strip_context: invalid JSON input: {exc}", file=sys.stderr)
         return 2

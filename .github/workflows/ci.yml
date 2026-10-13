@@ -89,6 +89,8 @@ jobs:
         run: python scripts/test_public_leak.py
       - name: Implementation-preview renderer tests
         run: python scripts/test_render_impl_preview.py
+      - name: Plugin folder ships only the runtime (allow-list)
+        run: python scripts/test_plugin_folder.py
       - name: Doc-drift invariant unit tests
         run: python scripts/test_check_doc_drift.py
       - name: Mode-doc drift invariants (check_doc_drift)

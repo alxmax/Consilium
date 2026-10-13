@@ -12,7 +12,7 @@ satisfies: [ARCH-CONSILIUM-LEARNING-001]
 
 # priors
 
-> Describes observed behavior, verified against scripts/priors.py source.
+> Describes observed behavior, verified against consilium/scripts/priors.py source.
 
 ## Description
 
@@ -38,13 +38,13 @@ Every line in this section is binding.
 
 ## Cases
 
-- **CASE-1** — Given a valid `FEEDBACK.html` and `runs/` directory, when `python scripts/priors.py` runs, then it completes without error.
+- **CASE-1** — Given a valid `FEEDBACK.html` and `runs/` directory, when `python consilium/scripts/priors.py` runs, then it completes without error.
 - **CASE-2** — Given the `--no-runs` flag, when `priors.py` runs, then `missing_feedback_runs` is suppressed from the output.
 - **CASE-3** — Given FEEDBACK entries with outcome PEND older than `STALE_PEND_DAYS`, when `priors.py` runs, then those entries appear in `stale_pendings`.
 - **CASE-4** — Given `runs/` files with no matching FEEDBACK row, when `priors.py` runs, then those files appear in `missing_feedback_runs`.
 
 ## Context (non-binding)
 
-**Notes** — Signals described here reflect observed behavior, verified against the `scripts/priors.py` source rather than a separate design spec.
+**Notes** — Signals described here reflect observed behavior, verified against the `consilium/scripts/priors.py` source rather than a separate design spec.
 
-**Current implementation** — `scripts/priors.py`
+**Current implementation** — `consilium/scripts/priors.py`

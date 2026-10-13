@@ -18,9 +18,10 @@ from pathlib import Path
 _SCRIPTS = Path(__file__).resolve().parent
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
+import plugin_paths  # noqa: E402,F401 — puts consilium/scripts on sys.path
 
 _spec = importlib.util.spec_from_file_location(
-    "confidence_calibration", _SCRIPTS / "confidence_calibration.py")
+    "confidence_calibration", plugin_paths.PLUGIN_SCRIPTS / "confidence_calibration.py")
 assert _spec and _spec.loader
 cc = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(cc)

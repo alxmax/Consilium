@@ -45,4 +45,4 @@ Every line in this section is binding.
 
 ## Context (non-binding)
 
-**Current implementation** — `scripts/aggregator.py`, tested in `scripts/test_round2.py`.
+**Current implementation** — `consilium/scripts/aggregator.py`, tested in `scripts/test_round2.py`.

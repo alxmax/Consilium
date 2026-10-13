@@ -19,6 +19,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
+import plugin_paths  # noqa: E402,F401 — puts consilium/scripts on sys.path
 from probe_change import _unquote_git_path, parse_numstat  # noqa: E402
 
 # git emits a C-quoted path as the literal 4 chars: backslash, 3, 0, 5 ...

@@ -16,6 +16,7 @@ from contextlib import redirect_stdout
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import plugin_paths  # noqa: E402,F401 — puts consilium/scripts on sys.path
 import check_versions as CV
 
 

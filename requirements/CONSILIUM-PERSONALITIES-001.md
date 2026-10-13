@@ -46,4 +46,4 @@ Every line in this section is binding.
 
 **Notes** — Input: `--name` optional filter (`essentialist | verifier | sentinel`); a legacy positional argument N is rejected (see exit code 2 above).
 
-**Current implementation** — `scripts/personalities.py`.
+**Current implementation** — `consilium/scripts/personalities.py`.

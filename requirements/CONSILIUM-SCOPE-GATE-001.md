@@ -54,4 +54,4 @@ Every line in this section is binding.
 
 **Notes** — None beyond the Description above.
 
-**Current implementation** — `scripts/scope_gate.py`
+**Current implementation** — `consilium/scripts/scope_gate.py`

@@ -5,7 +5,7 @@
  },
  {
   "name": "aggregator/majority picks highest mean",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "majority"
@@ -38,7 +38,7 @@
  },
  {
   "name": "aggregator/weighted scheme removed from CLI (deprecated)",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "weighted"
@@ -54,7 +54,7 @@
  },
  {
   "name": "aggregator/conservative_override vetoes risky candidate",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "conservative_override"
@@ -87,7 +87,7 @@
  },
  {
   "name": "aggregator/conservative_override survivor ranking prefers lower risk at gen+ctrl tie",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "conservative_override"
@@ -120,7 +120,7 @@
  },
  {
   "name": "aggregator/conservative_override veto-all attaches retry_suggested",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "conservative_override"
@@ -155,7 +155,7 @@
  },
  {
   "name": "aggregator/risk_adjusted_utility prefers safe over high-utility-but-risky",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "risk_adjusted_utility"
@@ -189,7 +189,7 @@
  {
   "_comment": "HM1 regression: meta_recommendation lives inside conservator.scores[], not at top level",
   "name": "aggregator/sequential scale_down triggers ADAPT_SHORT via nested scores meta_recommendation",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "sequential"
@@ -234,7 +234,7 @@
  },
  {
   "name": "confidence/well-aligned chosen returns numeric confidence",
-  "tool": "scripts/confidence.py",
+  "tool": "consilium/scripts/confidence.py",
   "stdin_json": {
    "candidates": [
     {
@@ -265,7 +265,7 @@
  },
  {
   "name": "confidence/null chosen returns null confidence with reason",
-  "tool": "scripts/confidence.py",
+  "tool": "consilium/scripts/confidence.py",
   "stdin_json": {
    "candidates": [],
    "chosen": null
@@ -277,7 +277,7 @@
  },
  {
   "name": "confidence/vote_pattern 2-1 with sentinel dissent drops below PEND threshold",
-  "tool": "scripts/confidence.py",
+  "tool": "consilium/scripts/confidence.py",
   "stdin_json": {
    "vote_pattern": "2-1",
    "dissent": [
@@ -296,7 +296,7 @@
  },
  {
   "name": "confidence/vote_pattern 2-1 with essentialist dissent keeps baseline",
-  "tool": "scripts/confidence.py",
+  "tool": "consilium/scripts/confidence.py",
   "stdin_json": {
    "vote_pattern": "2-1",
    "dissent": [
@@ -315,7 +315,7 @@
  },
  {
   "name": "confidence/vote_pattern 2-0 with sentinel abstain drops below PEND threshold",
-  "tool": "scripts/confidence.py",
+  "tool": "consilium/scripts/confidence.py",
   "stdin_json": {
    "vote_pattern": "2-0",
    "dissent": [],
@@ -334,7 +334,7 @@
  },
  {
   "name": "validate_report/full report with required fields passes",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "pipeline_executed": true,
    "success_criterion": "x is y",
@@ -369,7 +369,7 @@
  },
  {
   "name": "validate_report/skipped report with skip_reason passes",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "success_criterion": "x",
    "verification": "y",
@@ -381,7 +381,7 @@
  },
  {
   "name": "validate_report/skipped without skip_reason fails with explicit message",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "success_criterion": "x",
    "verification": "y",
@@ -395,7 +395,7 @@
  },
  {
   "name": "validate_report/missing success_criterion fails",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "verification": "y",
    "chosen_approach": "approach_a"
@@ -407,7 +407,7 @@
  },
  {
   "name": "validate_report/telemetry with malformed token count fails",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "success_criterion": "x",
    "verification": "y",
@@ -449,7 +449,7 @@
  },
  {
   "name": "validate_report/well-formed telemetry passes",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "pipeline_executed": true,
    "success_criterion": "x",
@@ -502,7 +502,7 @@
  },
  {
   "name": "strip_context/for control drops rationale",
-  "tool": "scripts/strip_context.py",
+  "tool": "consilium/scripts/strip_context.py",
   "args": [
    "--for",
    "control"
@@ -530,7 +530,7 @@
  },
  {
   "name": "strip_context/for conservator drops invalid verdicts and issue text",
-  "tool": "scripts/strip_context.py",
+  "tool": "consilium/scripts/strip_context.py",
   "args": [
    "--for",
    "conservator"
@@ -576,7 +576,7 @@
  },
  {
   "name": "build_report/full bundle produces canonical report with chosen + alternatives",
-  "tool": "scripts/build_report.py",
+  "tool": "consilium/scripts/build_report.py",
   "stdin_json": {
    "success_criterion": "introduce scope_gate auto without false-skip on sensitive paths",
    "verification": "run scope_gate on synthetic scenarios and run_evals 21/21",
@@ -658,7 +658,7 @@
  },
  {
   "name": "build_report/skipped bundle short-circuits to skipped report",
-  "tool": "scripts/build_report.py",
+  "tool": "consilium/scripts/build_report.py",
   "stdin_json": {
    "success_criterion": "trivial change to docstring",
    "verification": "n/a",
@@ -682,7 +682,7 @@
  },
  {
   "name": "build_report/missing success_criterion fails fast",
-  "tool": "scripts/build_report.py",
+  "tool": "consilium/scripts/build_report.py",
   "stdin_json": {
    "verification": "y",
    "generator": {
@@ -699,7 +699,7 @@
  },
  {
   "name": "build_report/output validates cleanly via validate_report contract",
-  "tool": "scripts/build_report.py",
+  "tool": "consilium/scripts/build_report.py",
   "stdin_json": {
    "success_criterion": "any non-empty sentence",
    "verification": "any non-empty step",
@@ -745,7 +745,7 @@
  },
  {
   "name": "log_feedback/normal report emits PEND line with cand+vetoed counts",
-  "tool": "scripts/log_feedback.py",
+  "tool": "consilium/scripts/log_feedback.py",
   "args": [
    "--dry-run"
   ],
@@ -797,7 +797,7 @@
  },
  {
   "name": "log_feedback/skipped report emits skipped note",
-  "tool": "scripts/log_feedback.py",
+  "tool": "consilium/scripts/log_feedback.py",
   "args": [
    "--dry-run"
   ],
@@ -817,7 +817,7 @@
  },
  {
   "name": "log_feedback/all-vetoed report emits null chosen with relaxed threshold",
-  "tool": "scripts/log_feedback.py",
+  "tool": "consilium/scripts/log_feedback.py",
   "args": [
    "--dry-run"
   ],
@@ -846,7 +846,7 @@
  },
  {
   "name": "log_feedback/missing success_criterion fails with explicit message",
-  "tool": "scripts/log_feedback.py",
+  "tool": "consilium/scripts/log_feedback.py",
   "args": [
    "--dry-run"
   ],
@@ -861,7 +861,7 @@
  },
  {
   "name": "validate_report/non-skipped missing deliberation_log fails",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "success_criterion": "x",
    "verification": "y",
@@ -877,7 +877,7 @@
  },
  {
   "name": "validate_report/deliberation_log aggregate result as string fails",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "success_criterion": "x",
    "verification": "y",
@@ -912,7 +912,7 @@
  },
  {
   "name": "validate_report/non-skipped missing telemetry fails",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "success_criterion": "x",
    "verification": "y",
@@ -946,7 +946,7 @@
  },
  {
   "name": "validate_report/telemetry without mode fails",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "success_criterion": "x",
    "verification": "y",
@@ -983,7 +983,7 @@
  },
  {
   "name": "log_feedback/rejects --outcome OK when confidence < 0.70 without --force-override",
-  "tool": "scripts/log_feedback.py",
+  "tool": "consilium/scripts/log_feedback.py",
   "args": [
    "--dry-run",
    "--outcome",
@@ -1026,7 +1026,7 @@
  },
  {
   "name": "log_feedback/accepts --outcome OK with --force-override when confidence < 0.70",
-  "tool": "scripts/log_feedback.py",
+  "tool": "consilium/scripts/log_feedback.py",
   "args": [
    "--dry-run",
    "--outcome",
@@ -1070,7 +1070,7 @@
  },
  {
   "name": "log_feedback/accepts --outcome OK when confidence >= 0.70",
-  "tool": "scripts/log_feedback.py",
+  "tool": "consilium/scripts/log_feedback.py",
   "args": [
    "--dry-run",
    "--outcome",
@@ -1113,7 +1113,7 @@
  },
  {
   "name": "log_feedback/rejects --outcome OK without --confirmed",
-  "tool": "scripts/log_feedback.py",
+  "tool": "consilium/scripts/log_feedback.py",
   "args": [
    "--dry-run",
    "--outcome",
@@ -1154,7 +1154,7 @@
  },
  {
   "name": "validate_report/parallel mode with no voices fails hard",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "success_criterion": "x",
    "verification": "y",
@@ -1193,7 +1193,7 @@
  },
  {
   "name": "validate_report/parallel mode with voices passes",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "pipeline_executed": true,
    "success_criterion": "x",
@@ -1245,7 +1245,7 @@
  },
  {
   "name": "validate_report/sequential mode without voices passes",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "pipeline_executed": true,
    "success_criterion": "x",
@@ -1280,7 +1280,7 @@
  },
  {
   "name": "validate_report/trias report without telemetry now fails",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "success_criterion": "x",
    "verification": "y",
@@ -1328,7 +1328,7 @@
  },
  {
   "name": "validate_report/trias report with telemetry passes",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "stdin_json": {
    "pipeline_executed": true,
    "success_criterion": "x",
@@ -1393,7 +1393,7 @@
  },
  {
   "name": "trias_unanimous_3_0",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "team_vote"
@@ -1431,7 +1431,7 @@
  },
  {
   "name": "trias_majority_2_1",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "team_vote"
@@ -1469,7 +1469,7 @@
  },
  {
   "name": "trias_abstain_2_0",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "team_vote"
@@ -1507,7 +1507,7 @@
  },
  {
   "name": "trias_fragment_1_1_1",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "team_vote"
@@ -1548,7 +1548,7 @@
  },
  {
   "name": "trias_total_veto_0_0_0",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "team_vote"
@@ -1586,7 +1586,7 @@
  },
  {
   "name": "build_report/passes through deliberation_quality when present",
-  "tool": "scripts/build_report.py",
+  "tool": "consilium/scripts/build_report.py",
   "args": [],
   "stdin_json": {
    "success_criterion": "test sc",
@@ -1651,7 +1651,7 @@
  },
  {
   "name": "memory/tier short returns stub with empty entries",
-  "tool": "scripts/memory.py",
+  "tool": "consilium/scripts/memory.py",
   "args": [
    "--tier",
    "short"
@@ -1664,7 +1664,7 @@
  },
  {
   "name": "personalities/essentialist weights generator highest (progress bias)",
-  "tool": "scripts/personalities.py",
+  "tool": "consilium/scripts/personalities.py",
   "args": [
    "--name",
    "essentialist"
@@ -1682,7 +1682,7 @@
  },
  {
   "name": "personalities/verifier weights tilted toward control (structural bias)",
-  "tool": "scripts/personalities.py",
+  "tool": "consilium/scripts/personalities.py",
   "args": [
    "--name",
    "verifier"
@@ -1700,7 +1700,7 @@
  },
  {
   "name": "personalities/sentinel weights conservator highest (risk-averse bias)",
-  "tool": "scripts/personalities.py",
+  "tool": "consilium/scripts/personalities.py",
   "args": [
    "--name",
    "sentinel"
@@ -1719,7 +1719,7 @@
  {
   "name": "priors/rates count only [confirmed] rows",
   "note": "Synthetic fixture: validates code-path coverage only, not semantic correctness. The static HTML in evals/fixtures/ exercises priors.py parsing/arithmetic; it does not assert that the weighting heuristic is the right one.",
-  "tool": "scripts/priors.py",
+  "tool": "consilium/scripts/priors.py",
   "args": [
    "--feedback-file",
    "evals/fixtures/priors_weighted_bad.html",
@@ -1744,7 +1744,7 @@
  {
   "name": "priors/stale_pendings surfaces old PEND entries",
   "note": "Synthetic fixture: validates code-path coverage only, not semantic correctness. The 2020-01-01 PEND entry is anchored to stay stale; the scenario confirms detection fires, not that the staleness window is well-calibrated.",
-  "tool": "scripts/priors.py",
+  "tool": "consilium/scripts/priors.py",
   "args": [
    "--feedback-file",
    "evals/fixtures/priors_stale_pendings.html",
@@ -1770,10 +1770,10 @@
  },
  {
   "name": "scope_gate/low magnitude emits sequential mode_ceiling",
-  "tool": "scripts/scope_gate.py",
+  "tool": "consilium/scripts/scope_gate.py",
   "args": [
    "--files",
-   "scripts/aggregator.py"
+   "consilium/scripts/aggregator.py"
   ],
   "stdin_json": null,
   "expect_exit": 0,
@@ -1785,7 +1785,7 @@
  {
   "name": "scope_gate/blocklist hit forces critical magnitude + trias mode_ceiling",
   "note": "Deterministic via --signals-stdin (no git/SHA dependency, survives history squash). A blocklisted path forces magnitude=critical regardless of line count.",
-  "tool": "scripts/scope_gate.py",
+  "tool": "consilium/scripts/scope_gate.py",
   "args": [
    "--signals-stdin"
   ],
@@ -1807,7 +1807,7 @@
  {
   "name": "scope_gate/many lines via stdin emits high magnitude + dialectic",
   "note": "Deterministic via --signals-stdin: >100 changed lines forces magnitude=high (routes to dialectic, not trias — trias requires critical/blocklist hit).",
-  "tool": "scripts/scope_gate.py",
+  "tool": "consilium/scripts/scope_gate.py",
   "args": [
    "--signals-stdin"
   ],
@@ -1830,7 +1830,7 @@
  },
  {
   "name": "aggregator/conservative_override emits low_separation when top-2 score delta < 0.12",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "conservative_override"
@@ -1863,7 +1863,7 @@
  {
   "name": "priors/--label finds match when context contains substring",
   "note": "Synthetic fixture: validates label-match code path. Fixture uses date 2099-12-31 so the entry always falls within the 30-day window.",
-  "tool": "scripts/priors.py",
+  "tool": "consilium/scripts/priors.py",
   "args": [
    "--label",
    "aggregator scoring",
@@ -1885,7 +1885,7 @@
  {
   "name": "priors/--label too short returns null (min-length guard)",
   "note": "Synthetic fixture: validates that labels shorter than 8 chars are rejected before any FEEDBACK lookup.",
-  "tool": "scripts/priors.py",
+  "tool": "consilium/scripts/priors.py",
   "args": [
    "--label",
    "fix",
@@ -1902,7 +1902,7 @@
  {
   "name": "validate_report/accepts chosen_approach prior-deliberation with empty deliberation_log",
   "note": "Synthetic fixture: validates that passthrough reports with no aggregate step pass the validator.",
-  "tool": "scripts/validate_report.py",
+  "tool": "consilium/scripts/validate_report.py",
   "args": [],
   "stdin_json": {
    "pipeline_executed": false,
@@ -1928,7 +1928,7 @@
  },
  {
   "name": "aggregator/sequential rejects generator.preferred not among candidate ids (#464 gate)",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "sequential"
@@ -1989,7 +1989,7 @@
  },
  {
   "name": "aggregator/sequential ghost preferred is rejected even on the scale_down path (gate precedes Priority 5)",
-  "tool": "scripts/aggregator.py",
+  "tool": "consilium/scripts/aggregator.py",
   "args": [
    "--scheme",
    "sequential"

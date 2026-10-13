@@ -18,11 +18,11 @@ satisfies: [ARCH-CONSILIUM-REPORT-001]
 
 Every line in this section is binding.
 
-- `scripts/utils.py` provides shared stdlib-only utilities that every other Consilium script imports instead of defining its own copies.
+- `consilium/scripts/utils.py` provides shared stdlib-only utilities that every other Consilium script imports instead of defining its own copies.
 - `DATA_DIR` resolves to `$CONSILIUM_DATA_DIR` (made absolute) when that variable is set to a non-blank value, and otherwise to `.consilium/` under the current working directory, which is the project the orchestrator writes its reports to.
 - `RUNS_DIR` resolves to `runs/` under `DATA_DIR`.
 - `FEEDBACK_PATH` resolves to `FEEDBACK.html` under `DATA_DIR`.
-- `DATA_DIR` never depends on where `scripts/utils.py` is installed: a plugin cache or an APM-deployed skill folder is replaced on every update, so state kept there would reset each version.
+- `DATA_DIR` never depends on where `consilium/scripts/utils.py` is installed: a plugin cache or an APM-deployed skill folder is replaced on every update, so state kept there would reset each version.
 - `atomic_write_text(path, content)` writes the given string content to `path` atomically, through a sibling `.tmp` file with fsync and rename.
 - A read-only parent directory makes `atomic_write_text` raise `OSError`, which propagates to the caller.
 - `atomic_write_text` deletes the temp file on any error path, so no stale `.tmp` file persists across crashes.
@@ -49,4 +49,4 @@ Every line in this section is binding.
 
 **Notes** — The module's functions have no CLI entry point of their own; each function is called directly by importer scripts (`load_json_stdin` reads stdin, `atomic_write_text(path, content)` takes a file path and string content, `issue_penalty(severity)` takes an issue dict, `validate_keys(data, keys)` takes a data dict and a required-keys list).
 
-**Current implementation** — `scripts/utils.py`.
+**Current implementation** — `consilium/scripts/utils.py`.

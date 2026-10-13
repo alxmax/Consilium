@@ -16,6 +16,7 @@ import textwrap
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+import plugin_paths  # noqa: E402,F401 — puts consilium/scripts on sys.path
 
 import implement_pipeline as _ip
 from implement_pipeline import _stub_bodies, build_plan, verify_red_green
@@ -481,7 +482,7 @@ def test_multiline_header_trailing_comment() -> None:
     )
 
 
-_SCRIPT = Path(__file__).parent / "implement_pipeline.py"
+_SCRIPT = Path(__file__).resolve().parent.parent / "consilium" / "scripts" / "implement_pipeline.py"
 
 
 def _run_cli(*args: str, stdin: str = "") -> subprocess.CompletedProcess:

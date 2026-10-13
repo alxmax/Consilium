@@ -56,4 +56,4 @@ Every line in this section is binding.
 
 **Notes** — None beyond the Description above.
 
-**Current implementation** — `scripts/render_impl_preview.py`
+**Current implementation** — `consilium/scripts/render_impl_preview.py`
