@@ -158,8 +158,8 @@
       "reason": "sync dev PRs #501-#506 into demo"
     },
     "CONSILIUM-UTILS-001": {
-      "hash": "4fc662c3b60b",
-      "reason": "sync dev PRs #501-#506 into demo"
+      "hash": "adb7b7ced563",
+      "reason": "state dir follows the project (cwd) or CONSILIUM_DATA_DIR instead of the install dir"
     },
     "CONSILIUM-VALIDATE-REPORT-001": {
       "hash": "1c84b371d725",

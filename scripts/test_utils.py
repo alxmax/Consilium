@@ -114,5 +114,55 @@ class TestValidateKeys(unittest.TestCase):
         validate_keys({"a": 1, "b": 2, "c": 3}, ["a"], "ctx")
 
 
+class TestDataDir(unittest.TestCase):
+    """DATA_DIR follows the project (cwd) or $CONSILIUM_DATA_DIR, never the
+    install dir — an install is replaced on every plugin/APM update."""
+
+    SCRIPTS = str(Path(__file__).resolve().parent)
+    PROBE = ("import sys; sys.path.insert(0, sys.argv[1]); import utils, "
+             "vote_degeneracy as v; print(utils.DATA_DIR); "
+             "print(utils.RUNS_DIR); print(utils.FEEDBACK_PATH); "
+             "print(v.DEFAULT_RUNS)")
+
+    def _probe(self, cwd, data_dir=None):
+        import subprocess
+        env = {k: val for k, val in os.environ.items()
+               if k != "CONSILIUM_DATA_DIR"}
+        if data_dir is not None:
+            env["CONSILIUM_DATA_DIR"] = data_dir
+        out = subprocess.run(
+            [sys.executable, "-c", self.PROBE, self.SCRIPTS], cwd=cwd,
+            env=env, capture_output=True, text=True, encoding="utf-8",
+            check=True).stdout
+        return [Path(line) for line in out.splitlines()]
+
+    def test_default_is_cwd_relative(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            data, runs, fb, vd = self._probe(td)
+            expected = Path(td).resolve() / ".consilium"
+            self.assertEqual(data.resolve(), expected)
+            self.assertEqual(runs.resolve(), expected / "runs")
+            self.assertEqual(fb.resolve(), expected / "FEEDBACK.html")
+            self.assertEqual(vd.resolve(), expected / "runs")
+
+    def test_env_override_wins(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as td, \
+                tempfile.TemporaryDirectory() as store:
+            data, runs, fb, vd = self._probe(td, data_dir=store)
+            self.assertEqual(data, Path(store).resolve())
+            self.assertEqual(runs, Path(store).resolve() / "runs")
+            self.assertEqual(fb, Path(store).resolve() / "FEEDBACK.html")
+            self.assertEqual(vd, Path(store).resolve() / "runs")
+
+    def test_empty_env_falls_back_to_cwd(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            data = self._probe(td, data_dir="  ")[0]
+            self.assertEqual(data.resolve(),
+                             Path(td).resolve() / ".consilium")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

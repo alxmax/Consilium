@@ -19,10 +19,10 @@ satisfies: [ARCH-CONSILIUM-REPORT-001]
 Every line in this section is binding.
 
 - `scripts/utils.py` provides shared stdlib-only utilities that every other Consilium script imports instead of defining its own copies.
-- `DATA_DIR` resolves to `.consilium/`, relative to the repo root.
-- `RUNS_DIR` resolves to `.consilium/runs/`, relative to the repo root.
-- `FEEDBACK_PATH` resolves to `.consilium/FEEDBACK.html`, relative to the repo root.
-- The repo root is derived from `Path(__file__).resolve().parent.parent` — two levels above `scripts/utils.py` — so path resolution is CWD-independent and does not break when a script runs from outside the repo.
+- `DATA_DIR` resolves to `$CONSILIUM_DATA_DIR` (made absolute) when that variable is set to a non-blank value, and otherwise to `.consilium/` under the current working directory, which is the project the orchestrator writes its reports to.
+- `RUNS_DIR` resolves to `runs/` under `DATA_DIR`.
+- `FEEDBACK_PATH` resolves to `FEEDBACK.html` under `DATA_DIR`.
+- `DATA_DIR` never depends on where `scripts/utils.py` is installed: a plugin cache or an APM-deployed skill folder is replaced on every update, so state kept there would reset each version.
 - `atomic_write_text(path, content)` writes the given string content to `path` atomically, through a sibling `.tmp` file with fsync and rename.
 - A read-only parent directory makes `atomic_write_text` raise `OSError`, which propagates to the caller.
 - `atomic_write_text` deletes the temp file on any error path, so no stale `.tmp` file persists across crashes.
@@ -39,7 +39,7 @@ Every line in this section is binding.
 
 ## Cases
 
-- **CASE-1** — Given a script imports `DATA_DIR`, `RUNS_DIR`, or `FEEDBACK_PATH` from any working directory, when the constants resolve, then they point to `.consilium/`, `.consilium/runs/`, and `.consilium/FEEDBACK.html` under the repo root (derived from `Path(__file__).resolve().parent.parent`, two levels above `scripts/utils.py`).
+- **CASE-1** — Given `CONSILIUM_DATA_DIR` is unset or blank, when a script imports `DATA_DIR`, `RUNS_DIR`, or `FEEDBACK_PATH`, then they point to `.consilium/`, `.consilium/runs/`, and `.consilium/FEEDBACK.html` under the current working directory; given it names a directory, then they point to that directory, its `runs/`, and its `FEEDBACK.html`.
 - **CASE-2** — Given `atomic_write_text` is interrupted mid-write, when the write fails, then the original file is left intact and no truncated or stale `.tmp` file persists.
 - **CASE-3** — Given `CLAUDE_HEADLESS` is unset or holds any value other than `'1'` (including `'true'` or `'0'`), when `is_headless` runs, then it returns `False`; given it equals `'1'`, then it returns `True`.
 - **CASE-4** — Given empty stdin or invalid JSON, when `load_json_stdin` runs, then it prints a diagnostic message to stderr and exits code 2.
