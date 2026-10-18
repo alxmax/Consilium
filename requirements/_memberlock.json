@@ -6,7 +6,7 @@
       "consilium/scripts/aggregator.py": "d90fa231f56f6459cc3295dda6f54d3566d50f49c19d0969ba08f82364977ed3"
     },
     "CONSILIUM-AUDIT-FEEDBACK-001": {
-      "consilium/scripts/audit_feedback.py": "78bdc67fcefb9b2569b44e091579366135d51851665c71c5a4ba28d87abb19de"
+      "consilium/scripts/audit_feedback.py": "92bfa7c58ea7a4b473d072df3e7ff935a394a997aa195243659efef88340758e"
     },
     "CONSILIUM-BUILD-REPORT-001": {
       "consilium/scripts/build_report.py": "684adfb06ec1672eb6cb4abec06c3f75e4b2efdff348f9906a41b5e2edba8956"
@@ -50,10 +50,10 @@
       "consilium/prompts/voices/sentinel_lens.md": "2050e06a45f0c3fe785b1651edabcee68454908a1fe8142557ea81804fcbb0d9"
     },
     "CONSILIUM-LOG-FEEDBACK-001": {
-      "consilium/scripts/log_feedback.py": "ec33e3cd3b75bda78dc6de45699c2838e3f56fdb189ea855d1891c335bcde3c3"
+      "consilium/scripts/log_feedback.py": "9709f65ce71dc98e9dc58d99054e5654efacc13d0064e707ba6d4f454dacfd31"
     },
     "CONSILIUM-MARK-OUTCOME-001": {
-      "consilium/scripts/mark_outcome.py": "adccf60a856f220da06704306eac139c3951986cc5055ce41c0d2eebf1655707"
+      "consilium/scripts/mark_outcome.py": "9ea6a3dca86754adc2d91dc326b0f73da3e7586f55fb18e2d889b5e0d4be8424"
     },
     "CONSILIUM-MEMORY-001": {
       "consilium/scripts/memory.py": "9ededeeaf6d1071f01fbde6c51509bc9311df6dd8ba5db956ff319de208a4968"
@@ -68,7 +68,7 @@
       "scripts/plugin_paths.py": "18b9bae7249c9868058a12a9d9b87c6857d3dbd92f1abaf97cdbb0f5983b0f74"
     },
     "CONSILIUM-PRIORS-001": {
-      "consilium/scripts/priors.py": "6b0ff03b72f3b923962c3a6b1e56b68f2faf3dc8b57dd1f0635284146a01f72e"
+      "consilium/scripts/priors.py": "3847c36138ae14366288bf620e65f8b45466dd7daaa40d42db66118fb6d1a578"
     },
     "CONSILIUM-RENDER-FEEDBACK-HTML-001": {
       "consilium/scripts/render_feedback_html.py": "c9eeb95f7fa18d8c432821823a714dba2c131cda38a3a50ab645bc3433909f41"
@@ -90,7 +90,7 @@
       "consilium/agents/consilium-subagent.md": "6ec27d4231a2d607196815760bef770a5c55710ebe453f367c9ee1a1ab86a135"
     },
     "CONSILIUM-UTILS-001": {
-      "consilium/scripts/utils.py": "d90c6dda6301b6b46dca89a6ee3dd62c4cc4e48905efb9a25692ac8e4615aafe"
+      "consilium/scripts/utils.py": "34be9053c193fb939e00672676743a16ad8a1ba51e04cf9f16164e769e667f4d"
     },
     "CONSILIUM-VALIDATE-SKEPTIC-001": {
       "consilium/scripts/validate_skeptic.py": "3c54be066cffb61c2fc899b0a86d26c08e87ebbd9baf3031d74194b13e1d166f"

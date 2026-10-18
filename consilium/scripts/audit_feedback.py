@@ -43,7 +43,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-from utils import FEEDBACK_PATH, RUNS_DIR, atomic_write_text, force_utf8_streams
+from utils import (
+    FEEDBACK_PATH,
+    RUNS_DIR,
+    atomic_write_text,
+    feedback_lock,
+    force_utf8_streams,
+)
 
 
 def _load_modules():
@@ -188,6 +194,24 @@ def _backfill(
     log_mod,
     render_mod,
 ) -> None:
+    with feedback_lock(feedback_path):
+        appended = _backfill_locked(
+            missing, runs_dir, feedback_path, fb_mod, log_mod, render_mod
+        )
+
+    print(f"\nbackfilled {appended} PEND row(s) into {feedback_path.name}.")
+    print("close them retroactively with: python scripts/mark_outcome.py "
+          "--run-path runs/<file>.json --outcome OK|BAD")
+
+
+def _backfill_locked(
+    missing: list[dict],
+    runs_dir: Path,
+    feedback_path: Path,
+    fb_mod,
+    log_mod,
+    render_mod,
+) -> int:
     # Batch backfill: read FEEDBACK.html once, accumulate all new Entry
     # objects, write once.  This avoids O(N²) read-render-write cycles.
     existing_rows = fb_mod.parse_feedback(feedback_path)
@@ -218,10 +242,7 @@ def _backfill(
         atomic_write_text(
             feedback_path, render_mod.render(accumulated, runs_dir))
         log_mod._save_map(runs_dir, run_map)
-
-    print(f"\nbackfilled {appended} PEND row(s) into {feedback_path.name}.")
-    print("close them retroactively with: python scripts/mark_outcome.py "
-          "--run-path runs/<file>.json --outcome OK|BAD")
+    return appended
 
 
 def main(argv: list[str] | None = None) -> int:

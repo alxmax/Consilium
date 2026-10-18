@@ -6,12 +6,14 @@ defining their own copies. Each script remains a stand-alone executable.
 # implements: CONSILIUM-UTILS-001
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import sys
 import tempfile
+import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 
 # ---------------------------------------------------------------------------
@@ -137,6 +139,61 @@ def atomic_write_text(path, content: str, encoding: str = "utf-8") -> None:
         except OSError:
             pass
         raise
+
+
+if sys.platform == "win32":
+    import msvcrt
+
+    def _try_lock(fh) -> None:
+        fh.seek(0)
+        msvcrt.locking(fh.fileno(), msvcrt.LK_NBLCK, 1)
+
+    def _unlock(fh) -> None:
+        fh.seek(0)
+        msvcrt.locking(fh.fileno(), msvcrt.LK_UNLCK, 1)
+else:
+    import fcntl
+
+    def _try_lock(fh) -> None:
+        fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+    def _unlock(fh) -> None:
+        fcntl.flock(fh, fcntl.LOCK_UN)
+
+
+@contextlib.contextmanager
+def feedback_lock(feedback_path, timeout: float = 30.0) -> Iterator[None]:
+    """Hold an exclusive cross-process lock for one FEEDBACK.html transaction.
+
+    ``atomic_write_text`` keeps a single write from tearing the file, but a
+    read-modify-write (parse rows, change, re-render) still loses a
+    concurrent writer's rows. Every writer of FEEDBACK.html and its
+    ``runs/.run_path_map.json`` sidecar takes this lock around the WHOLE
+    parse -> write sequence. The OS drops the lock when the holder dies, so a
+    killed process never leaves it stuck. Raises ``TimeoutError`` after
+    ``timeout`` seconds instead of waiting forever.
+    """
+    lock_path = Path(str(feedback_path) + ".lock")
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(lock_path, "a+b") as fh:
+        if lock_path.stat().st_size == 0:
+            fh.write(b"\0")
+            fh.flush()
+        deadline = time.monotonic() + timeout
+        while True:
+            try:
+                _try_lock(fh)
+                break
+            except OSError:
+                if time.monotonic() >= deadline:
+                    raise TimeoutError(
+                        f"feedback lock busy: {lock_path} (waited {timeout}s)"
+                    ) from None
+                time.sleep(0.05)
+        try:
+            yield
+        finally:
+            _unlock(fh)
 
 
 _ISSUE_PENALTIES = {"low": 0.05, "medium": 0.15, "high": 0.30}

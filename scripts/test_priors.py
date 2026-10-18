@@ -236,6 +236,43 @@ class TestFindMissingFeedbackRuns(unittest.TestCase):
             result = find_missing_feedback_runs(runs_dir, [], cap=3)
             self.assertEqual(len(result), 3)
 
+    def test_sidecar_entry_without_a_feedback_row_is_still_missing(self):
+        # An interrupted log (sidecar saved, row never written) must not hide
+        # the run: membership in the sidecar alone proves nothing.
+        from log_feedback import _fingerprint
+        with tempfile.TemporaryDirectory() as td:
+            runs_dir = Path(td) / "runs"
+            runs_dir.mkdir()
+            name = "2026-01-15-ghost.json"
+            (runs_dir / name).write_text(
+                json.dumps({"chosen_approach": "ghost_opt", "deliberation_log": []}),
+                encoding="utf-8",
+            )
+            fp = _fingerprint("2026-01-15", "ghost_opt", "ctx", run_id=name)
+            (runs_dir / ".run_path_map.json").write_text(
+                json.dumps({fp: f"runs/{name}"}), encoding="utf-8"
+            )
+            result = find_missing_feedback_runs(runs_dir, [])
+            self.assertEqual([m["run"] for m in result], [name])
+
+    def test_sidecar_entry_with_its_feedback_row_is_logged(self):
+        from log_feedback import _fingerprint
+        with tempfile.TemporaryDirectory() as td:
+            runs_dir = Path(td) / "runs"
+            runs_dir.mkdir()
+            name = "2026-01-15-real.json"
+            (runs_dir / name).write_text(
+                json.dumps({"chosen_approach": "real_opt", "deliberation_log": []}),
+                encoding="utf-8",
+            )
+            fp = _fingerprint("2026-01-15", "real_opt", "ctx", run_id=name)
+            (runs_dir / ".run_path_map.json").write_text(
+                json.dumps({fp: f"runs/{name}"}), encoding="utf-8"
+            )
+            # chosen differs from the run's, so only the sidecar can vouch
+            row = {"date": "2026-01-15", "chosen": "real_opt", "context": "ctx"}
+            self.assertEqual(find_missing_feedback_runs(runs_dir, [row]), [])
+
     def test_non_canonical_run_ignored(self):
         with tempfile.TemporaryDirectory() as td:
             runs_dir = Path(td) / "runs"

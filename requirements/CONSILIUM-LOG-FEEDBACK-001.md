@@ -1,7 +1,7 @@
 ---
 milestone: v1.0
 id: CONSILIUM-LOG-FEEDBACK-001
-status: confirmed
+status: draft
 level: code
 layer: feature
 owner: alxmax
@@ -30,9 +30,8 @@ Every line in this section is binding.
 - When `run_id` is absent, the fingerprint falls back to a microsecond-precision timestamp (`datetime.now().strftime("%f")`) as the 4th field, not a 3-field key. This prevents same-day collisions but makes the fingerprint non-deterministic.
 - Two recomputed fingerprints for the same legacy row differ, so old no-run_id rows can never be matched by fingerprint lookup — they fall back to `run_path=None`.
 - The confidence gate reads `report.get("confidence")` — the top-level key only. When a report carries both a top-level `confidence` and a nested `confidence.confidence` dict, the top-level value is used and the nested form is silently ignored.
-- The row-upgrade path (PEND -> OK) uses a read-modify-write cycle protected only by `atomic_write_text` (rename-swap); there is no file lock or compare-and-swap.
-- Two concurrent callers each read the same PEND state, and the last writer wins.
-- Concurrent upgrades are not prevented; they are tolerated as an acceptable race, since `log_feedback.py` is not designed for concurrent use.
+- The whole append or upgrade — parse the rows, write the row, write the sidecar — runs under `feedback_lock` (an exclusive cross-process lock on `FEEDBACK.html.lock`), so concurrent callers (appends and outcome upgrades alike) each start from the previous caller's result and no row is lost. A caller that cannot get the lock within 30 s fails with `TimeoutError`.
+- The row is written before its sidecar entry. A call interrupted between the two leaves a row with no sidecar entry; a retry with the same `--run-path` adopts that row (same `date|chosen|context`, claimed by no sidecar entry) instead of appending a duplicate, and saves the missing sidecar entry.
 
 ## Verify intent
 
@@ -46,6 +45,8 @@ Every line in this section is binding.
 - **CASE-4** — Given `--outcome OK` with a report whose `confidence` is below 0.70, when the script runs without `--force-override`, then it exits 1 with an error message.
 - **CASE-4b** — Given `--outcome OK` without `--confirmed`, when the script runs, then it exits 1 and writes nothing.
 - **CASE-5** — Given `--outcome OVR` without `--override-target`, when the script runs, then it exits 2 with an error message to stderr.
+- **CASE-6** — Given several `log_feedback.py` processes run at once (distinct appends plus an outcome upgrade of an existing row), when they all finish, then every appended row is present and the upgrade is applied.
+- **CASE-7** — Given the sidecar write fails after the row was written, when the same call is retried, then FEEDBACK.html still holds exactly one such row and the sidecar maps the run path.
 
 ## Context (non-binding)
 

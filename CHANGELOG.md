@@ -5,6 +5,12 @@ All notable changes to Consilium are recorded here, following
 Apache License 2.0 (see `LICENSE`); versions up to 1.14.0 were published under the
 Business Source License 1.1.
 
+## [1.15.5] — 2026-10-18
+
+### Fixed
+- `FEEDBACK.html` and its `runs/.run_path_map.json` sidecar were updated by read-modify-write cycles with no mutual exclusion: concurrent `log_feedback.py` appends, an outcome upgrade, `mark_outcome.py` and `audit_feedback.py --backfill` overwrote each other (9 concurrent writers kept 3 rows in a reproduction). All writers now run their whole parse -> write sequence under a new cross-process `feedback_lock`.
+- `log_feedback.py` saved the sidecar entry before the row, so a failure in between left a sidecar entry vouching for a row that did not exist, and `priors.py` then reported nothing missing. The row is now written first, a retry adopts a row left without its sidecar entry, and `priors.py` counts a sidecar entry only when a FEEDBACK row with that fingerprint exists.
+
 ## [1.15.4] — 2026-10-18
 
 ### Fixed

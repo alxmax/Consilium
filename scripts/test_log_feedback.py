@@ -8,7 +8,11 @@ Run:
     python -m pytest scripts/test_log_feedback.py -v  (if pytest available)
 """
 # tested-by: CONSILIUM-LOG-FEEDBACK-001
+import json
+import subprocess
 import sys
+import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -160,6 +164,115 @@ class TestBuildEntry(unittest.TestCase):
         )
         entry = build_entry(report)
         self.assertEqual(entry["chosen"], "null")
+
+_SCRIPTS = Path(__file__).resolve().parent.parent / "consilium" / "scripts"
+_LOG_CLI = _SCRIPTS / "log_feedback.py"
+
+_LOCK_HOLDER = """import pathlib, sys, time
+sys.path.insert(0, sys.argv[1])
+from utils import feedback_lock
+flag = pathlib.Path(sys.argv[3])
+with feedback_lock(sys.argv[2]):
+    flag.write_text("held")
+    for _ in range(300):
+        if pathlib.Path(str(flag) + ".release").exists():
+            break
+        time.sleep(0.05)
+"""
+
+
+def _report(i: int, **extra) -> dict:
+    return {
+        "success_criterion": f"concurrent task {i}",
+        "chosen_approach": f"opt_{i}",
+        "deliberation_log": [],
+        **extra,
+    }
+
+
+class TestFeedbackTransaction(unittest.TestCase):
+    """The FEEDBACK.html + sidecar read-modify-write is one transaction."""
+
+    def test_lock_excludes_another_process(self):
+        import utils
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+            fb = Path(td) / "FEEDBACK.html"
+            flag = Path(td) / "held"
+            holder = subprocess.Popen(
+                [sys.executable, "-c", _LOCK_HOLDER, str(_SCRIPTS), str(fb), str(flag)]
+            )
+            try:
+                for _ in range(100):
+                    if flag.exists():
+                        break
+                    time.sleep(0.05)
+                self.assertTrue(flag.exists(), "holder never acquired the lock")
+                with self.assertRaises(TimeoutError):
+                    with utils.feedback_lock(fb, timeout=0.3):
+                        pass
+            finally:
+                Path(str(flag) + ".release").write_text("x")
+                holder.wait(timeout=20)
+            with utils.feedback_lock(fb, timeout=5):
+                pass  # free again once the holder exits
+
+    def test_concurrent_appends_and_outcome_update_all_survive(self):
+        from feedback import parse_feedback
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+            fb = Path(td) / "FEEDBACK.html"
+            seed = "runs/2026-10-18_seed.json"
+            seed_rep = _report(0)
+
+            def cli(report, *args):
+                proc = subprocess.Popen(
+                    [sys.executable, str(_LOG_CLI), "--feedback", str(fb), *args],
+                    stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE, text=True,
+                )
+                assert proc.stdin is not None
+                proc.stdin.write(json.dumps(report))
+                proc.stdin.close()
+                return proc
+
+            cli(seed_rep, "--run-path", seed).wait(timeout=60)
+            procs = [cli(_report(i)) for i in range(1, 9)]
+            procs.append(cli(seed_rep, "--run-path", seed, "--outcome", "BAD"))
+            for p in procs:
+                p.wait(timeout=120)
+            rows = parse_feedback(fb)
+            self.assertEqual(sorted(r["chosen"] for r in rows),
+                             sorted(["opt_0"] + [f"opt_{i}" for i in range(1, 9)]))
+            by_chosen = {r["chosen"]: r for r in rows}
+            self.assertEqual(by_chosen["opt_0"]["outcome"], "BAD")
+
+    def test_row_is_written_before_the_sidecar(self):
+        import log_feedback as lf
+        from feedback import parse_feedback
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+            fb = Path(td) / "FEEDBACK.html"
+            run = "runs/2026-10-18_a.json"
+            entry = build_entry(_report(1))
+            seen = {}
+            real = lf._save_map
+
+            def failing_save(runs_dir, run_map):
+                seen["row_present"] = any(
+                    r["chosen"] == "opt_1" for r in parse_feedback(fb)
+                )
+                raise OSError("disk full")
+
+            lf._save_map = failing_save
+            try:
+                with self.assertRaises(OSError):
+                    lf.append_entry(fb, entry, run)
+            finally:
+                lf._save_map = real
+            self.assertTrue(seen.get("row_present"),
+                            "sidecar was saved before the row was written")
+            # retry after the interruption: no duplicate row, sidecar healed
+            lf.append_entry(fb, entry, run)
+            self.assertEqual(len(parse_feedback(fb)), 1)
+            self.assertIn(run, lf._load_map(fb.parent / "runs").values())
 
 
 if __name__ == "__main__":

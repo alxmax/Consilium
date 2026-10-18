@@ -47,6 +47,14 @@ assert _spec and _spec.loader
 _feedback = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_feedback)
 
+_LF_PATH = ROOT / "scripts" / "log_feedback.py"
+_lf_spec = importlib.util.spec_from_file_location(
+    "consilium_log_feedback", _LF_PATH
+)
+assert _lf_spec and _lf_spec.loader
+_log_feedback = importlib.util.module_from_spec(_lf_spec)
+_lf_spec.loader.exec_module(_log_feedback)
+
 FEEDBACK = _feedback.FEEDBACK
 RUNS = _feedback.RUNS
 parse_feedback = _feedback.parse_feedback
@@ -123,6 +131,27 @@ def _rates(entries: list[dict]) -> dict:
     }
 
 
+def _sidecar_row_exists(
+    fp: str, run_name: str, day: str, rows: list[dict]
+) -> bool:
+    """True when a FEEDBACK row really hashes to the sidecar's ``fp``.
+
+    A sidecar entry alone can outlive an interrupted write (or a hand-edited
+    journal), so it only counts once the row it claims to cover exists. Rows
+    from the run's own day are tried first: they are the usual match.
+    """
+    ordered = [r for r in rows if r.get("date") == day] + [
+        r for r in rows if r.get("date") != day
+    ]
+    return any(
+        _log_feedback._fingerprint(
+            r.get("date", ""), r.get("chosen", ""), r.get("context", ""),
+            run_id=run_name,
+        ) == fp
+        for r in ordered
+    )
+
+
 def find_missing_feedback_runs(
     runs_dir: Path, feedback_entries: list[dict], cap: int = 5
 ) -> list[dict]:
@@ -145,7 +174,7 @@ def find_missing_feedback_runs(
         )
     except (json.JSONDecodeError, OSError):
         sidecar = {}
-    logged_run_paths: set[str] = set(sidecar.values())
+    fp_by_path: dict[str, str] = {rp: fp for fp, rp in sidecar.items()}
 
     fb_keys: set[tuple[str, str]] = set()
     for e in feedback_entries:
@@ -160,8 +189,11 @@ def find_missing_feedback_runs(
             continue
         d = m.group(1)
         rel = f"runs/{run_file.name}"
-        # Prefer sidecar match (exact, no collision risk)
-        if rel in logged_run_paths:
+        # Prefer sidecar match (exact, no collision risk) — but only when
+        # the row it vouches for exists.
+        if rel in fp_by_path and _sidecar_row_exists(
+            fp_by_path[rel], run_file.name, d, feedback_entries
+        ):
             continue
         try:
             data = json.loads(run_file.read_text(encoding="utf-8-sig"))

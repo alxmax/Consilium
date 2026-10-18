@@ -1,7 +1,7 @@
 ---
 milestone: v1.0
 id: CONSILIUM-MARK-OUTCOME-001
-status: confirmed
+status: draft
 level: code
 layer: feature
 owner: alxmax
@@ -23,7 +23,7 @@ Every line in this section is binding.
 - Rows are located via a fingerprint sidecar map (`--run-path`) or by a direct `--date` + `--chosen` pair.
 - When no match is found, a fallback diagnostic lists the five most recent entries.
 - `--dry-run` allows inspection of which rows would be updated without modifying any file.
-- Overwrites `.consilium/FEEDBACK.html` atomically with updated outcome and annotated note for each matched row.
+- Overwrites `.consilium/FEEDBACK.html` atomically with updated outcome and annotated note for each matched row; the parse, the update and the write run under `feedback_lock`, so a concurrent append is not lost.
 - stdout carries per-matched-row lines of the form `matched [i]: date | chosen | old_outcome -> new_outcome`.
 - stdout carries `skip [i]: ...` lines when a row is already at the target outcome, or when PEND_HEADLESS is applied to a non-PEND row.
 - stdout prints `(dry-run; no write)` when `--dry-run` is active.
