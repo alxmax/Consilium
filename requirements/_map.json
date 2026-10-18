@@ -2053,7 +2053,7 @@
       "id": "CONSILIUM-PRIORS-001",
       "layer": "feature",
       "level": "code",
-      "status": "confirmed",
+      "status": "draft",
       "area": "CONSILIUM",
       "title": "priors",
       "intent": "Describes observed behavior, verified against consilium/scripts/priors.py source.",
@@ -2067,6 +2067,7 @@
         "`counts` tallies outcomes (OK / BAD / OVR / PEND) over the recent slice.",
         "`bad_rate` is a risk indicator derived from the `[confirmed]` rows of the recent slice (also surfaced to Conservator via `--memory-summary`); `unconfirmed_count` counts the OK/BAD/OVR rows left out.",
         "Rates count only rows whose note carries `[confirmed]`, so `rated_count == confirmed_count`. Outcomes assigned at log time without evidence do not move the rates.",
+        "With `--label`, `prior_deliberation_match` is the newest in-window `OK` row whose context contains the label AND whose note carries `[confirmed]`; an unconfirmed `OK` never matches, because the match lets the caller skip re-deliberation.",
         "Headless mode is set only by explicit signals (`--headless`, `CONSILIUM_HEADLESS=1`, `CLAUDE_HEADLESS=1`); a non-tty stdin does not imply headless.",
         "`stale_pendings` lists FEEDBACK rows still PEND and older than `STALE_PEND_DAYS`. `STALE_PEND_DAYS = 2` is hardcoded, reduced from 7, and not CLI-configurable; entries older than 2 days surface at step 0 for retrospective close.",
         "`missing_feedback_runs` lists `runs/` files with no matching FEEDBACK row.",
@@ -2105,7 +2106,12 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [
+        {
+          "signal": "unreviewed",
+          "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-RENDER-FEEDBACK-HTML-001",
@@ -4077,20 +4083,29 @@
     },
     {
       "month": "2026-10",
-      "count": 6,
+      "count": 7,
       "first": "2026-10-13",
-      "last": "2026-10-13",
+      "last": "2026-10-18",
       "versions": [
         "v1.13.0",
         "v1.13.1",
         "v1.14.0",
         "v1.15.0",
         "v1.15.1",
-        "v1.15.2"
+        "v1.15.2",
+        "v1.15.3"
       ],
       "landmark": "v1.15.0",
       "headline": "",
       "entries": [
+        {
+          "version": "v1.15.3",
+          "date": "2026-10-18",
+          "headline": "",
+          "body": "### Fixed\n- `priors.py --label` matched any recent `OK` row, including ones whose outcome was assigned at log time without evidence. Because a match lets the caller skip re-deliberation, it now requires the `[confirmed]` marker, the same filter the rates already use. An unconfirmed newer `OK` no longer shadows an older confirmed one.",
+          "first_commit": "2026-10-18",
+          "last_commit": "2026-10-18"
+        },
         {
           "version": "v1.15.2",
           "date": "2026-10-13",
@@ -4476,23 +4491,33 @@
     }
   },
   "health": {
-    "score": 100,
+    "score": 98,
     "total": 57,
     "scored": 56,
-    "healthy": 56,
+    "healthy": 55,
     "exempt": 17,
     "deprecated": 1,
-    "confirmed": 56,
+    "confirmed": 55,
     "implemented": 47,
     "tested": 32,
-    "drafts": 0,
+    "drafts": 1,
     "orphans": 0,
     "untested": 0,
     "open_intent": 0,
     "drift": 0,
     "gate_errors": 0,
     "gate_link_sync_clean": true,
-    "unhealthy": [],
+    "reviewed_score": 100,
+    "reviewed_total": 55,
+    "unhealthy": [
+      {
+        "id": "CONSILIUM-PRIORS-001",
+        "status": "draft",
+        "why": [
+          "not confirmed"
+        ]
+      }
+    ],
     "exempt_ids": [
       {
         "id": "CONSILIUM-AUDIT-FEEDBACK-001",

@@ -232,7 +232,9 @@ def _find_prior_match(
     Returns None when label is too short (< 8 chars after strip) or no
     match exists within window_days. Scans entries newest-first so the
     most recent match wins.
-    Only entries with outcome "OK" qualify — PEND/BAD/OVR do not. (GO is
+    Only entries with outcome "OK" AND CONFIRMED_MARKER qualify —
+    PEND/BAD/OVR and auto-assigned (unconfirmed) OK do not: passthrough
+    skips re-deliberation, so it must rest on a verified outcome. (GO is
     a review verdict, never a FEEDBACK outcome, so it can never match.)
     """
     if len(label.strip()) < _PRIOR_MATCH_MIN_LABEL_LEN:
@@ -243,6 +245,8 @@ def _find_prior_match(
         if entry.get("date", "") < cutoff:
             continue
         if entry.get("outcome") not in _PRIOR_MATCH_OUTCOMES:
+            continue
+        if not _is_confirmed(entry):
             continue
         context = (entry.get("context") or "").lower()
         if needle in context:

@@ -1,5 +1,5 @@
 ---
-generated: 2026-10-13
+generated: 2026-10-18
 engine: 2026-10-13.1
 nodes: 57
 edges: 105
@@ -221,5 +221,14 @@ _Requirements needing attention: red = unimplemented (confirmed, no code); orang
 
 ```mermaid
 graph LR
-  ok["No risk signals detected"]
+  subgraph sg_misc["misc"]
+    CONSILIUM_PRIORS_001["priors<br><small>CONSILIUM-PRIORS-001</small><br>unreviewed"]
+  end
+  style CONSILIUM_PRIORS_001 fill:#fff3cd,stroke:#a66,color:#630
 ```
+
+### Risk Table
+
+| ID | status | members | dependents | risks | recommendation |
+| --- | --- | --- | --- | --- | --- |
+| CONSILIUM-PRIORS-001 | draft | 2 | 1 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |

@@ -68,7 +68,7 @@
       "scripts/plugin_paths.py": "18b9bae7249c9868058a12a9d9b87c6857d3dbd92f1abaf97cdbb0f5983b0f74"
     },
     "CONSILIUM-PRIORS-001": {
-      "consilium/scripts/priors.py": "323e37aa81684364ccee7e4806bbc800bbbe9219af6d9e6d8cd95058273ac444"
+      "consilium/scripts/priors.py": "6b0ff03b72f3b923962c3a6b1e56b68f2faf3dc8b57dd1f0635284146a01f72e"
     },
     "CONSILIUM-RENDER-FEEDBACK-HTML-001": {
       "consilium/scripts/render_feedback_html.py": "c9eeb95f7fa18d8c432821823a714dba2c131cda38a3a50ab645bc3433909f41"
