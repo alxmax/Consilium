@@ -172,8 +172,10 @@ def check_mode_floor(
 ) -> dict:
     """Return {below_floor: bool, floor: float|None, outcome_hint: str}.
 
-    Callers check this after confidence derivation and log WEAK in FEEDBACK.html
-    when below_floor is True. outcome_hint is 'WEAK' or 'OK' (advisory only).
+    Callers check this after confidence derivation and pass ``--weak`` to
+    log_feedback.py when below_floor is True. WEAK is advisory quality
+    metadata (a ``[weak]`` note marker), not an observed outcome: the row
+    stays PEND. outcome_hint is 'WEAK' or 'OK' (advisory only).
 
     Trias confidence is derived from the democratic vote pattern, not
     voice-score variance: a decisive split (2-1=0.75, 2-0=0.70) sits

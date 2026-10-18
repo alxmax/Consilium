@@ -1,6 +1,6 @@
 # Consilium
 
-**A second opinion, structured.** Consilium is a Claude Code skill that evaluates a risky code change through three independent voices before you commit it:
+**A second opinion, structured.** Consilium is a Claude Code skill that evaluates a risky code change through three distinct voices before you commit it (roles in one shared context by default; Trias isolates its passes in separate sub-agents):
 
 - **Generator** proposes alternatives, always including `do_nothing`, and runs first, blind to risk framing.
 - **Conservator** scores each candidate's risk and reversibility.

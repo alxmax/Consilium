@@ -5,6 +5,12 @@ All notable changes to Consilium are recorded here, following
 Apache License 2.0 (see `LICENSE`); versions up to 1.14.0 were published under the
 Business Source License 1.1.
 
+## [1.15.7] — 2026-10-18
+
+### Fixed
+- `SKILL.md` and `modes/confidence.md` told the caller to log a below-floor run with `--outcome WEAK`, which `log_feedback.py` rejects, so the documented step failed with a CLI error. Added `log_feedback.py --weak`: it adds a `[weak]` note marker and leaves the row `PEND`, since WEAK is advisory quality metadata, not an observed outcome.
+- The README and `SKILL.md` called the three voices "independent". In Sequential they are roles in one shared context; only Trias isolates its passes in separate sub-agents. The wording now says so.
+
 ## [1.15.6] — 2026-10-18
 
 ### Fixed

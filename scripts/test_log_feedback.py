@@ -275,5 +275,40 @@ class TestFeedbackTransaction(unittest.TestCase):
             self.assertIn(run, lf._load_map(fb.parent / "runs").values())
 
 
+class TestWeakFlag(unittest.TestCase):
+    """WEAK is advisory quality metadata for a below-floor run, not an
+    observed outcome: the row stays PEND and carries a [weak] marker."""
+
+    def test_build_entry_marks_weak_and_keeps_pend(self):
+        entry = build_entry(_report(1), weak=True)
+        self.assertEqual(entry["outcome"], "PEND")
+        self.assertIn("[weak]", entry["note"])
+        self.assertNotIn("[weak]", build_entry(_report(1))["note"])
+
+    def test_below_floor_run_round_trips_through_the_logger(self):
+        from confidence import check_mode_floor
+        from feedback import parse_feedback
+        floor = check_mode_floor("sequential", 0.65)
+        self.assertTrue(floor["below_floor"])
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+            fb = Path(td) / "FEEDBACK.html"
+            proc = subprocess.run(
+                [sys.executable, str(_LOG_CLI), "--feedback", str(fb), "--weak"],
+                input=json.dumps(_report(1)), capture_output=True, text=True,
+            )
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            rows = parse_feedback(fb)
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["outcome"], "PEND")
+            self.assertIn("[weak]", rows[0]["note"])
+
+    def test_weak_is_not_an_outcome_value(self):
+        proc = subprocess.run(
+            [sys.executable, str(_LOG_CLI), "--outcome", "WEAK", "--dry-run"],
+            input=json.dumps(_report(1)), capture_output=True, text=True,
+        )
+        self.assertEqual(proc.returncode, 2)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

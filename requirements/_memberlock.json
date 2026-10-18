@@ -18,8 +18,8 @@
       "scripts/check_versions.py": "4b571d17082e5587d592d41d8ae1286238e47919f395409df7e9d2aa5d8ac20f"
     },
     "CONSILIUM-CONFIDENCE-001": {
-      "consilium/modes/confidence.md": "c58466f4da12e9a8b0619a75882cea08d98377e146b0350257d837311408f40f",
-      "consilium/scripts/confidence.py": "e66e96dc18afec40734e5ea1c84f2dd58748d8f89462b7ccc825376770ec6364"
+      "consilium/modes/confidence.md": "39b6d553c9a2050f33a695a4da327dbdec43023419952c23949d70e0ca93b982",
+      "consilium/scripts/confidence.py": "5e3242f56752ee22e4edfbc6e8e3974e69e89b52f0b364344222c6102b03d9e7"
     },
     "CONSILIUM-CONFIDENCE-CALIBRATION-001": {
       "consilium/scripts/confidence_calibration.py": "aee25644846808d611467d9622f6e0c392dfac0e1650d8da3d3ee48f1f476cae"
@@ -50,7 +50,7 @@
       "consilium/prompts/voices/sentinel_lens.md": "2050e06a45f0c3fe785b1651edabcee68454908a1fe8142557ea81804fcbb0d9"
     },
     "CONSILIUM-LOG-FEEDBACK-001": {
-      "consilium/scripts/log_feedback.py": "9709f65ce71dc98e9dc58d99054e5654efacc13d0064e707ba6d4f454dacfd31"
+      "consilium/scripts/log_feedback.py": "8ea774139f9df159236540adb9ff963ca6df2298037319f6a3add1bc59b40231"
     },
     "CONSILIUM-MARK-OUTCOME-001": {
       "consilium/scripts/mark_outcome.py": "9ea6a3dca86754adc2d91dc326b0f73da3e7586f55fb18e2d889b5e0d4be8424"

@@ -23,6 +23,7 @@ Every line in this section is binding.
 - Before appending, it checks for duplicates using a 16-character SHA-256 fingerprint keyed on `date|chosen|context|run_id`.
 - If the existing row has the same `run_path` but a different outcome (e.g., PEND->OK), the row is upgraded in place rather than duplicated.
 - The sidecar `.run_path_map.json` is updated on every real write so `efficiency.py` and `audit_feedback.py` can later join outcomes to telemetry by run path.
+- `--weak` adds the `[weak]` marker to the note for a run below its mode confidence floor; the row's outcome is unchanged (`PEND`), because WEAK is advisory quality metadata, not an observed outcome. `--outcome WEAK` is rejected.
 - `--outcome OK` requires `--confirmed` (the verification passed or the user confirmed the result), which adds the `[confirmed]` marker; it also enforces a 0.70 confidence threshold gate, requiring `--force-override` to bypass.
 - stdout is a `date | context | chosen | outcome | note` summary line (or `skipped (duplicate): ...` on exit 3).
 - `.consilium/FEEDBACK.html` is updated atomically with the new or upgraded row; `.consilium/runs/.run_path_map.json` is updated with the new fingerprint->run_path entry.
@@ -47,6 +48,7 @@ Every line in this section is binding.
 - **CASE-5** — Given `--outcome OVR` without `--override-target`, when the script runs, then it exits 2 with an error message to stderr.
 - **CASE-6** — Given several `log_feedback.py` processes run at once (distinct appends plus an outcome upgrade of an existing row), when they all finish, then every appended row is present and the upgrade is applied.
 - **CASE-7** — Given the sidecar write fails after the row was written, when the same call is retried, then FEEDBACK.html still holds exactly one such row and the sidecar maps the run path.
+- **CASE-8** — Given a below-floor result from `check_mode_floor`, when `log_feedback.py --weak` runs, then FEEDBACK.html holds one row with outcome `PEND` and a `[weak]` note marker, and `feedback.py` reads it back.
 
 ## Context (non-binding)
 
