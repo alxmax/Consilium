@@ -224,6 +224,7 @@ graph LR
   subgraph sg_CONSILIUM["CONSILIUM"]
     CONSILIUM_AGGREGATOR_001["aggregator<br><small>CONSILIUM-AGGREGATOR-001</small><br>unreviewed"]
     CONSILIUM_AUDIT_FEEDBACK_001["Orphan run detection and PEND backfill<br><small>CONSILIUM-AUDIT-FEEDBACK-001</small><br>unreviewed"]
+    CONSILIUM_BUILD_REPORT_001["build_report<br><small>CONSILIUM-BUILD-REPORT-001</small><br>unreviewed"]
     CONSILIUM_CONFIDENCE_CALIBRATION_001["confidence_calibration<br><small>CONSILIUM-CONFIDENCE-CALIBRATION-001</small><br>unreviewed"]
     CONSILIUM_FEEDBACK_001["feedback<br><small>CONSILIUM-FEEDBACK-001</small><br>unreviewed"]
     CONSILIUM_IMPLEMENT_PIPELINE_001["implement_pipeline<br><small>CONSILIUM-IMPLEMENT-PIPELINE-001</small><br>unreviewed"]
@@ -235,6 +236,7 @@ graph LR
   end
   style CONSILIUM_AGGREGATOR_001 fill:#fff3cd,stroke:#a66,color:#630
   style CONSILIUM_AUDIT_FEEDBACK_001 fill:#fff3cd,stroke:#a66,color:#630
+  style CONSILIUM_BUILD_REPORT_001 fill:#fff3cd,stroke:#a66,color:#630
   style CONSILIUM_CONFIDENCE_CALIBRATION_001 fill:#fff3cd,stroke:#a66,color:#630
   style CONSILIUM_FEEDBACK_001 fill:#fff3cd,stroke:#a66,color:#630
   style CONSILIUM_IMPLEMENT_PIPELINE_001 fill:#fff3cd,stroke:#a66,color:#630
@@ -251,6 +253,7 @@ graph LR
 | --- | --- | --- | --- | --- | --- |
 | CONSILIUM-AGGREGATOR-001 | draft | 3 | 3 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
 | CONSILIUM-AUDIT-FEEDBACK-001 | draft | 1 | 1 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
+| CONSILIUM-BUILD-REPORT-001 | draft | 3 | 1 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
 | CONSILIUM-CONFIDENCE-CALIBRATION-001 | draft | 2 | 1 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
 | CONSILIUM-FEEDBACK-001 | draft | 2 | 7 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
 | CONSILIUM-IMPLEMENT-PIPELINE-001 | draft | 3 | 5 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |

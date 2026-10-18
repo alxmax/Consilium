@@ -131,11 +131,11 @@ Consilium/
 
 ## Modes
 
-| Mode | Cost | What it adds |
+| Mode | Sub-agent ratio (nominal, not measured $) | What it adds |
 |------|------|--------------|
 | **Sequential** (default) | 1× | Generator → Conservator → Control in one context (Generator runs first, blind to risk framing). Low confidence triggers one retry and an override prompt, never an automatic re-run |
 | **Dialectic** | 1.33× | Sequential + a Skeptic sub-agent on the chosen answer, with code-context injection |
-| **Trias** | ~2.67× | 3 personalities (Essentialist / Verifier / Sentinel), each running its own Sequential pass as a sub-agent, then a majority vote, then one post-vote Skeptic sub-agent on the winner |
+| **Trias** | ~2.67× (up to 7 dispatches on a deadlock retry) | 3 personalities (Essentialist / Verifier / Sentinel), each running its own Sequential pass as a sub-agent, then a majority vote, then one post-vote Skeptic sub-agent on the winner |
 | **`skeptic_on_chosen`** | base +1 | Composable flag over any mode — a focal Skeptic challenges the chosen answer. Opt-in (`--skeptic-on-chosen`) or on high Conservator concern — not on confidence |
 
 For changes that are both `critical` and `irreversible`, select **Trias** explicitly — there is no automatic escalation. All dispatched voices run on Sonnet; the orchestrator runs on Opus.

@@ -128,6 +128,36 @@ class TestBuildFull(unittest.TestCase):
         steps = [step["step"] for step in report["deliberation_log"]]
         self.assertEqual(steps, ["generator", "control", "conservator", "aggregate"])
 
+    def test_telemetry_without_dispatch_count_or_latency_is_marked_incomplete(self):
+        report = build(self._base_bundle(telemetry={"mode": "sequential"}))
+        self.assertIs(report.get("telemetry_incomplete"), True)
+        self.assertEqual(report["telemetry_gaps"], ["dispatch_count", "latency_ms"])
+
+    def test_zero_latency_counts_as_unmeasured(self):
+        tele = {"mode": "sequential", "dispatch_count": 3,
+                "voices": {"generator": {"tokens_in": 1, "tokens_out": 1,
+                                         "latency_ms": 0}}}
+        report = build(self._base_bundle(telemetry=tele))
+        self.assertEqual(report["telemetry_gaps"], ["latency_ms"])
+
+    def test_complete_telemetry_is_not_marked(self):
+        tele = {"mode": "sequential", "dispatch_count": 3,
+                "voices": {"generator": {"tokens_in": 10, "tokens_out": 5,
+                                         "latency_ms": 1200}}}
+        report = build(self._base_bundle(telemetry=tele))
+        self.assertNotIn("telemetry_incomplete", report)
+        self.assertNotIn("telemetry_gaps", report)
+
+    def test_top_level_latency_also_counts_as_measured(self):
+        tele = {"mode": "sequential", "dispatch_count": 3, "latency_ms": 900}
+        report = build(self._base_bundle(telemetry=tele))
+        self.assertNotIn("telemetry_incomplete", report)
+
+    def test_skipped_report_is_never_marked(self):
+        report = build({"success_criterion": "c", "verification": "v",
+                        "skipped": True, "skip_reason": "trivial"})
+        self.assertNotIn("telemetry_incomplete", report)
+
     def test_full_bundle_chosen_approach_set(self):
         report = build(self._base_bundle())
         self.assertEqual(report["chosen_approach"], "A")
