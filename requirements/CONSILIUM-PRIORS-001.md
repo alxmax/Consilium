@@ -30,7 +30,7 @@ Every line in this section is binding.
 - With `--label`, `prior_deliberation_match` is the newest in-window `OK` row whose context contains the label AND whose note carries `[confirmed]`; an unconfirmed `OK` never matches, because the match lets the caller skip re-deliberation.
 - Headless mode is set only by explicit signals (`--headless`, `CONSILIUM_HEADLESS=1`, `CLAUDE_HEADLESS=1`); a non-tty stdin does not imply headless.
 - `stale_pendings` lists FEEDBACK rows still PEND and older than `STALE_PEND_DAYS`. `STALE_PEND_DAYS = 2` is hardcoded, reduced from 7, and not CLI-configurable; entries older than 2 days surface at step 0 for retrospective close.
-- `missing_feedback_runs` lists `runs/` files with no matching FEEDBACK row.
+- `missing_feedback_runs` lists `runs/` files with no matching FEEDBACK row. A sidecar (`.run_path_map.json`) entry counts as a match only when a FEEDBACK row that hashes to its fingerprint exists, so an entry left by an interrupted log does not hide the run.
 - Exit code is non-zero on a parse error.
 
 ## Verify intent

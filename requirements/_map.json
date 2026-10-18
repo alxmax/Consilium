@@ -481,13 +481,14 @@
       "id": "CONSILIUM-AUDIT-FEEDBACK-001",
       "layer": "feature",
       "level": "code",
-      "status": "confirmed",
+      "status": "draft",
       "area": "CONSILIUM",
       "title": "Orphan run detection and PEND backfill",
       "intent": "Finds `.consilium/runs/*.json` files that have no matching row in `FEEDBACK.html` (orphans created when step 6 log is skipped) and optionally backfills them with default PEND rows so `priors.py` can surface them.",
       "contract": [
         "Without flags, `audit_feedback.py` lists orphan runs (runs with no FEEDBACK.html row) and exits 0.",
         "With `--backfill`, `audit_feedback.py` appends one PEND row per orphan to `FEEDBACK.html`, using the same note-derivation as `log_feedback.py`.",
+        "`--backfill` reads and writes FEEDBACK.html and the sidecar under `feedback_lock`, so it cannot drop a row a concurrent `log_feedback.py` appends.",
         "`audit_feedback.py` never overwrites an existing row — a run is considered matched if any row shares the same date AND chosen_approach prefix.",
         "With `--dry-run`, `audit_feedback.py` prints the rows that would be appended without writing.",
         "Backfill outcome is always PEND (never retroactively OK); the user closes them via the standard PEND→OK/BAD prompt at the next step 0."
@@ -523,7 +524,12 @@
       "test_exempt": "integration-only — depends on live FEEDBACK.html + runs/; acceptance-tested via --dry-run and manual backfill",
       "milestone": null,
       "priority": "",
-      "risks": []
+      "risks": [
+        {
+          "signal": "unreviewed",
+          "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-BUILD-REPORT-001",
@@ -1456,7 +1462,7 @@
       "id": "CONSILIUM-LOG-FEEDBACK-001",
       "layer": "feature",
       "level": "code",
-      "status": "confirmed",
+      "status": "draft",
       "area": "CONSILIUM",
       "title": "log_feedback",
       "intent": "Atomically appends (or upgrades) a FEEDBACK.html row from a deliberation report.",
@@ -1473,16 +1479,15 @@
         "When `run_id` is absent, the fingerprint falls back to a microsecond-precision timestamp (`datetime.now().strftime(\"%f\")`) as the 4th field, not a 3-field key. This prevents same-day collisions but makes the fingerprint non-deterministic.",
         "Two recomputed fingerprints for the same legacy row differ, so old no-run_id rows can never be matched by fingerprint lookup — they fall back to `run_path=None`.",
         "The confidence gate reads `report.get(\"confidence\")` — the top-level key only. When a report carries both a top-level `confidence` and a nested `confidence.confidence` dict, the top-level value is used and the nested form is silently ignored.",
-        "The row-upgrade path (PEND -> OK) uses a read-modify-write cycle protected only by `atomic_write_text` (rename-swap); there is no file lock or compare-and-swap.",
-        "Two concurrent callers each read the same PEND state, and the last writer wins.",
-        "Concurrent upgrades are not prevented; they are tolerated as an acceptable race, since `log_feedback.py` is not designed for concurrent use."
+        "The whole append or upgrade — parse the rows, write the row, write the sidecar — runs under `feedback_lock` (an exclusive cross-process lock on `FEEDBACK.html.lock`), so concurrent callers (appends and outcome upgrades alike) each start from the previous caller's result and no row is lost. A caller that cannot get the lock within 30 s fails with `TimeoutError`.",
+        "The row is written before its sidecar entry. A call interrupted between the two leaves a row with no sidecar entry; a retry with the same `--run-path` adopts that row (same `date|chosen|context`, claimed by no sidecar entry) instead of appending a duplicate, and saves the missing sidecar entry."
       ],
       "verify": [
         "None - all questions resolved."
       ],
       "notes": [],
       "current_impl": [],
-      "accept": "- **CASE-1** — Given a report with a valid `success_criterion` and `chosen_approach`, when `log_feedback.py` runs, then it produces a new `<tr>` row in FEEDBACK.html with the correct date, truncated context, and derived note.\n- **CASE-2** — Given the same report is appended twice with the same `--run-path` and the same `--outcome`, when the second call runs, then it exits 3 and does not add a duplicate row.\n- **CASE-3** — Given the same report is appended twice with the same `--run-path` but a different outcome (e.g. PEND then OK), when the second call runs, then it upgrades the existing row in place and exits 0.\n- **CASE-4** — Given `--outcome OK` with a report whose `confidence` is below 0.70, when the script runs without `--force-override`, then it exits 1 with an error message.\n- **CASE-4b** — Given `--outcome OK` without `--confirmed`, when the script runs, then it exits 1 and writes nothing.\n- **CASE-5** — Given `--outcome OVR` without `--override-target`, when the script runs, then it exits 2 with an error message to stderr.",
+      "accept": "- **CASE-1** — Given a report with a valid `success_criterion` and `chosen_approach`, when `log_feedback.py` runs, then it produces a new `<tr>` row in FEEDBACK.html with the correct date, truncated context, and derived note.\n- **CASE-2** — Given the same report is appended twice with the same `--run-path` and the same `--outcome`, when the second call runs, then it exits 3 and does not add a duplicate row.\n- **CASE-3** — Given the same report is appended twice with the same `--run-path` but a different outcome (e.g. PEND then OK), when the second call runs, then it upgrades the existing row in place and exits 0.\n- **CASE-4** — Given `--outcome OK` with a report whose `confidence` is below 0.70, when the script runs without `--force-override`, then it exits 1 with an error message.\n- **CASE-4b** — Given `--outcome OK` without `--confirmed`, when the script runs, then it exits 1 and writes nothing.\n- **CASE-5** — Given `--outcome OVR` without `--override-target`, when the script runs, then it exits 2 with an error message to stderr.\n- **CASE-6** — Given several `log_feedback.py` processes run at once (distinct appends plus an outcome upgrade of an existing row), when they all finish, then every appended row is present and the upgrade is applied.\n- **CASE-7** — Given the sidecar write fails after the row was written, when the same call is retried, then FEEDBACK.html still holds exactly one such row and the sidecar maps the run path.",
       "input": "",
       "output": "",
       "desc": "",
@@ -1511,13 +1516,18 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [
+        {
+          "signal": "unreviewed",
+          "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-MARK-OUTCOME-001",
       "layer": "feature",
       "level": "code",
-      "status": "confirmed",
+      "status": "draft",
       "area": "CONSILIUM",
       "title": "mark_outcome",
       "intent": "Corrects a logged FEEDBACK.html outcome in place once production reality is known.",
@@ -1527,7 +1537,7 @@
         "Rows are located via a fingerprint sidecar map (`--run-path`) or by a direct `--date` + `--chosen` pair.",
         "When no match is found, a fallback diagnostic lists the five most recent entries.",
         "`--dry-run` allows inspection of which rows would be updated without modifying any file.",
-        "Overwrites `.consilium/FEEDBACK.html` atomically with updated outcome and annotated note for each matched row.",
+        "Overwrites `.consilium/FEEDBACK.html` atomically with updated outcome and annotated note for each matched row; the parse, the update and the write run under `feedback_lock`, so a concurrent append is not lost.",
         "stdout carries per-matched-row lines of the form `matched [i]: date | chosen | old_outcome -> new_outcome`.",
         "stdout carries `skip [i]: ...` lines when a row is already at the target outcome, or when PEND_HEADLESS is applied to a non-PEND row.",
         "stdout prints `(dry-run; no write)` when `--dry-run` is active.",
@@ -1572,7 +1582,12 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [
+        {
+          "signal": "unreviewed",
+          "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-MEMORY-001",
@@ -2076,7 +2091,7 @@
         "With `--label`, `prior_deliberation_match` is the newest in-window `OK` row whose context contains the label AND whose note carries `[confirmed]`; an unconfirmed `OK` never matches, because the match lets the caller skip re-deliberation.",
         "Headless mode is set only by explicit signals (`--headless`, `CONSILIUM_HEADLESS=1`, `CLAUDE_HEADLESS=1`); a non-tty stdin does not imply headless.",
         "`stale_pendings` lists FEEDBACK rows still PEND and older than `STALE_PEND_DAYS`. `STALE_PEND_DAYS = 2` is hardcoded, reduced from 7, and not CLI-configurable; entries older than 2 days surface at step 0 for retrospective close.",
-        "`missing_feedback_runs` lists `runs/` files with no matching FEEDBACK row.",
+        "`missing_feedback_runs` lists `runs/` files with no matching FEEDBACK row. A sidecar (`.run_path_map.json`) entry counts as a match only when a FEEDBACK row that hashes to its fingerprint exists, so an entry left by an interrupted log does not hide the run.",
         "Exit code is non-zero on a parse error."
       ],
       "verify": [
@@ -2524,7 +2539,7 @@
       "id": "CONSILIUM-UTILS-001",
       "layer": "bus",
       "level": "code",
-      "status": "confirmed",
+      "status": "draft",
       "area": "CONSILIUM",
       "title": "utils",
       "intent": "Shared stdlib-only utilities: canonical paths, atomic writes, stdin JSON, headless detection.",
@@ -2537,6 +2552,7 @@
         "`atomic_write_text(path, content)` writes the given string content to `path` atomically, through a sibling `.tmp` file with fsync and rename.",
         "A read-only parent directory makes `atomic_write_text` raise `OSError`, which propagates to the caller.",
         "`atomic_write_text` deletes the temp file on any error path, so no stale `.tmp` file persists across crashes.",
+        "`feedback_lock(feedback_path, timeout=30.0)` is a context manager holding an exclusive cross-process lock on `<feedback_path>.lock` (`msvcrt` on Windows, `fcntl` elsewhere). A second holder waits and raises `TimeoutError` after `timeout` seconds; the OS releases the lock when its holder dies, so a killed process never leaves it stuck.",
         "`load_json_stdin` reads and parses JSON from stdin.",
         "`load_json_stdin` exits code 2 on empty stdin or a parse failure.",
         "`issue_penalty(severity)` returns a float score penalty for an issue dict's severity: `0.05` for `low`, `0.15` for `medium` or a missing severity, `0.30` for `high`.",
@@ -2591,7 +2607,12 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [
+        {
+          "signal": "unreviewed",
+          "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-VALIDATE-REPORT-001",
@@ -4089,7 +4110,7 @@
     },
     {
       "month": "2026-10",
-      "count": 8,
+      "count": 9,
       "first": "2026-10-13",
       "last": "2026-10-18",
       "versions": [
@@ -4100,18 +4121,27 @@
         "v1.15.1",
         "v1.15.2",
         "v1.15.3",
-        "v1.15.4"
+        "v1.15.4",
+        "v1.15.5"
       ],
       "landmark": "v1.15.0",
       "headline": "",
       "entries": [
         {
+          "version": "v1.15.5",
+          "date": "2026-10-18",
+          "headline": "",
+          "body": "### Fixed\n- `FEEDBACK.html` and its `runs/.run_path_map.json` sidecar were updated by read-modify-write cycles with no mutual exclusion: concurrent `log_feedback.py` appends, an outcome upgrade, `mark_outcome.py` and `audit_feedback.py --backfill` overwrote each other (9 concurrent writers kept 3 rows in a reproduction). All writers now run their whole parse -> write sequence under a new cross-process `feedback_lock`.\n- `log_feedback.py` saved the sidecar entry before the row, so a failure in between left a sidecar entry vouching for a row that did not exist, and `priors.py` then reported nothing missing. The row is now written first, a retry adopts a row left without its sidecar entry, and `priors.py` counts a sidecar entry only when a FEEDBACK row with that fingerprint exists.",
+          "first_commit": "2026-10-18",
+          "last_commit": "2026-10-18"
+        },
+        {
           "version": "v1.15.4",
           "date": "2026-10-18",
           "headline": "",
           "body": "### Fixed\n- The red→green gate (`implement_pipeline.py --verify-gate`) wrote the stub bodies over the real target files and restored them in a `finally` block, so a SIGTERM or hard kill during the RED run left the sources stubbed. The RED run now happens in a temporary copy of the working directory and the originals are never written. Targets must be under the working directory.\n- The gate counted any non-zero exit as RED, so a syntax error, a collection error or an unavailable test tool could pass it, and the stub was always inserted at header indent + 4, which is an `IndentationError` on a 2-space or tab-indented file. The stub now sits at the body's own indent, an uncompilable stub is rejected before any run, and a RED needs the stub's exception in the suite output. The gate JSON gains `red_reason`.",
-          "first_commit": "2026-10-18",
-          "last_commit": "2026-10-18"
+          "first_commit": "2026-10-19",
+          "last_commit": "2026-10-19"
         },
         {
           "version": "v1.15.3",
@@ -4400,11 +4430,11 @@
   ],
   "design": {
     "files": 32,
-    "clean_files": 23,
-    "score": 72,
+    "clean_files": 22,
+    "score": 69,
     "candidates": {
-      "encapsulation": 0,
-      "abstraction": 3,
+      "encapsulation": 2,
+      "abstraction": 4,
       "inheritance": 0,
       "polymorphism": 0,
       "standards": 11
@@ -4425,6 +4455,22 @@
         "line": 1,
         "name": "aggregator.py",
         "detail": "765 lines (over 500)"
+      },
+      {
+        "pillar": "encapsulation",
+        "kind": "data-clump",
+        "file": "consilium/scripts/audit_feedback.py",
+        "line": 107,
+        "name": "_print_dry_run",
+        "detail": "log_mod, missing, runs_dir travel together through 3 functions: _backfill, _backfill_locked, _print_dry_run"
+      },
+      {
+        "pillar": "encapsulation",
+        "kind": "data-clump",
+        "file": "consilium/scripts/audit_feedback.py",
+        "line": 141,
+        "name": "_backfill_entry",
+        "detail": "log_mod, render_mod, runs_dir travel together through 3 functions: _backfill, _backfill_entry, _backfill_locked"
       },
       {
         "pillar": "standards",
@@ -4456,7 +4502,15 @@
         "file": "consilium/scripts/log_feedback.py",
         "line": 1,
         "name": "log_feedback.py",
-        "detail": "536 lines (over 500)"
+        "detail": "566 lines (over 500)"
+      },
+      {
+        "pillar": "abstraction",
+        "kind": "long-function",
+        "file": "consilium/scripts/log_feedback.py",
+        "line": 322,
+        "name": "_append_entry_locked",
+        "detail": "`_append_entry_locked` is 84 lines (over 80)"
       },
       {
         "pillar": "standards",
@@ -4524,6 +4578,7 @@
       }
     ],
     "advice": {
+      "data-clump": "the same parameters travel through several functions: make them one object with those functions as methods",
       "file-too-long": "a file this long is several modules sharing a name: split it along the prefix families it already shows",
       "line-too-long": "lines wider than the limit hide their tail in every diff and side-by-side view: wrap them",
       "long-function": "a function this long hides several steps: extract each step under a name that says what it does",
@@ -4531,16 +4586,16 @@
     }
   },
   "health": {
-    "score": 96,
+    "score": 89,
     "total": 57,
     "scored": 56,
-    "healthy": 54,
+    "healthy": 50,
     "exempt": 17,
     "deprecated": 1,
-    "confirmed": 54,
+    "confirmed": 50,
     "implemented": 47,
     "tested": 32,
-    "drafts": 2,
+    "drafts": 6,
     "orphans": 0,
     "untested": 0,
     "open_intent": 0,
@@ -4548,8 +4603,15 @@
     "gate_errors": 0,
     "gate_link_sync_clean": true,
     "reviewed_score": 100,
-    "reviewed_total": 54,
+    "reviewed_total": 50,
     "unhealthy": [
+      {
+        "id": "CONSILIUM-AUDIT-FEEDBACK-001",
+        "status": "draft",
+        "why": [
+          "not confirmed"
+        ]
+      },
       {
         "id": "CONSILIUM-IMPLEMENT-PIPELINE-001",
         "status": "draft",
@@ -4558,7 +4620,28 @@
         ]
       },
       {
+        "id": "CONSILIUM-LOG-FEEDBACK-001",
+        "status": "draft",
+        "why": [
+          "not confirmed"
+        ]
+      },
+      {
+        "id": "CONSILIUM-MARK-OUTCOME-001",
+        "status": "draft",
+        "why": [
+          "not confirmed"
+        ]
+      },
+      {
         "id": "CONSILIUM-PRIORS-001",
+        "status": "draft",
+        "why": [
+          "not confirmed"
+        ]
+      },
+      {
+        "id": "CONSILIUM-UTILS-001",
         "status": "draft",
         "why": [
           "not confirmed"

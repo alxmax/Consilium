@@ -49,6 +49,7 @@ from utils import (
     FEEDBACK_PATH,
     atomic_write_text,
     canonical_run_path,
+    feedback_lock,
     force_utf8_streams,
 )
 
@@ -340,23 +341,28 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     runs_dir = feedback_path.parent / "runs"
 
-    entries = _load_entries(feedback_path, fb_mod, render_mod)
+    # Parse -> update -> write is one transaction: without the lock a
+    # concurrent append between the parse and the write is silently lost.
+    with feedback_lock(feedback_path):
+        entries = _load_entries(feedback_path, fb_mod, render_mod)
 
-    matched_idx = _match_rows(entries, args)
-    if not matched_idx:
-        _print_no_match(entries, args)
-        return 1
+        matched_idx = _match_rows(entries, args)
+        if not matched_idx:
+            _print_no_match(entries, args)
+            return 1
 
-    updated = _update_rows(entries, matched_idx, args)
+        updated = _update_rows(entries, matched_idx, args)
 
-    if args.dry_run:
-        print("(dry-run; no write)")
-        return 0
+        if args.dry_run:
+            print("(dry-run; no write)")
+            return 0
 
-    if not updated:
-        return 0
+        if not updated:
+            return 0
 
-    atomic_write_text(feedback_path, render_mod.render(entries, runs_dir))
+        atomic_write_text(
+            feedback_path, render_mod.render(entries, runs_dir)
+        )
     print(f"updated {updated} row(s) in {feedback_path.name}")
     return 0
 

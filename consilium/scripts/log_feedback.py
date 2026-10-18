@@ -59,6 +59,7 @@ from utils import (
     FEEDBACK_PATH,
     atomic_write_text,
     canonical_run_path,
+    feedback_lock,
     force_utf8_streams,
     load_json_stdin,
 )
@@ -267,6 +268,22 @@ def _stable_fp(row: dict) -> str:
     ).hexdigest()[:16]
 
 
+def _find_unmapped_row(
+    existing: list[dict], run_map: dict[str, str], entry: dict
+) -> int | None:
+    """Index of a row with this entry's content that no run is mapped to.
+
+    That is the row an interrupted earlier call left behind: written, but
+    the sidecar entry that would have claimed it was never saved. Adopting
+    it on retry (instead of appending) keeps the retry from duplicating it.
+    """
+    want = _stable_fp(entry)
+    for i, row in enumerate(existing):
+        if _stable_fp(row) == want and _row_run_path(row, run_map) is None:
+            return i
+    return None
+
+
 def _print_duplicate(new_fp: str) -> None:
     print(
         f"log_feedback: duplicate entry (fp {new_fp[:8]}) — "
@@ -302,7 +319,7 @@ def _upgrade_entries(
     return _existing_entries(existing, run_map, render_mod)
 
 
-def append_entry(
+def _append_entry_locked(
     feedback_path: Path, entry: dict, run_path: str | None
 ) -> int:
     """Round-trip the HTML: parse existing rows, append, re-render.
@@ -332,6 +349,8 @@ def append_entry(
     # — upgrade the row in place). The old blanket "run_path seen => duplicate"
     # swallowed Step-6 close-the-loop calls, leaving PEND rows un-upgraded.
     matched_idx = _find_run_row(existing, run_map, run_path)
+    if matched_idx is None and run_path:
+        matched_idx = _find_unmapped_row(existing, run_map, entry)
     if matched_idx is not None:
         assert run_path  # matched_idx is only set when run_path is truthy
         prior = existing[matched_idx]
@@ -342,11 +361,13 @@ def append_entry(
             return 3
         entries = _upgrade_entries(existing, matched_idx, entry, run_map,
                                    render_mod)
-        run_map[new_fp] = run_path
-        _save_map(runs_dir, run_map)
+        # Row first, sidecar second: a crash between the two leaves a row
+        # the next call adopts, never a sidecar entry claiming a missing row.
         atomic_write_text(
             feedback_path, render_mod.render(entries, runs_dir)
         )
+        run_map[new_fp] = run_path
+        _save_map(runs_dir, run_map)
         print(
             f"log_feedback: upgraded {prior['chosen']} -> "
             f"{entry['outcome']} in place (run {run_id}).",
@@ -374,14 +395,23 @@ def append_entry(
         vote_pattern=entry.get("vote_pattern", ""),
     ))
 
+    atomic_write_text(feedback_path, render_mod.render(entries, runs_dir))
+
     # Persist run_path for the new entry so future re-renders can
-    # recover it.
+    # recover it — after the row, see the upgrade branch above.
     if run_path:
         run_map[new_fp] = run_path
         _save_map(runs_dir, run_map)
-
-    atomic_write_text(feedback_path, render_mod.render(entries, runs_dir))
     return 0
+
+
+def append_entry(
+    feedback_path: Path, entry: dict, run_path: str | None
+) -> int:
+    """``_append_entry_locked`` under ``feedback_lock``: the parse, the
+    row write and the sidecar write are one transaction."""
+    with feedback_lock(feedback_path):
+        return _append_entry_locked(feedback_path, entry, run_path)
 
 
 def _build_parser() -> argparse.ArgumentParser:

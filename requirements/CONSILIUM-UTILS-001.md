@@ -1,7 +1,7 @@
 ---
 milestone: v1.0
 id: CONSILIUM-UTILS-001
-status: confirmed
+status: draft
 level: code
 layer: bus
 owner: alxmax
@@ -26,6 +26,7 @@ Every line in this section is binding.
 - `atomic_write_text(path, content)` writes the given string content to `path` atomically, through a sibling `.tmp` file with fsync and rename.
 - A read-only parent directory makes `atomic_write_text` raise `OSError`, which propagates to the caller.
 - `atomic_write_text` deletes the temp file on any error path, so no stale `.tmp` file persists across crashes.
+- `feedback_lock(feedback_path, timeout=30.0)` is a context manager holding an exclusive cross-process lock on `<feedback_path>.lock` (`msvcrt` on Windows, `fcntl` elsewhere). A second holder waits and raises `TimeoutError` after `timeout` seconds; the OS releases the lock when its holder dies, so a killed process never leaves it stuck.
 - `load_json_stdin` reads and parses JSON from stdin.
 - `load_json_stdin` exits code 2 on empty stdin or a parse failure.
 - `issue_penalty(severity)` returns a float score penalty for an issue dict's severity: `0.05` for `low`, `0.15` for `medium` or a missing severity, `0.30` for `high`.
