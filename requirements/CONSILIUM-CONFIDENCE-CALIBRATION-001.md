@@ -1,7 +1,7 @@
 ---
 milestone: v1.1
 id: CONSILIUM-CONFIDENCE-CALIBRATION-001
-status: confirmed
+status: draft
 level: code
 layer: feature
 owner: alxmax
@@ -19,7 +19,8 @@ risk: 1
 Every line in this section is binding.
 
 - `confidence_calibration.py` reads `.consilium/FEEDBACK.html` through `feedback.py`'s parser.
-- `confidence_calibration.py` keeps only rows that are resolved (a success or failure outcome) and carry a `conf=<x>` value in their note.
+- `confidence_calibration.py` keeps only rows that are resolved (`OK` as success, `BAD` as failure), carry the `[confirmed]` marker (outcomes assigned at log time without evidence would calibrate confidence against its own output) and have a `conf=<x>` value in their note. `OVR` is a user override, not an observed failure, so it is never scored.
+- Rows left out are counted, not dropped silently: the result carries `excluded` with `unconfirmed`, `overridden`, `untagged` and `unresolved` counts, and a corpus with no confirmed rows yields `INSUFFICIENT_DATA` with `resolved = 0`.
 - A row whose confidence lies outside 0.0–1.0, or whose outcome is still pending, is left out of every count.
 - The script splits the kept rows at `--gate` (default 0.7) into a low band and a high band and computes each band's OK-rate.
 - The verdict is `INSUFFICIENT_DATA` when there are fewer than 20 resolved rows, fewer than 10 failures, or fewer than 5 rows in either band. Each defaults to a flag.
@@ -32,7 +33,7 @@ Every line in this section is binding.
 
 ## Cases
 
-- **CASE-1** — Given entries mixing resolved, pending and untagged rows, when `calibration_records` runs, then only the resolved rows with a `conf=` value are returned.
+- **CASE-1** — Given entries mixing confirmed and unconfirmed resolved rows, overrides, pending and untagged rows, when `calibration_records` runs, then only the confirmed OK/BAD rows with a `conf=` value are returned.
 - **CASE-2** — Given records where the high band is clearly more successful than the low band, when `decide` runs, then the verdict is `SHIP_C`.
 - **CASE-3** — Given records where both bands succeed at the same rate, when `decide` runs, then the verdict is `FALLBACK_A`.
 - **CASE-4** — Given fewer resolved records than `min_resolved`, or no failures at all, when `decide` runs, then the verdict is `INSUFFICIENT_DATA`.

@@ -23,6 +23,7 @@ from priors import (
     STALE_PEND_DAYS,
     _find_prior_match,
     _is_confirmed,
+    _prior_match_status,
     _outcome_counts,
     _rates,
     _top_keywords,
@@ -75,6 +76,7 @@ class TestFindPriorMatch(unittest.TestCase):
     def test_confirmed_ok_matches(self):
         entries = [self._entry(note=f"verified {CONFIRMED_MARKER}")]
         match = _find_prior_match("aggregator scoring", entries)
+        assert match is not None
         self.assertEqual(match["chosen"], "extend_trigger")
 
     def test_unconfirmed_ok_does_not_match(self):
@@ -86,11 +88,86 @@ class TestFindPriorMatch(unittest.TestCase):
         newer = self._entry(note="auto")
         newer["chosen"] = "auto_pick"
         match = _find_prior_match("aggregator scoring", [older, newer])
+        assert match is not None
         self.assertEqual(match["chosen"], "extend_trigger")
 
     def test_confirmed_bad_does_not_match(self):
         entries = [self._entry(outcome="BAD", note=CONFIRMED_MARKER)]
         self.assertIsNone(_find_prior_match("aggregator scoring", entries))
+
+
+class TestPriorMatchEvidence(unittest.TestCase):
+    """A passthrough match needs a confirmed OK that no newer confirmed
+    BAD/OVR contradicts and that a run on disk backs."""
+
+    TODAY = date.today().isoformat()
+    YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
+
+    def _row(self, outcome, day=None, confirmed=True, chosen="extend_trigger"):
+        return {
+            "date": day or self.TODAY,
+            "context": "refactor aggregator scoring formula",
+            "chosen": chosen,
+            "outcome": outcome,
+            "note": CONFIRMED_MARKER if confirmed else "auto",
+        }
+
+    def test_newer_confirmed_bad_retires_an_older_ok(self):
+        entries = [self._row("OK", self.YESTERDAY), self._row("BAD")]
+        match, contradiction = _prior_match_status("aggregator scoring", entries)
+        self.assertIsNone(match)
+        assert contradiction is not None
+        self.assertEqual(contradiction["outcome"], "BAD")
+        self.assertIsNone(_find_prior_match("aggregator scoring", entries))
+
+    def test_newer_confirmed_ovr_is_a_contradiction_too(self):
+        entries = [self._row("OK", self.YESTERDAY), self._row("OVR")]
+        match, contradiction = _prior_match_status("aggregator scoring", entries)
+        self.assertIsNone(match)
+        assert contradiction is not None
+        self.assertEqual(contradiction["outcome"], "OVR")
+
+    def test_unconfirmed_bad_does_not_retire_a_confirmed_ok(self):
+        entries = [self._row("OK", self.YESTERDAY),
+                   self._row("BAD", confirmed=False)]
+        match, contradiction = _prior_match_status("aggregator scoring", entries)
+        self.assertIsNotNone(match)
+        self.assertIsNone(contradiction)
+
+    def test_older_bad_does_not_retire_a_newer_ok(self):
+        entries = [self._row("BAD", self.YESTERDAY), self._row("OK")]
+        match, _ = _prior_match_status("aggregator scoring", entries)
+        self.assertIsNotNone(match)
+
+    def test_source_run_must_resolve_when_runs_are_consulted(self):
+        with tempfile.TemporaryDirectory() as td:
+            runs = Path(td) / "runs"
+            runs.mkdir()
+            entries = [self._row("OK")]
+            self.assertIsNone(
+                _find_prior_match("aggregator scoring", entries, runs_dir=runs))
+            (runs / f"{self.TODAY}_x.json").write_text(
+                json.dumps({"chosen_approach": "other_approach"}),
+                encoding="utf-8")
+            self.assertIsNone(
+                _find_prior_match("aggregator scoring", entries, runs_dir=runs))
+            (runs / f"{self.TODAY}_y.json").write_text(
+                json.dumps({"chosen_approach": "extend_trigger"}),
+                encoding="utf-8")
+            self.assertIsNotNone(
+                _find_prior_match("aggregator scoring", entries, runs_dir=runs))
+
+    def test_unresolved_newest_ok_falls_back_to_an_older_resolvable_one(self):
+        with tempfile.TemporaryDirectory() as td:
+            runs = Path(td) / "runs"
+            runs.mkdir()
+            (runs / f"{self.YESTERDAY}_a.json").write_text(
+                json.dumps({"chosen_approach": "older_pick"}), encoding="utf-8")
+            entries = [self._row("OK", self.YESTERDAY, chosen="older_pick"),
+                       self._row("OK", chosen="ghost_pick")]
+            match = _find_prior_match("aggregator scoring", entries, runs_dir=runs)
+            assert match is not None
+            self.assertEqual(match["chosen"], "older_pick")
 
 
 class TestIsConfirmed(unittest.TestCase):

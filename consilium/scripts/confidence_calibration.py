@@ -57,18 +57,22 @@ parse_feedback = _feedback.parse_feedback
 CONF_RE = re.compile(r"conf=([0-9]*\.?[0-9]+)")
 
 # Outcome -> success(1) / failure(0) / None(unresolved, excluded from
-# calibration).
+# calibration). Only rows carrying CONFIRMED_MARKER count: most historical OK
+# rows were assigned at log time from confidence itself, so using them would
+# calibrate confidence against its own output.
+CONFIRMED_MARKER = "[confirmed]"
 SUCCESS = {"OK"}
-# OVR = the chosen was overridden -> confidence was misplaced.
-FAILURE = {"BAD", "OVR"}
+# OVR is a user override, not an observed failure of the approach, so it is
+# reported (see calibration_exclusions) but never scored as a failure.
+FAILURE = {"BAD"}
 
 # 1.01 so conf==1.0 lands in the top bin.
 DEFAULT_EDGES = [0.0, 0.6, 0.7, 0.8, 0.9, 1.01]
 
 
 def calibration_records(entries: list[dict]) -> list[tuple[float, int]]:
-    """(confidence, success) pairs for entries that are BOTH resolved and
-    conf-tagged."""
+    """(confidence, success) pairs for entries that are resolved,
+    ``[confirmed]`` and conf-tagged."""
     records: list[tuple[float, int]] = []
     for e in entries:
         outcome = e.get("outcome", "")
@@ -77,7 +81,9 @@ def calibration_records(entries: list[dict]) -> list[tuple[float, int]]:
         elif outcome in FAILURE:
             success = 0
         else:
-            continue  # PEND / PEND_HEADLESS / WEAK / "" — not yet knowable.
+            continue  # PEND / PEND_HEADLESS / OVR / "" — no observed result.
+        if CONFIRMED_MARKER not in (e.get("note") or ""):
+            continue
         m = CONF_RE.search(e.get("note", ""))
         if not m:
             continue
@@ -86,6 +92,29 @@ def calibration_records(entries: list[dict]) -> list[tuple[float, int]]:
             continue
         records.append((conf, success))
     return records
+
+
+def calibration_exclusions(entries: list[dict]) -> dict:
+    """Rows that did not become calibration evidence, and why.
+
+    ``unconfirmed``: OK/BAD without the confirmed marker; ``overridden``:
+    OVR rows; ``untagged``: confirmed OK/BAD with no ``conf=`` in the note;
+    ``unresolved``: every other outcome (PEND, PEND_HEADLESS, ...).
+    """
+    out = {"unconfirmed": 0, "overridden": 0, "untagged": 0, "unresolved": 0}
+    for e in entries:
+        outcome = e.get("outcome", "")
+        note = e.get("note") or ""
+        if outcome == "OVR":
+            out["overridden"] += 1
+        elif outcome in SUCCESS | FAILURE:
+            if CONFIRMED_MARKER not in note:
+                out["unconfirmed"] += 1
+            elif not CONF_RE.search(note):
+                out["untagged"] += 1
+        else:
+            out["unresolved"] += 1
+    return out
 
 
 def compute_bins(
@@ -197,6 +226,11 @@ def render(bins: list[dict], decision: dict) -> str:
         f"  resolved={decision['resolved']}  "
         f"negatives={decision['negatives']}"
     )
+    ex = decision.get("excluded")
+    if ex:
+        out.append(
+            "  excluded: " + "  ".join(f"{k}={v}" for k, v in ex.items())
+        )
     out.append("")
     out.append(f"  VERDICT: {decision['verdict']}")
     out.append(f"  {decision['reason']}")
@@ -208,7 +242,12 @@ def run(feedback_path: Path, t: Thresholds, edges: list[float]) -> dict:
     records = calibration_records(entries)
     bins = compute_bins(records, edges)
     decision = decide(records, t)
-    return {"feedback_total": len(entries), "bins": bins, **decision}
+    return {
+        "feedback_total": len(entries),
+        "excluded": calibration_exclusions(entries),
+        "bins": bins,
+        **decision,
+    }
 
 
 def main() -> int:

@@ -5,6 +5,13 @@ All notable changes to Consilium are recorded here, following
 Apache License 2.0 (see `LICENSE`); versions up to 1.14.0 were published under the
 Business Source License 1.1.
 
+## [1.15.8] — 2026-10-18
+
+### Fixed
+- The confidence-calibration gate scored every OK/BAD/OVR row, including OK rows assigned at log time from confidence itself, and counted a user override (OVR) as a failure. It now uses only `[confirmed]` OK and BAD rows, never scores OVR, reports what it left out (`excluded`: unconfirmed, overridden, untagged, unresolved), and a corpus with no confirmed rows gives `INSUFFICIENT_DATA` with zero resolved.
+- `feedback.py`'s success rate counted the same unconfirmed rows; it is now computed over confirmed OK/BAD only and states how many were excluded.
+- The prior-deliberation match ignored later evidence: a confirmed BAD or OVR after the OK did not stop `priors.py --label` from offering the old approach, and an OK with no run on disk could still match. A newer confirmed BAD/OVR now retires the match and is reported as `prior_contradiction`; when runs are consulted, the OK row needs a run on disk with the same date and `chosen_approach`.
+
 ## [1.15.7] — 2026-10-18
 
 ### Fixed

@@ -250,45 +250,90 @@ def find_stale_pendings(
 
 _PRIOR_MATCH_MIN_LABEL_LEN = 8
 _PRIOR_MATCH_WINDOW_DAYS = 30
-_PRIOR_MATCH_OUTCOMES = {"OK"}
+# Confirmed outcomes that retire a prior approach: a later BAD or OVR means
+# the approach was applied and did not hold (BAD) or was overridden (OVR).
+_PRIOR_CONTRADICTING_OUTCOMES = {"BAD", "OVR"}
+
+
+def _source_run_resolves(entry: dict, runs_dir: Path) -> bool:
+    """True when a run on disk backs this FEEDBACK row: same date, same
+    ``chosen_approach``. A row with no such run cannot be re-checked, so it
+    is no basis for skipping re-deliberation."""
+    day = entry.get("date") or ""
+    if not day or not runs_dir.exists():
+        return False
+    chosen = entry.get("chosen")
+    for run_file in runs_dir.glob(f"{day}*.json"):
+        try:
+            data = json.loads(run_file.read_text(encoding="utf-8-sig"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        if not isinstance(data, dict):
+            continue
+        ca = data.get("chosen_approach")
+        if ("null" if ca is None else str(ca)).strip() == chosen:
+            return True
+    return False
+
+
+def _prior_match_status(
+    label: str,
+    entries: list[dict],
+    window_days: int = _PRIOR_MATCH_WINDOW_DAYS,
+    runs_dir: Path | None = None,
+) -> tuple[dict | None, dict | None]:
+    """``(match, contradiction)`` for ``label``.
+
+    Scans the window newest-first. The newest confirmed row decides: a
+    confirmed BAD/OVR is returned as the ``contradiction`` (and there is no
+    match, even if an older OK exists); a confirmed OK is the ``match``.
+    Unconfirmed rows never count. When ``runs_dir`` is given, an OK row also
+    needs a resolvable source run (see ``_source_run_resolves``) — an
+    unresolved one is skipped and an older, resolvable OK may still match.
+    Labels shorter than 8 characters match nothing.
+    """
+    if len(label.strip()) < _PRIOR_MATCH_MIN_LABEL_LEN:
+        return None, None
+    cutoff = (date.today() - timedelta(days=window_days)).isoformat()
+    needle = label.strip().lower()
+    for entry in reversed(entries):
+        if entry.get("date", "") < cutoff:
+            continue
+        if needle not in (entry.get("context") or "").lower():
+            continue
+        if not _is_confirmed(entry):
+            continue
+        outcome = entry.get("outcome")
+        row = {
+            "label": label,
+            "date": entry.get("date"),
+            "outcome": outcome,
+            "chosen": entry.get("chosen"),
+        }
+        if outcome in _PRIOR_CONTRADICTING_OUTCOMES:
+            return None, row
+        if outcome == "OK" and (
+            runs_dir is None or _source_run_resolves(entry, runs_dir)
+        ):
+            return row, None
+    return None, None
 
 
 def _find_prior_match(
     label: str,
     entries: list[dict],
     window_days: int = _PRIOR_MATCH_WINDOW_DAYS,
+    runs_dir: Path | None = None,
 ) -> dict | None:
-    """Return the most recent authoritative FEEDBACK entry whose context
-    contains label.
+    """Most recent authoritative FEEDBACK entry whose context contains label.
 
-    Returns None when label is too short (< 8 chars after strip) or no
-    match exists within window_days. Scans entries newest-first so the
-    most recent match wins.
-    Only entries with outcome "OK" AND CONFIRMED_MARKER qualify —
-    PEND/BAD/OVR and auto-assigned (unconfirmed) OK do not: passthrough
-    skips re-deliberation, so it must rest on a verified outcome. (GO is
-    a review verdict, never a FEEDBACK outcome, so it can never match.)
+    Authoritative = outcome OK AND ``[confirmed]`` (passthrough skips
+    re-deliberation, so it must rest on a verified outcome), not followed by
+    a newer confirmed BAD/OVR, and — when ``runs_dir`` is given — backed by a
+    run on disk. None otherwise. (GO is a review verdict, never a FEEDBACK
+    outcome, so it can never match.) See ``_prior_match_status``.
     """
-    if len(label.strip()) < _PRIOR_MATCH_MIN_LABEL_LEN:
-        return None
-    cutoff = (date.today() - timedelta(days=window_days)).isoformat()
-    needle = label.strip().lower()
-    for entry in reversed(entries):
-        if entry.get("date", "") < cutoff:
-            continue
-        if entry.get("outcome") not in _PRIOR_MATCH_OUTCOMES:
-            continue
-        if not _is_confirmed(entry):
-            continue
-        context = (entry.get("context") or "").lower()
-        if needle in context:
-            return {
-                "label": label,
-                "date": entry.get("date"),
-                "outcome": entry.get("outcome"),
-                "chosen": entry.get("chosen"),
-            }
-    return None
+    return _prior_match_status(label, entries, window_days, runs_dir)[0]
 
 
 def _prompt_drift(runs_dir: Path) -> dict | None:
@@ -329,7 +374,10 @@ def _prompt_drift(runs_dir: Path) -> dict | None:
 
 
 def get_memory_summary(
-    label: str | None = None, n: int = 10, feedback: Path = FEEDBACK
+    label: str | None = None,
+    n: int = 10,
+    feedback: Path = FEEDBACK,
+    runs_dir: Path | None = None,
 ) -> str | None:
     """Return a compact plain-text memory context block for Conservator
     injection.
@@ -363,13 +411,22 @@ def get_memory_summary(
         f"BAD={bad}, OVR={ovr}, PEND={pend}{br_str}]"
     )
     if label is not None:
-        match = _find_prior_match(label, entries)
+        match, contradiction = _prior_match_status(
+            label, entries, runs_dir=runs_dir
+        )
         if match:
             lines.append(
                 f"[Prior match for '{label}': "
                 f"chosen='{match['chosen']}', date={match['date']},"
                 f" outcome={match['outcome']} — assess whether this "
                 f"approach is still valid.]"
+            )
+        if contradiction:
+            lines.append(
+                f"[Prior contradiction for '{label}': confirmed "
+                f"{contradiction['outcome']} on {contradiction['date']} "
+                f"(chosen='{contradiction['chosen']}') — do not reuse "
+                f"without re-deliberating.]"
             )
     keywords = _top_keywords(recent, k=3)
     if keywords:
@@ -414,7 +471,12 @@ def build_priors(
         if drift:
             out["prompt_drift"] = drift
     if label is not None:
-        out["prior_deliberation_match"] = _find_prior_match(label, entries)
+        match, contradiction = _prior_match_status(
+            label, entries, runs_dir=runs_dir if include_runs else None
+        )
+        out["prior_deliberation_match"] = match
+        if contradiction:
+            out["prior_contradiction"] = contradiction
     if headless:
         out["stale_pendings"] = []
         out["missing_feedback_runs"] = []

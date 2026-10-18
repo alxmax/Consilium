@@ -35,8 +35,10 @@ def check(name: str, cond: bool) -> None:
         _fails.append(name)
 
 
-def entry(conf: float | None, outcome: str) -> dict:
+def entry(conf: float | None, outcome: str, confirmed: bool = True) -> dict:
     note = f"5 cand, 0 vetoed, conf={conf}, mode=sequential" if conf is not None else "no conf here"
+    if confirmed:
+        note += " [confirmed]"
     return {"date": "2026-01-01", "context": "x", "chosen": "y", "outcome": outcome, "note": note}
 
 
@@ -44,15 +46,45 @@ def test_records_filter() -> None:
     entries = [
         entry(0.9, "OK"),            # kept -> (0.9, 1)
         entry(0.4, "BAD"),           # kept -> (0.4, 0)
-        entry(0.8, "OVR"),           # kept -> (0.8, 0)  OVR = failure
+        entry(0.8, "OVR"),           # dropped — override, not an observed failure
+        entry(0.9, "OK", confirmed=False),  # dropped — auto-assigned, unconfirmed
         entry(0.95, "PEND"),         # dropped — unresolved
         entry(0.5, "PEND_HEADLESS"), # dropped — unresolved
         entry(None, "OK"),           # dropped — no conf in note
     ]
     recs = cc.calibration_records(entries)
-    check("records: keeps only resolved AND conf-tagged", len(recs) == 3)
-    check("records: OVR mapped to failure", (0.8, 0) in recs)
+    check("records: keeps only confirmed, resolved AND conf-tagged", len(recs) == 2)
+    check("records: OVR is not scored as a failure", (0.8, 0) not in recs)
     check("records: OK mapped to success", (0.9, 1) in recs)
+    check("records: BAD mapped to failure", (0.4, 0) in recs)
+
+
+def test_unconfirmed_corpus_is_not_calibration_evidence() -> None:
+    entries = [entry(0.9, "OK", confirmed=False) for _ in range(30)] + [
+        entry(0.4, "BAD", confirmed=False) for _ in range(15)]
+    recs = cc.calibration_records(entries)
+    check("zero confirmed: no records", recs == [])
+    d = cc.decide(recs, cc.Thresholds(
+        gate=0.7, margin=0.15, min_resolved=20, min_negatives=10,
+        min_band=5, high_floor=0.75))
+    check("zero confirmed: INSUFFICIENT_DATA, not a verdict",
+          d["verdict"] == "INSUFFICIENT_DATA" and d["resolved"] == 0)
+
+
+def test_exclusions_are_counted_with_a_reason() -> None:
+    entries = [
+        entry(0.9, "OK"),                      # counted
+        entry(0.9, "OK", confirmed=False),     # unconfirmed
+        entry(0.4, "BAD", confirmed=False),    # unconfirmed
+        entry(0.8, "OVR"),                     # overridden
+        entry(None, "OK"),                     # untagged (confirmed, no conf=)
+        entry(0.5, "PEND"),                    # unresolved
+    ]
+    ex = cc.calibration_exclusions(entries)
+    check("exclusions: unconfirmed", ex["unconfirmed"] == 2)
+    check("exclusions: overridden", ex["overridden"] == 1)
+    check("exclusions: untagged", ex["untagged"] == 1)
+    check("exclusions: unresolved", ex["unresolved"] == 1)
 
 
 def test_note_without_conf_skipped() -> None:
@@ -113,7 +145,7 @@ def test_html_end_to_end() -> None:
             '<tr class="entry">'
             "<td>+</td><td>2026-01-01</td><td>ctx</td><td>cand</td>"
             f"<td>{outcome}</td>"
-            f"<td>5 cand, 0 vetoed, conf={conf}, mode=sequential</td>"
+            f"<td>5 cand, 0 vetoed, conf={conf}, mode=sequential [confirmed]</td>"
             "</tr>"
         )
     html = "<table>\n" + "\n".join(rows) + "\n</table>"
@@ -130,7 +162,9 @@ def test_html_end_to_end() -> None:
 
 def main() -> int:
     print("test_confidence_calibration")
-    for fn in [test_records_filter, test_note_without_conf_skipped, test_sharp_ship_c,
+    for fn in [test_records_filter, test_unconfirmed_corpus_is_not_calibration_evidence,
+               test_exclusions_are_counted_with_a_reason,
+               test_note_without_conf_skipped, test_sharp_ship_c,
                test_flat_fallback_a, test_insufficient_data, test_insufficient_when_no_negatives,
                test_bins, test_html_end_to_end]:
         fn()
