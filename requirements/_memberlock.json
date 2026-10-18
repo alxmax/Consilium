@@ -31,8 +31,8 @@
       "consilium/prompts/implement/coder.md": "c038feb961f0d5c071d700facbb5356d4a1bc99018dc8d8eaac55c19f45b0369"
     },
     "CONSILIUM-IMPLEMENT-PIPELINE-001": {
-      "consilium/modes/implement_pipeline.md": "8d5dd526c80cd0bcd72f8d9a074790c3ffa47b8c24af4a93543730d8c31457d8",
-      "consilium/scripts/implement_pipeline.py": "e57a78da34041757c4702e01317d96b7f997a99f36600f36e4a4eac919a7c37d"
+      "consilium/modes/implement_pipeline.md": "f1277ddd700cf6d86bf8415886cf4d8aef7d0a9e3e2d6ba26436ac371163321a",
+      "consilium/scripts/implement_pipeline.py": "6acc29638e3d3ef3f12de11a2bbfcdb055117e52b232a7bae458efbb91340f69"
     },
     "CONSILIUM-IMPLEMENT-SUBAGENT-001": {
       "consilium/agents/consilium-implement-subagent.md": "e92c61d413b1cb83c1a3f0241ab816488770838a1fd765ff6e9e0cd5369509be"

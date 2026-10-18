@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import textwrap
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -531,10 +532,9 @@ def test_cli_no_pipeline_exits_1() -> None:
 def test_gate_fails_when_real_suite_fails() -> None:
     # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-3
     with tempfile.TemporaryDirectory() as d:
-        impl = Path(d) / "impl.py"
-        impl.write_text("def f():\n    return 1\n", encoding="utf-8")
+        (Path(d) / "impl.py").write_text("def f():\n    return 1\n", encoding="utf-8")
         failing = f'{_PY} -c "import sys; sys.exit(1)"'
-        result = verify_red_green(failing, str(impl))
+        result = _in_dir(d, lambda: verify_red_green(failing, "impl.py"))
         check(
             "gate: green_ok False when the real suite fails",
             result.get("green_ok") is False,
@@ -547,40 +547,210 @@ def test_gate_fails_when_real_suite_fails() -> None:
         )
 
 
-def test_gate_restores_target_when_stubbed_run_raises() -> None:
+def _in_dir(path, fn):
+    prev = os.getcwd()
+    os.chdir(path)
+    try:
+        return fn()
+    finally:
+        os.chdir(prev)
+
+
+def test_gate_never_writes_stubs_into_the_original() -> None:
     # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-4
+    # The RED run happens in a disposable copy: the original is byte-identical
+    # at every moment, so a crash cannot leave it stubbed.
     original = "def f():\n    return 1\n"
     with tempfile.TemporaryDirectory() as d:
         impl = Path(d) / "impl.py"
         impl.write_text(original, encoding="utf-8")
-        calls: list[str] = []
+        seen: list[tuple[str, str, str]] = []
 
-        def fake_run(_cmd: str) -> int:
-            calls.append(impl.read_text(encoding="utf-8"))
-            if len(calls) == 1:
-                return 0  # GREEN run against the real file
+        def fake_run(_cmd: str, cwd=None):
+            here = Path(cwd) if cwd else Path.cwd()
+            seen.append((
+                str(here.resolve()),
+                impl.read_text(encoding="utf-8"),
+                (here / "impl.py").read_text(encoding="utf-8"),
+            ))
+            if len(seen) == 1:
+                return 0, ""
             raise RuntimeError("stubbed run crashed")
 
         real_run = _ip._run
         _ip._run = fake_run
         raised = False
         try:
-            verify_red_green("ignored", str(impl))
+            _in_dir(d, lambda: verify_red_green("ignored", "impl.py"))
         except RuntimeError:
             raised = True
         finally:
             _ip._run = real_run
-        check("restore-on-crash: the crash propagated", raised)
+        check("isolation: the crash propagated", raised)
         check(
-            "restore-on-crash: file was stubbed during the crashing run",
-            len(calls) == 2 and MARKER in calls[1],
-            repr(calls),
+            "isolation: RED ran in a different directory",
+            len(seen) == 2 and seen[1][0] != seen[0][0],
+            repr(seen),
         )
         check(
-            "restore-on-crash: original content restored",
+            "isolation: stub existed only in the copy",
+            len(seen) == 2 and MARKER in seen[1][2] and MARKER not in seen[1][1],
+            repr(seen),
+        )
+        check(
+            "isolation: original unchanged after the crash",
             impl.read_text(encoding="utf-8") == original,
             repr(impl.read_text(encoding="utf-8")),
         )
+
+
+def test_gate_original_survives_sigkill_during_red() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-4
+    # Real process kill (no finally block runs) while the RED suite is mid-run.
+    original = "def f():\n    return 1\n"
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as d:
+        tmp = Path(d)
+        (tmp / "impl.py").write_text(original, encoding="utf-8")
+        (tmp / "hang.py").write_text(textwrap.dedent("""\
+            import pathlib, sys, time
+            import impl
+            try:
+                impl.f()
+            except NotImplementedError:
+                flag = pathlib.Path(sys.argv[1])
+                flag.write_text("x")
+                for _ in range(150):
+                    if pathlib.Path(str(flag) + ".stop").exists():
+                        break
+                    time.sleep(0.1)
+                raise
+        """), encoding="utf-8")
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as fd:
+            flag = Path(fd) / "red_started"
+            proc = subprocess.Popen(
+                [sys.executable, str(_SCRIPT), "--verify-gate",
+                 "--test-cmd", f"{_PY} hang.py {shlex.quote(str(flag))}",
+                 "--target", "impl.py"],
+                cwd=tmp, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+            try:
+                for _ in range(200):
+                    if flag.exists() or proc.poll() is not None:
+                        break
+                    time.sleep(0.1)
+                started = flag.exists()
+                proc.kill()
+                proc.wait()
+            finally:
+                Path(str(flag) + ".stop").write_text("x")
+            check("sigkill: RED suite had started", started)
+            check(
+                "sigkill: original impl.py is byte-identical",
+                (tmp / "impl.py").read_text(encoding="utf-8") == original,
+                repr((tmp / "impl.py").read_text(encoding="utf-8")),
+            )
+
+
+def test_stub_bodies_two_space_indent_compiles() -> None:
+    # REGRESSION: the stub was always inserted at header indent + 4, so a body
+    # indented by 2 gave "unindent does not match" -> an invalid mutant.
+    for label, source in (
+        ("function", "def f():\n  return 1\n"),
+        ("method", "class A:\n  def m(self):\n    return 1\n"),
+        ("tabs", "def f():\n\treturn 1\n"),
+        ("deep", "def f():\n        return 1\n"),
+    ):
+        stubbed = _stub_bodies(source, MARKER)
+        try:
+            compile(stubbed, "<stub>", "exec")
+            ok, detail = True, ""
+        except SyntaxError as exc:
+            ok, detail = False, f"{exc!r}\n{stubbed}"
+        check(f"two-space stub compiles ({label})", ok, detail)
+
+
+def _gate_in_fixture(files: dict[str, str], cmd: str, target: str = "impl.py") -> dict:
+    with tempfile.TemporaryDirectory() as d:
+        for name, text in files.items():
+            (Path(d) / name).write_text(text, encoding="utf-8")
+        return _in_dir(d, lambda: verify_red_green(cmd, target))
+
+
+def test_gate_compile_only_check_is_not_red() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-3
+    # A suite that only compiles the file never exercises behavior: the valid
+    # stub compiles, so it stays GREEN and the gate must fail.
+    result = _gate_in_fixture(
+        {"impl.py": "def f():\n  return 1\n"},
+        f"{_PY} -m py_compile impl.py",
+    )
+    check("compile-only: gate_passed False", result.get("gate_passed") is False, repr(result))
+    check("compile-only: red_ok False", result.get("red_ok") is False, repr(result))
+
+
+def test_gate_behavioral_test_on_two_space_file_passes() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-3
+    result = _gate_in_fixture(
+        {"impl.py": "def f():\n  return 1\n"},
+        f'{_PY} -c "import impl; assert impl.f() == 1"',
+    )
+    check("two-space behavioral: gate_passed", result.get("gate_passed") is True, repr(result))
+
+
+def test_gate_non_behavioral_failure_is_not_red() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-3
+    # Non-zero exit that is not the stub firing (here: the suite bails out on
+    # seeing a modified file) is a technical error, not a RED.
+    result = _gate_in_fixture(
+        {
+            "impl.py": "def f():\n    return 1\n",
+            "check_stub.py": (
+                "import sys\n"
+                "if 'Not' + 'Implemented' in open('impl.py').read():\n"
+                "    sys.exit('tampered')\n"
+            ),
+        },
+        f"{_PY} check_stub.py",
+    )
+    check("non-behavioral: red_ok False", result.get("red_ok") is False, repr(result))
+    check("non-behavioral: gate_passed False", result.get("gate_passed") is False, repr(result))
+
+
+def test_gate_invalid_mutant_is_rejected_before_running() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-3
+    real_stub = _ip._stub_bodies
+    _ip._stub_bodies = lambda source, marker: "def f(:\n"
+    try:
+        result = _gate_in_fixture(
+            {"impl.py": "def f():\n    return 1\n"},
+            f'{_PY} -c "import impl; assert impl.f() == 1"',
+        )
+    finally:
+        _ip._stub_bodies = real_stub
+    check("invalid-mutant: gate_passed False", result.get("gate_passed") is False, repr(result))
+    check(
+        "invalid-mutant: error names the syntax problem",
+        "syntax" in str(result.get("error", "")).lower(),
+        repr(result),
+    )
+
+
+def test_gate_unrunnable_test_command_is_an_error_not_a_crash() -> None:
+    # verifies: CONSILIUM-IMPLEMENT-PIPELINE-001#CASE-3
+    result = _gate_in_fixture(
+        {"impl.py": "def f():\n    return 1\n"}, "no_such_binary_xyz_123"
+    )
+    check("unrunnable: gate_passed False", result.get("gate_passed") is False, repr(result))
+    check("unrunnable: error present", "error" in result, repr(result))
+
+
+def test_gate_target_outside_cwd_is_rejected() -> None:
+    with tempfile.TemporaryDirectory() as d, tempfile.TemporaryDirectory() as other:
+        impl = Path(other) / "impl.py"
+        impl.write_text("def f():\n    return 1\n", encoding="utf-8")
+        result = _in_dir(d, lambda: verify_red_green(f"{_PY} -c pass", str(impl)))
+        check("outside-cwd: gate_passed False", result.get("gate_passed") is False, repr(result))
+        check("outside-cwd: error present", "error" in result, repr(result))
 
 
 def test_cli_verify_gate_missing_args_exits_2() -> None:
@@ -621,7 +791,15 @@ def main() -> None:
     test_build_plan_shape()
     test_cli_no_pipeline_exits_1()
     test_gate_fails_when_real_suite_fails()
-    test_gate_restores_target_when_stubbed_run_raises()
+    test_gate_never_writes_stubs_into_the_original()
+    test_gate_original_survives_sigkill_during_red()
+    test_stub_bodies_two_space_indent_compiles()
+    test_gate_compile_only_check_is_not_red()
+    test_gate_behavioral_test_on_two_space_file_passes()
+    test_gate_non_behavioral_failure_is_not_red()
+    test_gate_invalid_mutant_is_rejected_before_running()
+    test_gate_unrunnable_test_command_is_an_error_not_a_crash()
+    test_gate_target_outside_cwd_is_rejected()
     test_cli_verify_gate_missing_args_exits_2()
 
     total = _PASS + _FAIL
