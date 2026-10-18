@@ -154,7 +154,7 @@ Snapshot 2026-06-24. Three tasks (a hard C++ coding task, a trick question whose
 | superpowers | 2/4 | ✓ | ✓ ~42 s | $0.30 |
 | **sonnet_bare** (baseline) | 1/4 | ✓ | ✓ ~38 s | $0.30 |
 
-Same model throughout — the flip from 1/4 to 4/4 on the trick question is the deliberation *process*, not the model. The price is **~4–5× cost** and minutes instead of seconds — which is why the skill defaults to the cheapest mode and escalates on *stake* (irreversibility × magnitude), not difficulty. (Per-task cost ratios compress the pure deliberation multipliers in the Modes table — every mode also pays the same task-solving work; deliberation is the increment on top.)
+Same model throughout, so the 1/4 → 4/4 gap on the trick question is what the modes did differently here; with 4 tries on a single discriminating task it is an observation, not evidence that deliberation causes the gain. The price is **~4–5× cost** and minutes instead of seconds — which is why the skill defaults to the cheapest mode and escalates on *stake* (irreversibility × magnitude), not difficulty. (Per-task cost ratios compress the pure deliberation multipliers in the Modes table — every mode also pays the same task-solving work; deliberation is the increment on top.)
 
 Honest limits: n=4 tries per mode (a rigorous claim wants ~15); only one task is hard enough to discriminate; the Trias coding-task timeout (15-minute cap, sub-agents dispatched one at a time) is a real operational cost, not a quality result. Full write-up in the Benchmark section of `docs/architecture.html`.
 
