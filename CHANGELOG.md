@@ -5,6 +5,12 @@ All notable changes to Consilium are recorded here, following
 Apache License 2.0 (see `LICENSE`); versions up to 1.14.0 were published under the
 Business Source License 1.1.
 
+## [1.15.4] — 2026-10-18
+
+### Fixed
+- The red→green gate (`implement_pipeline.py --verify-gate`) wrote the stub bodies over the real target files and restored them in a `finally` block, so a SIGTERM or hard kill during the RED run left the sources stubbed. The RED run now happens in a temporary copy of the working directory and the originals are never written. Targets must be under the working directory.
+- The gate counted any non-zero exit as RED, so a syntax error, a collection error or an unavailable test tool could pass it, and the stub was always inserted at header indent + 4, which is an `IndentationError` on a 2-space or tab-indented file. The stub now sits at the body's own indent, an uncompilable stub is rejected before any run, and a RED needs the stub's exception in the suite output. The gate JSON gains `red_reason`.
+
 ## [1.15.3] — 2026-10-18
 
 ### Fixed

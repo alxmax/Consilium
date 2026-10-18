@@ -1,9 +1,9 @@
 ---
-generated: 2026-10-18
+generated: 2026-10-19
 engine: 2026-10-13.1
 nodes: 57
 edges: 105
-design pass-rate: 75% (24/32 source files without a design candidate)
+design pass-rate: 72% (23/32 source files without a design candidate)
 ---
 
 # Requirement Map
@@ -221,9 +221,11 @@ _Requirements needing attention: red = unimplemented (confirmed, no code); orang
 
 ```mermaid
 graph LR
-  subgraph sg_misc["misc"]
+  subgraph sg_CONSILIUM["CONSILIUM"]
+    CONSILIUM_IMPLEMENT_PIPELINE_001["implement_pipeline<br><small>CONSILIUM-IMPLEMENT-PIPELINE-001</small><br>unreviewed"]
     CONSILIUM_PRIORS_001["priors<br><small>CONSILIUM-PRIORS-001</small><br>unreviewed"]
   end
+  style CONSILIUM_IMPLEMENT_PIPELINE_001 fill:#fff3cd,stroke:#a66,color:#630
   style CONSILIUM_PRIORS_001 fill:#fff3cd,stroke:#a66,color:#630
 ```
 
@@ -231,4 +233,5 @@ graph LR
 
 | ID | status | members | dependents | risks | recommendation |
 | --- | --- | --- | --- | --- | --- |
+| CONSILIUM-IMPLEMENT-PIPELINE-001 | draft | 3 | 5 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
 | CONSILIUM-PRIORS-001 | draft | 2 | 1 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |

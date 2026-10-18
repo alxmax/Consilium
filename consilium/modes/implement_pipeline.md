@@ -63,9 +63,9 @@ Dispatch vehicle: `agents/consilium-implement-subagent.md`. Returns a file manif
 `--verify-gate` runs the suite twice:
 
 1. **GREEN run** — real implementation. Must exit 0.
-2. **RED run** — stub that replaces every function body with `raise NotImplementedError`. Must exit non-zero.
+2. **RED run** — in a temporary copy of the working directory, every target's functions are stubbed with `raise NotImplementedError`. Must exit non-zero **and** show the stub firing in its output; a compile-only check, a collection error or a missing test tool is not a RED.
 
-`--target` accepts one or more files. Under Coder fan-out (N impl files), pass **all** of them: stubbing only one leaves the rest live, so the suite can stay GREEN under the stub and the gate spuriously **fails** a correctly-tested change. All targets are stubbed together for the RED run and every original is restored afterward. (`red_ok` is an existential signal across the passed set — it does not certify each file is individually covered.)
+`--target` accepts one or more files. Under Coder fan-out (N impl files), pass **all** of them: stubbing only one leaves the rest live, so the suite can stay GREEN under the stub and the gate spuriously **fails** a correctly-tested change. All targets are stubbed together for the RED run, in the copy only: the originals are never written, so a killed gate cannot leave a file stubbed. Targets must live under the working directory. (`red_ok` is an existential signal across the passed set — it does not certify each file is individually covered.)
 
 A test that passes the stub provides no regression protection and is rejected (`gate_passed: false`).
 

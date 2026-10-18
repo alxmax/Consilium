@@ -1072,7 +1072,7 @@
       "id": "CONSILIUM-IMPLEMENT-PIPELINE-001",
       "layer": "feature",
       "level": "code",
-      "status": "confirmed",
+      "status": "draft",
       "area": "CONSILIUM",
       "title": "implement_pipeline",
       "intent": "Turns a deliberation report into an implementation dispatch plan; optionally verifies the red->green gate.",
@@ -1083,12 +1083,13 @@
         "Planning mode maps the three roles (Coder, Test Writer, Reviewer) to their prompt files and emits a JSON plan for the orchestrating agent to consume.",
         "The script is a planner, not a dispatcher: `agents/consilium-implement-subagent.md` performs the actual sub-agent calls.",
         "In gate-verification mode (`--verify-gate`), the script runs the real test suite, expecting GREEN (exit 0).",
-        "Gate-verification mode then rewrites the target file with stub bodies — a heuristic line-scanner that inserts `raise NotImplementedError` after each `def`/`async def` — to confirm the suite fails RED.",
+        "Gate-verification mode then runs the suite in a temporary copy of the working directory whose target files have stub bodies — a heuristic line-scanner that inserts `raise NotImplementedError` after each `def`/`async def`, at the body's own indent — to confirm the suite fails RED.",
         "The stub heuristic appends the stub marker as a new line after the `def`/`async def` header; it does not replace an existing `pass` or `...` body, and nested functions each receive their own stub insertion.",
-        "Gate-verification mode restores the original target file content in a `finally` block regardless of outcome.",
+        "Gate-verification mode never writes to the original target files: the stubs exist only in the temporary copy, so an exception, SIGTERM or hard kill cannot leave a target stubbed. Targets must be under the working directory; otherwise the gate fails with an `error`.",
+        "A RED counts only when the stubbed `.py` targets compile and the suite output shows the stub's exception (`red_reason: behavioral`). A passing suite (`suite_passed`), a failure without that evidence (`no_stub_evidence`: collection error, missing tool), an invalid mutant or a test command that cannot start all fail the gate.",
         "The script exits 1 for `do_nothing`/`skipped` chosen approaches, and 2 for malformed input.",
         "Exit code 1 is shared between `do_nothing`/`skipped` (no pipeline) and gate failure; the caller reads stdout to distinguish the two cases — this collapse is intentional and documented in the script's module docstring.",
-        "stdout in plan mode is a human-readable plan summary followed by `{\"plan\": ...}` JSON; stdout in gate mode is `{\"red_ok\": bool, \"green_ok\": bool, \"gate_passed\": bool}` JSON.",
+        "stdout in plan mode is a human-readable plan summary followed by `{\"plan\": ...}` JSON; stdout in gate mode is `{\"red_ok\": bool, \"red_reason\": str, \"green_ok\": bool, \"gate_passed\": bool}` JSON, or `{\"error\": str, \"gate_passed\": false}` when no run could be made; the suite's own output goes to stderr.",
         "Exit code is 0 on success, dry-run, or gate passed; 1 on no-pipeline or gate failure; 2 on bad input.",
         "The plan JSON schema (`spec`, `sequence`, `roles`, `rules`) is defined entirely by `build_plan()` in this script; the subagent handoff contract lives in `agents/consilium-implement-subagent.md` and is not part of this requirement."
       ],
@@ -1097,7 +1098,7 @@
       ],
       "notes": [],
       "current_impl": [],
-      "accept": "- **CASE-1** — Given a report with a non-empty `chosen_approach`, when `build_plan` runs, then it returns a dict with `spec`, `sequence`, `roles`, `rules` keys, each role lists whether its prompt file exists, and `spec.chosen_approach` is the full generator candidate object with `chosen_resolved: true` when resolvable from `deliberation_log`, else the bare id with `chosen_resolved: false`.\n- **CASE-2** — Given `chosen_approach` is `do_nothing` or `skipped`, when the script runs, then it prints a message and exits 1.\n- **CASE-3** — Given `--verify-gate` mode, when the script runs, then `gate_passed` is `true` only if the real suite passes (exit 0) and the stubbed suite fails (exit non-0).\n- **CASE-4** — Given `--verify-gate` mode, when the test command raises or the stubbed run crashes, then `verify_red_green` always restores the original target file content.\n- **CASE-5** — Given `--verify-gate` without `--test-cmd` or `--target`, when the script runs, then it exits 2 with an error message to stderr.",
+      "accept": "- **CASE-1** — Given a report with a non-empty `chosen_approach`, when `build_plan` runs, then it returns a dict with `spec`, `sequence`, `roles`, `rules` keys, each role lists whether its prompt file exists, and `spec.chosen_approach` is the full generator candidate object with `chosen_resolved: true` when resolvable from `deliberation_log`, else the bare id with `chosen_resolved: false`.\n- **CASE-2** — Given `chosen_approach` is `do_nothing` or `skipped`, when the script runs, then it prints a message and exits 1.\n- **CASE-3** — Given `--verify-gate` mode, when the script runs, then `gate_passed` is `true` only if the real suite passes (exit 0) and the stubbed suite fails (exit non-0).\n- **CASE-4** — Given `--verify-gate` mode, when the test command raises or the process is killed during the RED run, then the original target files are byte-identical to before the run.\n- **CASE-5** — Given `--verify-gate` without `--test-cmd` or `--target`, when the script runs, then it exits 2 with an error message to stderr.",
       "input": "",
       "output": "",
       "desc": "",
@@ -1122,7 +1123,7 @@
         },
         {
           "role": "implements",
-          "loc": "consilium/scripts/implement_pipeline.py:43"
+          "loc": "consilium/scripts/implement_pipeline.py:45"
         },
         {
           "role": "tested-by",
@@ -1132,7 +1133,12 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [
+        {
+          "signal": "unreviewed",
+          "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-IMPLEMENT-SUBAGENT-001",
@@ -4083,7 +4089,7 @@
     },
     {
       "month": "2026-10",
-      "count": 7,
+      "count": 8,
       "first": "2026-10-13",
       "last": "2026-10-18",
       "versions": [
@@ -4093,17 +4099,26 @@
         "v1.15.0",
         "v1.15.1",
         "v1.15.2",
-        "v1.15.3"
+        "v1.15.3",
+        "v1.15.4"
       ],
       "landmark": "v1.15.0",
       "headline": "",
       "entries": [
         {
+          "version": "v1.15.4",
+          "date": "2026-10-18",
+          "headline": "",
+          "body": "### Fixed\n- The red→green gate (`implement_pipeline.py --verify-gate`) wrote the stub bodies over the real target files and restored them in a `finally` block, so a SIGTERM or hard kill during the RED run left the sources stubbed. The RED run now happens in a temporary copy of the working directory and the originals are never written. Targets must be under the working directory.\n- The gate counted any non-zero exit as RED, so a syntax error, a collection error or an unavailable test tool could pass it, and the stub was always inserted at header indent + 4, which is an `IndentationError` on a 2-space or tab-indented file. The stub now sits at the body's own indent, an uncompilable stub is rejected before any run, and a RED needs the stub's exception in the suite output. The gate JSON gains `red_reason`.",
+          "first_commit": "2026-10-18",
+          "last_commit": "2026-10-18"
+        },
+        {
           "version": "v1.15.3",
           "date": "2026-10-18",
           "headline": "",
           "body": "### Fixed\n- `priors.py --label` matched any recent `OK` row, including ones whose outcome was assigned at log time without evidence. Because a match lets the caller skip re-deliberation, it now requires the `[confirmed]` marker, the same filter the rates already use. An unconfirmed newer `OK` no longer shadows an older confirmed one.",
-          "first_commit": "2026-10-18",
+          "first_commit": "2026-10-13",
           "last_commit": "2026-10-18"
         },
         {
@@ -4385,14 +4400,14 @@
   ],
   "design": {
     "files": 32,
-    "clean_files": 24,
-    "score": 75,
+    "clean_files": 23,
+    "score": 72,
     "candidates": {
       "encapsulation": 0,
-      "abstraction": 2,
+      "abstraction": 3,
       "inheritance": 0,
       "polymorphism": 0,
-      "standards": 9
+      "standards": 11
     },
     "findings": [
       {
@@ -4410,6 +4425,30 @@
         "line": 1,
         "name": "aggregator.py",
         "detail": "765 lines (over 500)"
+      },
+      {
+        "pillar": "standards",
+        "kind": "file-too-long",
+        "file": "consilium/scripts/implement_pipeline.py",
+        "line": 1,
+        "name": "implement_pipeline.py",
+        "detail": "549 lines (over 500)"
+      },
+      {
+        "pillar": "abstraction",
+        "kind": "long-function",
+        "file": "consilium/scripts/implement_pipeline.py",
+        "line": 211,
+        "name": "verify_red_green",
+        "detail": "`verify_red_green` is 97 lines (over 80)"
+      },
+      {
+        "pillar": "standards",
+        "kind": "line-too-long",
+        "file": "consilium/scripts/implement_pipeline.py",
+        "line": 277,
+        "name": "implement_pipeline.py",
+        "detail": "1 line(s) wider than 80 columns, first at line 277"
       },
       {
         "pillar": "standards",
@@ -4487,20 +4526,21 @@
     "advice": {
       "file-too-long": "a file this long is several modules sharing a name: split it along the prefix families it already shows",
       "line-too-long": "lines wider than the limit hide their tail in every diff and side-by-side view: wrap them",
+      "long-function": "a function this long hides several steps: extract each step under a name that says what it does",
       "prefix-family": "functions sharing a prefix are a namespace: a class (or module) with that name makes the boundary explicit"
     }
   },
   "health": {
-    "score": 98,
+    "score": 96,
     "total": 57,
     "scored": 56,
-    "healthy": 55,
+    "healthy": 54,
     "exempt": 17,
     "deprecated": 1,
-    "confirmed": 55,
+    "confirmed": 54,
     "implemented": 47,
     "tested": 32,
-    "drafts": 1,
+    "drafts": 2,
     "orphans": 0,
     "untested": 0,
     "open_intent": 0,
@@ -4508,8 +4548,15 @@
     "gate_errors": 0,
     "gate_link_sync_clean": true,
     "reviewed_score": 100,
-    "reviewed_total": 55,
+    "reviewed_total": 54,
     "unhealthy": [
+      {
+        "id": "CONSILIUM-IMPLEMENT-PIPELINE-001",
+        "status": "draft",
+        "why": [
+          "not confirmed"
+        ]
+      },
       {
         "id": "CONSILIUM-PRIORS-001",
         "status": "draft",
