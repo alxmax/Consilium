@@ -138,13 +138,13 @@ Consilium/
 | **Trias** | ~2.67× (up to 7 dispatches on a deadlock retry) | 3 personalities (Essentialist / Verifier / Sentinel), each running its own Sequential pass as a sub-agent, then a majority vote, then one post-vote Skeptic sub-agent on the winner |
 | **`skeptic_on_chosen`** | base +1 | Composable flag over any mode — a focal Skeptic challenges the chosen answer. Opt-in (`--skeptic-on-chosen`) or on high Conservator concern — not on confidence |
 
-For changes that are both `critical` and `irreversible`, select **Trias** explicitly — there is no automatic escalation. All dispatched voices run on Sonnet; the orchestrator runs on Opus.
+For changes that are both `critical` and `irreversible`, select **Trias** explicitly — there is no automatic escalation. All dispatched voices run on Sonnet (the `sonnet` alias, currently **Sonnet 5.5**); the orchestrator is your own session model, which the skill does not pin — Opus 5.5 gives the strongest orchestration.
 
 **Canonical output** (validated by `consilium/scripts/validate_report.py`): JSON with `success_criterion`, `chosen_approach`, `verification`, `alternatives`, `voice_scores`, `confidence`, and a `deliberation_log`.
 
 ## Benchmark results
 
-Snapshot 2026-06-24. Three tasks (a hard C++ coding task, a trick question whose obvious answer is a trap, a rate-math puzzle), five modes, all on **Sonnet 4.6** at high effort, graded **deterministically** against an answer key kept outside the repo — no AI judging AI, and every consilium run is verified to have actually deliberated. Two tasks sit at ceiling for every mode; the trick question is what separates them:
+Snapshot 2026-06-24. Three tasks (a hard C++ coding task, a trick question whose obvious answer is a trap, a rate-math puzzle), five modes, all on **Sonnet 4.6** (the model at the time — the default is now Sonnet 5.5 and these numbers have not been re-run on it) at high effort, graded **deterministically** against an answer key kept outside the repo — no AI judging AI, and every consilium run is verified to have actually deliberated. Two tasks sit at ceiling for every mode; the trick question is what separates them:
 
 | Mode | Trick question (4 tries) | Coding task | Math puzzle | Avg cost / task |
 |---|---|---|---|---|
