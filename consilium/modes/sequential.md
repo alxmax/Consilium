@@ -59,6 +59,7 @@ The 8 design components (per spec): vocabulary_map, length_targets, priority_vet
 | `irreversibility_flag: true` | Conservator | BLOCK (backstop) | Ask consent before finalizing (Step 1.6 gates the common case) |
 | `glossary_fail: true` | Control | BLOCK (soft) | Ask user to reformulate with operational terms |
 | `disagreements: substantial` | Control | REWORK | Re-run Generator with clarification context |
+| preferred candidate invalid / not evaluated by Control / `net_concern` > 0.8 | Control, Conservator | REWORK (`preferred_inadmissible`) | Pick another candidate or record an explicit waiver `{id, reason}`; never ship it as a normal recommendation |
 | `meta_recommendation: scale_down` | Conservator | SHORT-CIRCUIT | Skip Control (Generator already ran). Emit minimal report with `chosen_approach: "trivial-direct"`, `confidence: 0.85`, `pipeline_executed: false`. See SKILL.md Step 3 (authoritative). |
 | `meta_recommendation: scale_up` | Conservator | ADAPT_EXTENDED | Warn user, add context |
 | 3+ of above simultaneously | Aggregator | ESCALATE | Present trigger table to user, request decision |

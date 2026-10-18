@@ -1944,6 +1944,135 @@
   "expect_exit": 0
  },
  {
+  "name": "aggregator/sequential invalid preferred is not a normal recommendation (admissibility gate)",
+  "note": "Synthetic fixture: Control marked the preferred candidate valid=false; the cascade must REWORK, not AGGREGATE it.",
+  "tool": "consilium/scripts/aggregator.py",
+  "args": [
+   "--scheme",
+   "sequential"
+  ],
+  "stdin_json": {
+   "generator": {
+    "preferred": "A",
+    "candidates": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ]
+   },
+   "control": {
+    "verdicts": [
+     {
+      "id": "A",
+      "valid": false
+     },
+     {
+      "id": "B",
+      "valid": true
+     }
+    ]
+   },
+   "conservator": {
+    "scores": [
+     {
+      "id": "A",
+      "regression_risk": {
+       "net_concern": 0.1
+      },
+      "meta_recommendation": null
+     },
+     {
+      "id": "B",
+      "regression_risk": {
+       "net_concern": 0.1
+      },
+      "meta_recommendation": null
+     }
+    ]
+   }
+  },
+  "expect_exit": 0,
+  "expect_stdout_subset": {
+   "result": "REWORK",
+   "reason": "preferred_inadmissible",
+   "chosen": null,
+   "admissible_alternatives": [
+    "B"
+   ]
+  }
+ },
+ {
+  "name": "aggregator/sequential explicit waiver records the derogation and allows the pick",
+  "note": "Synthetic fixture: same invalid preferred, but the user supplied {id, reason}; the waiver is recorded in admissibility.",
+  "tool": "consilium/scripts/aggregator.py",
+  "args": [
+   "--scheme",
+   "sequential"
+  ],
+  "stdin_json": {
+   "generator": {
+    "preferred": "A",
+    "candidates": [
+     {
+      "id": "A"
+     },
+     {
+      "id": "B"
+     }
+    ]
+   },
+   "control": {
+    "verdicts": [
+     {
+      "id": "A",
+      "valid": false
+     },
+     {
+      "id": "B",
+      "valid": true
+     }
+    ]
+   },
+   "conservator": {
+    "scores": [
+     {
+      "id": "A",
+      "regression_risk": {
+       "net_concern": 0.1
+      },
+      "meta_recommendation": null
+     },
+     {
+      "id": "B",
+      "regression_risk": {
+       "net_concern": 0.1
+      },
+      "meta_recommendation": null
+     }
+    ]
+   },
+   "waiver": {
+    "id": "A",
+    "reason": "user accepted the risk"
+   }
+  },
+  "expect_exit": 0,
+  "expect_stdout_subset": {
+   "result": "AGGREGATE",
+   "chosen": "A",
+   "admissibility": {
+    "checked": true,
+    "waived": {
+     "id": "A",
+     "reason": "user accepted the risk"
+    }
+   }
+  }
+ },
+ {
   "name": "aggregator/sequential rejects generator.preferred not among candidate ids (#464 gate)",
   "tool": "consilium/scripts/aggregator.py",
   "args": [

@@ -30,6 +30,7 @@ cat input.json | python scripts/aggregator.py --scheme conservative_override
 
 Vetoes any candidate whose conservator risk is **strictly greater** than `veto_threshold` (default `0.8` — `risk = 0.80` survives, `0.81` is vetoed). Survivors are ranked by weighted average of `(generator, control, safety)` where `safety = 1 − conservator`. Flipping conservator into safety is the point of the scheme: without it a higher-risk survivor would outrank a lower-risk one when the other voices tie.
 
+- **Control-rejected candidates** (`valid: false`, or a `control` score of 0 or less — how `build_report.py` encodes invalid / never-evaluated) are excluded and listed in `vetoed` with `reason: "control_invalid"`; they can never win on generator or safety score.
 - **All vetoed** → `chosen: null`. With `auto_relax` (default on), emits `retry_suggested` with a relaxed threshold = lowest candidate risk, unless that risk exceeds `RELAXED_VETO_CAP` (0.85), in which case it sets `escalation_required` instead — relaxing would not help.
 - **Veto uncertainty band** — candidates within `VETO_UNCERTAINTY_BAND` (0.15) of the threshold are flagged `veto_uncertain` (inter-run conservator pstdev is 0.12–0.18, so boundary vetoes may not reproduce).
 
@@ -50,6 +51,6 @@ Operates on voice **outputs**, not candidate scores. Priority-ordered veto casca
 3. ≥3 triggers at once → **ESCALATE**
 4. substantial disagreement → **REWORK**
 5. `scale_down` meta → **ADAPT_SHORT**; `scale_up` → **ADAPT_EXTENDED**
-6. default → **AGGREGATE** (picks Generator's `preferred`, derives `confidence_per_option` from `net_concern`)
+6. default → **AGGREGATE** (picks Generator's `preferred`, derives `confidence_per_option` from `net_concern`) — but only if `preferred` is admissible: Control evaluated it (`valid: true`) and `net_concern` is not above `0.8`. Otherwise **REWORK** (`reason: preferred_inadmissible`, `chosen: null`, with `admissible_alternatives`) unless the input carries `waiver: {id, reason}` for it, which is recorded in `admissibility.waived`. `scale_down` skips Control by design and is exempt.
 
 <!-- implements: CONSILIUM-AGGREGATOR-001 -->

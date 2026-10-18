@@ -2,8 +2,8 @@
   "_schema": 2,
   "members": {
     "CONSILIUM-AGGREGATOR-001": {
-      "consilium/modes/aggregator_schemes.md": "3b9c587ac70ae315afafe0b0e10549f4eb3e6b5e9d3553108ff8166a510b5dfa",
-      "consilium/scripts/aggregator.py": "d90fa231f56f6459cc3295dda6f54d3566d50f49c19d0969ba08f82364977ed3"
+      "consilium/modes/aggregator_schemes.md": "2574061315e9a7ab23c31fb74adfd64fbf2bce76c1dde20ab28fc01df6264065",
+      "consilium/scripts/aggregator.py": "f308716e57d7f2c31d13f84c56d3bb4d15f30c059ee710f6202b46fe35e030da"
     },
     "CONSILIUM-AUDIT-FEEDBACK-001": {
       "consilium/scripts/audit_feedback.py": "92bfa7c58ea7a4b473d072df3e7ff935a394a997aa195243659efef88340758e"

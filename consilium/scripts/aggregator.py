@@ -90,16 +90,35 @@ def aggregate_majority(candidates: list[dict]) -> dict:
     }
 
 
+def _control_rejects(c: dict) -> bool:
+    """True when Control did not clear this candidate.
+
+    build_report encodes an invalid or never-evaluated candidate as control
+    score 0.0 (a valid one scores at least 0.3), so a score <= 0 means
+    "rejected"; an explicit ``valid: false`` says the same.
+    """
+    return c.get("valid") is False or float(c["scores"]["control"]) <= 0.0
+
+
 def _split_by_veto(
     candidates: list[dict], veto_threshold: float
 ) -> tuple[list[dict], list[dict]]:
-    """Partition candidates into (survivors, vetoed) by conservator risk."""
+    """Partition candidates into (survivors, vetoed).
+
+    A candidate is vetoed by conservator risk above the threshold, or
+    because Control rejected it (``reason: control_invalid``) — ranking
+    never lets a high generator/safety score outvote an invalid candidate.
+    """
     survivors = []
     vetoed = []
     for c in candidates:
         risk = float(c["scores"]["conservator"])
         if risk > veto_threshold:
             vetoed.append({"id": c["id"], "risk": risk})
+        elif _control_rejects(c):
+            vetoed.append(
+                {"id": c["id"], "risk": risk, "reason": "control_invalid"}
+            )
         else:
             survivors.append(c)
     return survivors, vetoed
@@ -117,12 +136,20 @@ def _all_vetoed_result(
         "scheme": "conservative_override",
         "veto_threshold": veto_threshold,
         "chosen": None,
-        "reason": "all candidates vetoed by conservator",
+        "reason": "all candidates vetoed by conservator or rejected by Control",
         "vetoed": vetoed,
     }
-    if auto_relax and candidates:
+    # Relaxing the risk threshold can only help a candidate Control cleared.
+    relaxable = [c for c in candidates if not _control_rejects(c)]
+    if auto_relax and candidates and not relaxable:
+        result["escalation_required"] = True
+        result["escalation_reason"] = (
+            "no candidate passed Control; relaxing the risk threshold "
+            "cannot help"
+        )
+    elif auto_relax and relaxable:
         lowest = min(
-            candidates, key=lambda c: float(c["scores"]["conservator"])
+            relaxable, key=lambda c: float(c["scores"]["conservator"])
         )
         lowest_risk = float(lowest["scores"]["conservator"])
         if lowest_risk > RELAXED_VETO_CAP:
@@ -234,6 +261,7 @@ def aggregate_conservative_override(
         "ranking": [{"id": c["id"], "score": s} for s, c in ranked],
         "vetoed": vetoed,
         "weights": dict(zip(VOICES, w)),
+        "admissibility": {"checked": True},
     }
     if (
         len(ranked) >= 2
@@ -242,7 +270,8 @@ def aggregate_conservative_override(
         result["low_separation"] = True
     uncertain = [
         v["id"] for v in vetoed
-        if abs(v["risk"] - veto_threshold) <= VETO_UNCERTAINTY_BAND
+        if "reason" not in v
+        and abs(v["risk"] - veto_threshold) <= VETO_UNCERTAINTY_BAND
     ]
     if uncertain:
         result["veto_uncertain"] = True
@@ -601,6 +630,82 @@ def _triggered_result(
     return None
 
 
+def inadmissible_reasons(
+    cid: str,
+    control_out: dict,
+    conservator_out: dict,
+    veto_threshold: float = DEFAULT_VETO,
+) -> list[str]:
+    """Why ``cid`` may not become a normal recommendation (empty = admissible).
+
+    - ``not_evaluated``: Control produced no verdict for it;
+    - ``invalid``: Control's verdict is not ``valid: true``;
+    - ``vetoed``: Conservator ``net_concern`` above ``veto_threshold`` (strict,
+      like the conservative_override veto).
+    Shared with ``validate_report.py`` so selection and the final gate agree.
+    """
+    reasons: list[str] = []
+    verdict = next(
+        (
+            v for v in control_out.get("verdicts") or []
+            if isinstance(v, dict) and v.get("id") == cid
+        ),
+        None,
+    )
+    if verdict is None:
+        reasons.append("not_evaluated")
+    elif verdict.get("valid") is not True:
+        reasons.append("invalid")
+    if _net_concern_for(conservator_out, cid) > veto_threshold:
+        reasons.append("vetoed")
+    return reasons
+
+
+def _waiver_reason(waiver: Any, cid: str) -> str | None:
+    """The user's stated reason when ``waiver`` explicitly accepts ``cid``."""
+    if (
+        isinstance(waiver, dict)
+        and waiver.get("id") == cid
+        and isinstance(waiver.get("reason"), str)
+        and waiver["reason"].strip()
+    ):
+        return waiver["reason"].strip()
+    return None
+
+
+def _inadmissible_result(
+    preferred: str,
+    reasons: list[str],
+    options: list,
+    control_out: dict,
+    conservator_out: dict,
+) -> dict:
+    """REWORK result for a preferred candidate that failed admissibility."""
+    alternatives = [
+        o["id"] for o in options
+        if isinstance(o, dict) and o.get("id") not in (None, preferred)
+        and not inadmissible_reasons(o["id"], control_out, conservator_out)
+    ]
+    return {
+        "scheme": "sequential",
+        "result": "REWORK",
+        "reason": "preferred_inadmissible",
+        "chosen": None,
+        "preferred": preferred,
+        "inadmissible_reasons": reasons,
+        "admissible_alternatives": alternatives,
+        "admissibility": {
+            "checked": True,
+            "rejected": {"id": preferred, "reasons": reasons},
+        },
+        "action": (
+            "The Generator's preferred candidate did not clear Control or "
+            "the Conservator veto. Re-run with a different candidate, or "
+            "record an explicit waiver {id, reason} to proceed."
+        ),
+    }
+
+
 def _checked_preferred(generator_out: dict) -> tuple[Any, list]:
     """Return (preferred, options), failing loud on a ghost preferred."""
     preferred = generator_out.get("preferred")
@@ -654,6 +759,7 @@ def aggregate_sequential(
     generator_out: dict,
     control_out: dict,
     conservator_out: dict,
+    waiver: dict | None = None,
 ) -> dict:
     """Sequential priority-based aggregation with veto cascade.
 
@@ -666,7 +772,11 @@ def aggregate_sequential(
     4. substantial disagreement (Control) → REWORK
     5. scale_down (Conservator meta) → ADAPT_SHORT
     6. scale_up (Conservator meta) → ADAPT_EXTENDED
-    7. default → AGGREGATE
+    7. default → AGGREGATE, but only for an admissible preferred
+       candidate (Control-evaluated, ``valid: true``, net_concern not above
+       the veto); otherwise REWORK unless ``waiver`` = {id, reason} explicitly
+       accepts it, in which case the waiver is recorded in ``admissibility``.
+       (Priority 5, scale_down, skips Control by design and is exempt.)
     """
     blocked = _blocking_result(control_out, conservator_out)
     if blocked is not None:
@@ -681,6 +791,18 @@ def aggregate_sequential(
 
     # Default: aggregate normally
     preferred, options = _checked_preferred(generator_out)
+    admissibility: dict = {"checked": True}
+    if preferred is not None:
+        reasons = inadmissible_reasons(preferred, control_out, conservator_out)
+        if reasons:
+            waived = _waiver_reason(waiver, preferred)
+            if waived is None:
+                return _inadmissible_result(
+                    preferred, reasons, options, control_out, conservator_out
+                )
+            admissibility["waived"] = {
+                "id": preferred, "reasons": reasons, "reason": waived,
+            }
     confidence_per_option = _confidence_per_option(
         options, preferred, conservator_out
     )
@@ -692,6 +814,7 @@ def aggregate_sequential(
         "chosen": preferred,
         "confidence_per_option": confidence_per_option,
         "confidence_methodology": methodology_confidence,
+        "admissibility": admissibility,
         "methodology_notes": _sequential_methodology_notes(
             generator_out, control_out
         ),
@@ -721,6 +844,7 @@ SCHEMES = {
         data["generator"],
         data["control"],
         data["conservator"],
+        data.get("waiver"),
     ),
 }
 

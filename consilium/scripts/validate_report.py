@@ -289,6 +289,67 @@ def _validate_deliberation_log(
     return []
 
 
+def _load_aggregator():
+    """Load the sibling aggregator (scripts are not a package)."""
+    import importlib.util
+    path = Path(__file__).resolve().parent / "aggregator.py"
+    spec = importlib.util.spec_from_file_location("consilium_aggregator", path)
+    assert spec and spec.loader
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _validate_admissibility(report: dict) -> list[str]:
+    """Reject a report whose chosen candidate its own log shows to be
+    invalid, never evaluated by Control, or vetoed by the Conservator —
+    unless the aggregate step records an explicit waiver for that candidate
+    with a reason.
+
+    Only reports whose aggregate result carries an ``admissibility`` block
+    (written by the aggregator since the admissibility gate) are judged: older
+    runs predate the rule and stay readable, and a report with no judgeable
+    pipeline log is skipped. The Conservator veto applies to the ``sequential``
+    scheme only — conservative_override vetoes on its own risk scores.
+    """
+    chosen = report.get("chosen_approach")
+    if not isinstance(chosen, str) or report.get("pipeline_executed") is not True:
+        return []
+    steps = {
+        s.get("step"): s
+        for s in report.get("deliberation_log") or []
+        if isinstance(s, dict)
+    }
+    control, cons, agg = steps.get("control"), steps.get("conservator"), steps.get("aggregate")
+    if not (control and cons and agg):
+        return []
+    result = agg.get("result")
+    adm = result.get("admissibility") if isinstance(result, dict) else None
+    if not isinstance(adm, dict):
+        return []
+    reasons = _load_aggregator().inadmissible_reasons(
+        chosen,
+        {"verdicts": control.get("verdicts")},
+        {"scores": cons.get("scores")},
+    )
+    if agg.get("scheme", result.get("scheme") if isinstance(result, dict) else None) != "sequential":
+        reasons = [r for r in reasons if r != "vetoed"]
+    if not reasons:
+        return []
+    waived = adm.get("waived") if isinstance(adm, dict) else None
+    if (
+        isinstance(waived, dict)
+        and waived.get("id") == chosen
+        and _is_non_empty_str(waived.get("reason"))
+    ):
+        return []
+    return [
+        f"admissibility: chosen_approach '{chosen}' is not admissible "
+        f"({', '.join(reasons)}) and no explicit waiver with a reason is "
+        f"recorded in the aggregate step"
+    ]
+
+
 def _validate_pipeline_executed(report: dict) -> list[str]:
     """pipeline_executed must be present for non-skipped reports.
 
@@ -564,6 +625,8 @@ def validate(report: dict) -> list[str]:
 
     if is_trias:
         _validate_trias(report, problems)
+    elif not is_passthrough:
+        problems.extend(_validate_admissibility(report))
 
     return problems
 

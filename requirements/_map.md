@@ -222,28 +222,34 @@ _Requirements needing attention: red = unimplemented (confirmed, no code); orang
 ```mermaid
 graph LR
   subgraph sg_CONSILIUM["CONSILIUM"]
+    CONSILIUM_AGGREGATOR_001["aggregator<br><small>CONSILIUM-AGGREGATOR-001</small><br>unreviewed"]
     CONSILIUM_AUDIT_FEEDBACK_001["Orphan run detection and PEND backfill<br><small>CONSILIUM-AUDIT-FEEDBACK-001</small><br>unreviewed"]
     CONSILIUM_IMPLEMENT_PIPELINE_001["implement_pipeline<br><small>CONSILIUM-IMPLEMENT-PIPELINE-001</small><br>unreviewed"]
     CONSILIUM_LOG_FEEDBACK_001["log_feedback<br><small>CONSILIUM-LOG-FEEDBACK-001</small><br>unreviewed"]
     CONSILIUM_MARK_OUTCOME_001["mark_outcome<br><small>CONSILIUM-MARK-OUTCOME-001</small><br>unreviewed"]
     CONSILIUM_PRIORS_001["priors<br><small>CONSILIUM-PRIORS-001</small><br>unreviewed"]
     CONSILIUM_UTILS_001["utils<br><small>CONSILIUM-UTILS-001</small><br>unreviewed"]
+    CONSILIUM_VALIDATE_REPORT_001["validate_report<br><small>CONSILIUM-VALIDATE-REPORT-001</small><br>unreviewed"]
   end
+  style CONSILIUM_AGGREGATOR_001 fill:#fff3cd,stroke:#a66,color:#630
   style CONSILIUM_AUDIT_FEEDBACK_001 fill:#fff3cd,stroke:#a66,color:#630
   style CONSILIUM_IMPLEMENT_PIPELINE_001 fill:#fff3cd,stroke:#a66,color:#630
   style CONSILIUM_LOG_FEEDBACK_001 fill:#fff3cd,stroke:#a66,color:#630
   style CONSILIUM_MARK_OUTCOME_001 fill:#fff3cd,stroke:#a66,color:#630
   style CONSILIUM_PRIORS_001 fill:#fff3cd,stroke:#a66,color:#630
   style CONSILIUM_UTILS_001 fill:#fff3cd,stroke:#a66,color:#630
+  style CONSILIUM_VALIDATE_REPORT_001 fill:#fff3cd,stroke:#a66,color:#630
 ```
 
 ### Risk Table
 
 | ID | status | members | dependents | risks | recommendation |
 | --- | --- | --- | --- | --- | --- |
+| CONSILIUM-AGGREGATOR-001 | draft | 3 | 3 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
 | CONSILIUM-AUDIT-FEEDBACK-001 | draft | 1 | 1 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
 | CONSILIUM-IMPLEMENT-PIPELINE-001 | draft | 3 | 5 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
 | CONSILIUM-LOG-FEEDBACK-001 | draft | 2 | 1 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
 | CONSILIUM-MARK-OUTCOME-001 | draft | 2 | 1 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
 | CONSILIUM-PRIORS-001 | draft | 2 | 1 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
 | CONSILIUM-UTILS-001 | draft | 2 | 18 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |
+| CONSILIUM-VALIDATE-REPORT-001 | draft | 2 | 3 | unreviewed | Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced. |

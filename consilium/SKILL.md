@@ -180,7 +180,7 @@ Output: `{glossary, hidden_assumptions, disagreements, fixed_constraints, negoti
 ```bash
 python scripts/aggregator.py --scheme conservative_override
 ```
-Default **conservative_override** — veto at `risk_score > 0.8` (strictly greater: `0.80` is NOT vetoed, `0.81` IS); ranking by weighted average `(generator + control + safety)` with `safety = 1 - conservator`; ties go to the safer candidate. Alternative: `--scheme risk_adjusted_utility` (sigmoid penalty, no rigid veto). All schemes + input shapes: [modes/aggregator_schemes.md](modes/aggregator_schemes.md).
+Default **conservative_override** — veto at `risk_score > 0.8` (strictly greater: `0.80` is NOT vetoed, `0.81` IS); ranking by weighted average `(generator + control + safety)` with `safety = 1 - conservator`; ties go to the safer candidate. A candidate Control did not clear (`valid: false`, or control score 0) is excluded too — it cannot win on the other voices. In the `sequential` scheme an inadmissible `preferred` (invalid, not evaluated by Control, or `net_concern` > 0.8) returns REWORK instead of a recommendation unless a `waiver` `{id, reason}` is supplied and recorded. Alternative: `--scheme risk_adjusted_utility` (sigmoid penalty, no rigid veto). All schemes + input shapes: [modes/aggregator_schemes.md](modes/aggregator_schemes.md).
 
 ### 5b. Confidence
 ```bash

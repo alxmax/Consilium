@@ -1,7 +1,7 @@
 ---
 milestone: v1.0
 id: CONSILIUM-VALIDATE-REPORT-001
-status: confirmed
+status: draft
 level: code
 layer: bus
 owner: alxmax
@@ -28,6 +28,7 @@ Every line in this section is binding.
 - `deliberation_log` contains an aggregate step whose `result` is a dict, not a string narrative.
 - For non-bypassed reports, `deliberation_log` also requires the `generator` and `control` steps to be present.
 - `deliberation_log`'s `conservator` step presence is not enforced, except when `--strict-round2` is set.
+- For a pipeline-executed, non-Trias, non-passthrough report whose aggregate result carries an `admissibility` block, the chosen candidate must be admissible by the report's own log: a `valid: true` Control verdict and (for the `sequential` scheme) `net_concern` not above 0.8. A chosen candidate that is not is an error unless the aggregate result's `admissibility.waived` names it with a non-empty `reason`. Reports without the block (older runs) are not judged.
 - `telemetry` is present for non-skipped reports and carries a non-empty `mode` string.
 - Telemetry count fields (`tokens_in`, `tokens_out`, `latency_ms`) are non-negative ints, checked strictly via `isinstance(v, int)`; a float value such as `1500.0` is rejected.
 - Each telemetry count field is optional per voice.
