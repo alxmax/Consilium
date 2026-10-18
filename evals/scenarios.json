@@ -1883,6 +1883,23 @@
   }
  },
  {
+  "name": "priors/--label ignores an unconfirmed OK (passthrough needs a verified outcome)",
+  "note": "Synthetic fixture: an auto-assigned OK without the [confirmed] marker must not enable passthrough.",
+  "tool": "consilium/scripts/priors.py",
+  "args": [
+   "--label",
+   "aggregator scoring",
+   "--no-runs",
+   "--feedback-file",
+   "evals/fixtures/priors_label_unconfirmed.html"
+  ],
+  "stdin_json": null,
+  "expect_exit": 0,
+  "expect_stdout_subset": {
+   "prior_deliberation_match": null
+  }
+ },
+ {
   "name": "priors/--label too short returns null (min-length guard)",
   "note": "Synthetic fixture: validates that labels shorter than 8 chars are rejected before any FEEDBACK lookup.",
   "tool": "consilium/scripts/priors.py",

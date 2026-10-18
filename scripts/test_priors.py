@@ -21,6 +21,7 @@ import plugin_paths  # noqa: E402,F401 — puts consilium/scripts on sys.path
 from priors import (
     CONFIRMED_MARKER,
     STALE_PEND_DAYS,
+    _find_prior_match,
     _is_confirmed,
     _outcome_counts,
     _rates,
@@ -53,6 +54,43 @@ class TestOutcomeCounts(unittest.TestCase):
         self.assertEqual(result["BAD"], 1)
         self.assertEqual(result["OVR"], 1)
         self.assertEqual(result["PEND"], 1)
+
+
+class TestFindPriorMatch(unittest.TestCase):
+    """Passthrough skips re-deliberation, so only outcomes verified in
+    reality (CONFIRMED_MARKER) may qualify — an auto-assigned OK measures
+    agreement, not outcome."""
+
+    TODAY = date.today().isoformat()
+
+    def _entry(self, outcome="OK", note=""):
+        return {
+            "date": self.TODAY,
+            "context": "refactor aggregator scoring formula",
+            "chosen": "extend_trigger",
+            "outcome": outcome,
+            "note": note,
+        }
+
+    def test_confirmed_ok_matches(self):
+        entries = [self._entry(note=f"verified {CONFIRMED_MARKER}")]
+        match = _find_prior_match("aggregator scoring", entries)
+        self.assertEqual(match["chosen"], "extend_trigger")
+
+    def test_unconfirmed_ok_does_not_match(self):
+        entries = [self._entry(note="worked as expected")]
+        self.assertIsNone(_find_prior_match("aggregator scoring", entries))
+
+    def test_unconfirmed_ok_does_not_shadow_older_confirmed_ok(self):
+        older = self._entry(note=f"verified {CONFIRMED_MARKER}")
+        newer = self._entry(note="auto")
+        newer["chosen"] = "auto_pick"
+        match = _find_prior_match("aggregator scoring", [older, newer])
+        self.assertEqual(match["chosen"], "extend_trigger")
+
+    def test_confirmed_bad_does_not_match(self):
+        entries = [self._entry(outcome="BAD", note=CONFIRMED_MARKER)]
+        self.assertIsNone(_find_prior_match("aggregator scoring", entries))
 
 
 class TestIsConfirmed(unittest.TestCase):

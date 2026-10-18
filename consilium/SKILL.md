@@ -73,7 +73,7 @@ Two actions in order:
 
    **Headless** (`claude -p` or CI): `priors.py` detects it from explicit signals only — `--headless`, `CONSILIUM_HEADLESS=1` or `CLAUDE_HEADLESS=1` — and returns `stale_pendings`/`missing_feedback_runs` as `[]` and sets `headless_mode: true`. Log warnings to stderr, never prompt; run `audit_feedback.py --backfill` automatically.
 
-   **Prior-deliberation passthrough.** If `priors.py --label` returns a non-null `prior_deliberation_match` (outcome OK, within 30 days, label substring match), ask:
+   **Prior-deliberation passthrough.** If `priors.py --label` returns a non-null `prior_deliberation_match` (confirmed outcome OK, within 30 days, label substring match), ask:
    > *"Prior deliberation found: `<match.chosen>` (`<match.date>`, outcome=`<match.outcome>`). Proceed directly to implementation without re-deliberating?"*
 
    - **YES** → skip Steps 1–5; build this report and go to Step 7:

@@ -5,6 +5,11 @@ All notable changes to Consilium are recorded here, following
 Apache License 2.0 (see `LICENSE`); versions up to 1.14.0 were published under the
 Business Source License 1.1.
 
+## [1.15.3] — 2026-10-18
+
+### Fixed
+- `priors.py --label` matched any recent `OK` row, including ones whose outcome was assigned at log time without evidence. Because a match lets the caller skip re-deliberation, it now requires the `[confirmed]` marker, the same filter the rates already use. An unconfirmed newer `OK` no longer shadows an older confirmed one.
+
 ## [1.15.2] — 2026-10-13
 
 ### Fixed
