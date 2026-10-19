@@ -172,6 +172,35 @@ def _acceptance_lint(body, r, rid):
                           "own Then".format(_bn, _tn)})
     return findings
 
+def _over_scoped(body):
+    # implements: ARCH-LINTCHECKS-025  # implements: REQ-LINT-863
+    # [(contract_n, groups, ac_count)] when a requirement is over BOTH the
+    # contract and the acceptance ceilings, else []. `clarify` asks its
+    # over-scoped question on this same predicate, so the two never disagree.
+    # An absent section counts 0, which is under either ceiling.
+    # Scope units, not sentences. A contract that groups its clauses under
+    # bold labels states one facet per group, so the group count is what
+    # says how much the requirement promises; the clause count only says how
+    # finely the prose was split. Counting clauses alone punished the atomic
+    # voice — one obligation per bullet multiplies bullets without
+    # widening scope at all. Ungrouped contracts fall back to the
+    # clause count, which
+    # is what this check has always used. Counted off _section_raw, not
+    # _prose_lint: _prose_lint strips each line, and a label is defined by
+    # sitting at column 0 (see _is_label_line). Given stripped input every
+    # wrapped clause that opens and closes on bold spans counts as a group,
+    # inflating contract_n — and `over-scoped` is an ERROR under --strict,
+    # so that miscount fails CI on a requirement that is not over-scoped.
+    groups = sum(
+        1 for ln in
+        _from_any(_section_raw, body, CONTRACT_LABELS).split("\n")
+        if _is_label_line(ln))
+    contract_n = groups or len(_from_any(_bullets, body, CONTRACT_LABELS))
+    ac_count = _count_ac(body)
+    return ([(contract_n, groups, ac_count)] if contract_n > cfg.LINT_CONTRACT_MAX
+            and ac_count > cfg.LINT_AC_MAX else [])
+
+
 def _shape_lint(rid, r, body, children):
     # implements: ARCH-LINTCHECKS-025  # implements: REQ-LINT-863
     """Corpus shape: a requirement over both ceilings at once, and a
@@ -183,43 +212,23 @@ def _shape_lint(rid, r, body, children):
     # Requiring BOTH axes (a composite) keeps false positives near zero: a
     # large-but-cohesive capability rarely maxes both. Advisory only — it
     # surfaces split candidates; the split decision stays with the human.
-    if _has_any(body, CONTRACT_LABELS) and _has_any(body, ACCEPTANCE_LABELS):
-        # Scope units, not sentences. A contract that groups its clauses under
-        # bold labels states one facet per group, so the group count is what
-        # says how much the requirement promises; the clause count only says how
-        # finely the prose was split. Counting clauses alone punished the atomic
-        # voice — one obligation per bullet multiplies bullets without
-        # widening scope at all. Ungrouped contracts fall back to the
-        # clause count, which
-        # is what this check has always used. Counted off _section_raw, not
-        # _prose_lint: _prose_lint strips each line, and a label is defined by
-        # sitting at column 0 (see _is_label_line). Given stripped input every
-        # wrapped clause that opens and closes on bold spans counts as a group,
-        # inflating contract_n — and `over-scoped` is an ERROR under --strict,
-        # so that miscount fails CI on a requirement that is not over-scoped.
-        groups = sum(
-            1 for ln in
-            _from_any(_section_raw, body, CONTRACT_LABELS).split("\n")
-            if _is_label_line(ln))
-        contract_n = groups or len(_from_any(_bullets, body, CONTRACT_LABELS))
-        ac_count = _count_ac(body)
-        if contract_n > cfg.LINT_CONTRACT_MAX and ac_count > cfg.LINT_AC_MAX:
-            findings.append({
-                "severity": "warn", "check": "over-scoped",
-                # The trigger is an AND, so clearing EITHER number clears the
-                # finding — which is genuinely useful to an author and was
-                # nowhere in the output. Same correction as `ac-count-high`:
-                # `--decompose` cannot act on this.
-                "detail": "{} contract {} + {} AC (both over {}/{}): "
-                          "likely several "
-                          "capabilities \u2014 bring either number under "
-                          "its ceiling and this "
-                          "clears (`--decompose` does not cover this "
-                          "check)".format(
-                              contract_n,
-                              "groups" if groups else "clauses",
-                              ac_count, cfg.LINT_CONTRACT_MAX,
-                              cfg.LINT_AC_MAX)})
+    for contract_n, groups, ac_count in _over_scoped(body):
+        findings.append({
+            "severity": "warn", "check": "over-scoped",
+            # The trigger is an AND, so clearing EITHER number clears the
+            # finding — which is genuinely useful to an author and was
+            # nowhere in the output. Same correction as `ac-count-high`:
+            # `--decompose` cannot act on this.
+            "detail": "{} contract {} + {} AC (both over {}/{}): "
+                      "likely several "
+                      "capabilities \u2014 bring either number under "
+                      "its ceiling and this "
+                      "clears (`--decompose` does not cover this "
+                      "check)".format(
+                          contract_n,
+                          "groups" if groups else "clauses",
+                          ac_count, cfg.LINT_CONTRACT_MAX,
+                          cfg.LINT_AC_MAX)})
     # fan-out (warn): a parent in the `satisfies:` hierarchy normally carries
     # 5-20 children. Too few and the level buys no grouping; too many and it is
     # a bucket, not a level. Counted on the satisfies graph, NOT on `depends_on`

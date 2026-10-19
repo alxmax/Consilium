@@ -2,7 +2,7 @@
 import json, re
 
 from . import MAP_ENGINE_VERSION, config as cfg
-from .lintrules import _count_ac
+from .lintrules import _count_ac, _over_scoped
 from .sections import ACCEPTANCE_LABELS, CONTRACT_LABELS, _from_any
 from .text import _bullets, _ellipsis, _req_title, _section_raw
 
@@ -40,6 +40,12 @@ CLARIFY_HEDGES = (
     "best-effort", "gracefully", "large", "small", "many", "several",
     "various",
 )
+# A hedge counts only as a whole word outside a code span, so "smaller" is not
+# "small", a quoted `appropriate` is an example, and "how many" asks for a
+# count rather than hedging one. A code span leaves group 1 empty.
+_CLARIFY_HEDGE_RE = re.compile(r"`[^`]*`|(?<![\w-])(" + "|".join(
+    r"(?<!how )many" if w == "many" else re.escape(w)
+    for w in CLARIFY_HEDGES) + r")(?![\w-])")
 # A case mentioning any of these is exercising a failure path. Absence of ALL
 # of them across every case is the signal -- a requirement whose acceptance
 # is pure happy path.
@@ -49,22 +55,10 @@ CLARIFY_FAILURE_WORDS = (
     "unreadable", "not found", "timeout", "conflict", "duplicate", "unknown",
     "no ", "none", "cannot", "without",
 )
-CLARIFY_LIMIT_WORDS = ("at most", "up to", "no more than", "maximum",
-                       "max ", "limit", "capped", "bounded", "first ", "top ")
-CLARIFY_UNIT_RE = re.compile(
-    r"^(ms|s|sec|secs|second|seconds|min|mins|minute|minutes|hour|hours|"
-    r"day|days|"
-    r"kb|mb|gb|b|%|percent|char|chars|character|characters|line|lines|"
-    r"file|files|"
-    r"byte|bytes|request|requests|item|items|entry|entries|pair|pairs|"
-    r"clause|clauses|"
-    r"criterion|criteria|px|em|rem|x)$", re.I)
-# A bare number in a clause. Excluded by construction: anything glued to a
-# word or a dot (`v4.0.0`, `CASE-2`, `utf-8`), because those are identifiers,
-# not quantities.
-_CLARIFY_NUM_RE = re.compile(r"(?<![\w.\-#])(\d+(?:\.\d+)?)\s*([A-Za-z%]*)")
-# An exit code is a value, not a quantity: "exits 2" has no unit to ask for.
-_CLARIFY_EXIT_RE = re.compile(r"\bexit(?:s|\s+code|\s+status)?\s*$", re.I)
+# A clause that ends by naming another requirement (`... [[REQ-X-001]]`, or
+# `[[REQ-X-001]] details the behaviour.`) hands its cases to that requirement.
+_CLARIFY_DELEGATES_RE = re.compile(
+    r"\]\](?:\s+details the behaviou?r)?\s*\.?\s*$")
 
 
 # Every case of ARCH-SEARCH-036 described its input as prose to be matched:
@@ -128,49 +122,55 @@ def _domain_heads(reqs):
                      if c / float(total) >= CLARIFY_DOMAIN_SHARE)
 
 
+# What each rule rests on, so a reader can tell a fact from a guess: a
+# section that is absent, two numbers that disagree, or a guess from wording
+# or a count that never reads a case. Sampled on this corpus, most `wording`
+# questions were false positives ("every candidate", "how many releases"), and
+# so were 9 of 20 `clause-without-case` ones, 7 real (ADR-0075).
+# implements: REQ-CLARIFY-1100
+CLARIFY_BASIS = {
+    "no-contract": "structure", "no-cases": "structure",
+    "clause-without-case": "wording", "over-scoped": "count",
+    "vague-term": "wording", "ambiguous-actor": "wording",
+    "no-failure-case": "wording", "case-monoculture": "wording",
+}
+
+
 def _clarify_item(rule, severity, where, quote, question, suggest):
     # implements: ARCH-CLARIFY-062  # implements: REQ-CLARIFY-956
+    # implements: REQ-CLARIFY-1100
     """One open-question record, in the shape `_clarify_questions` emits."""
-    return {"rule": rule, "severity": severity, "where": where,
-            "quote": quote, "question": question, "suggest": suggest}
+    return {"rule": rule, "severity": severity, "basis": CLARIFY_BASIS[rule],
+            "where": where, "quote": quote, "question": question,
+            "suggest": suggest}
 
 
 def _clause_questions(clauses):
     # implements: ARCH-CLARIFY-062  # implements: REQ-CLARIFY-956
-    """Per-clause advisory questions: vague terms, bare numbers without
-    a unit, unbounded quantities, and ambiguous actors."""
+    # implements: REQ-CLARIFY-1102
+    """Per-clause advisory questions: vague terms and ambiguous actors.
+    "All", "every" and "any" ask nothing: in a requirement they nearly
+    always range over a finite set the engine owns, and 19 of 20 such
+    questions were not real (ADR-0072). A number asks nothing either: 0 of
+    the 9 unit questions on this corpus were real (ADR-0075)."""
     out = []
     for i, c in enumerate(clauses, 1):
         low = c.lower()
         where = "clause {}".format(i)
-        for w in CLARIFY_HEDGES:
-            if w in low:
-                out.append(_clarify_item(
-                    "vague-term", "advisory", where, c,
-                    'What is the measurable threshold behind "{}"?'
-                    .format(w.strip()),
-                    "Replace it with a number and a unit, or with the "
-                    "observable "
-                    "condition it stands for."))
-                # one hedge per clause is enough to start the
-                # conversation
-                break
-        m = next((n for n in _CLARIFY_NUM_RE.finditer(c)
-                  if not _CLARIFY_EXIT_RE.search(c, 0, n.start())), None)
-        if m and not CLARIFY_UNIT_RE.match(m.group(2) or ""):
+        # one hedge per clause is enough to start the conversation
+        h = next((x for x in _CLARIFY_HEDGE_RE.finditer(low) if x.group(1)),
+                 None)
+        if h:
             out.append(_clarify_item(
-                "number-without-unit", "advisory", where, c,
-                'What unit is "{}" in?'.format(m.group(1)),
-                "State the unit beside the number so a test can assert it."))
-        if (" all " in " " + low or low.startswith("all ")
-                or " every " in low or " any " in low) \
-                and not any(w in low for w in CLARIFY_LIMIT_WORDS):
-            out.append(_clarify_item(
-                "unbounded-quantity", "advisory", where, c,
-                "Is there an upper bound, and what happens when it is "
-                "reached?",
-                "Name the limit, or say explicitly that there is none."))
-        if low.startswith("it ") or " the system " in low:
+                "vague-term", "advisory", where, c,
+                'What is the measurable threshold behind "{}"?'
+                .format(h.group(1)),
+                "Replace it with a number and a unit, or with the "
+                "observable "
+                "condition it stands for."))
+        # the subject only: "the system placeholder" mid-clause is a noun,
+        # and "The System Map" a name
+        if re.match(r"(?:[Ii]t|[Tt]he system) [a-z]", c):
             out.append(_clarify_item(
                 "ambiguous-actor", "advisory", where, c,
                 "Who performs this -- which command or component?",
@@ -234,6 +234,7 @@ def _monoculture_question(body, reqs, domain):
 
 def _clarify_questions(rid, r, reqs=None, domain=None):
     # implements: ARCH-CLARIFY-062  # implements: REQ-CLARIFY-956
+    # implements: REQ-CLARIFY-1102
     """The open questions one requirement has not answered, as records:
     {rule, severity, where, quote, question, suggest}. Deterministic --
     the same requirement always yields the same list, in the same
@@ -241,11 +242,13 @@ def _clarify_questions(rid, r, reqs=None, domain=None):
     written; everything else is advice. `domain` is
     `_domain_heads(reqs)`, passed in by the corpus-wide callers so it
     is read once rather than recomputed per requirement (it was 90% of
-    a `sync`'s question pass, and quadratic in the corpus)."""
+    a `sync`'s question pass, and quadratic in the corpus). A deprecated
+    requirement is retired, so nothing in it waits for an answer."""
+    if r["meta"].get("status") == "deprecated":
+        return []
     body = r["body"]
     clauses = _from_any(_bullets, body, CONTRACT_LABELS)
-    cases_raw = _from_any(_section_raw, body, ACCEPTANCE_LABELS) or ""
-    cases_low = cases_raw.lower()
+    cases_low = _from_any(_section_raw, body, ACCEPTANCE_LABELS).lower()
     n_cases = _count_ac(body)
     out = []
 
@@ -264,9 +267,14 @@ def _clarify_questions(rid, r, reqs=None, domain=None):
             "Add `CASE-1` with Given / When / Then, one per clause."))
 
     out.extend(_clause_questions(clauses))
-    out.extend(_clause_case_gap_question(clauses, n_cases))
+    # a clause that hands its cases to another requirement is proved there,
+    # so neither count below holds it
+    own = [c for c in clauses if not _CLARIFY_DELEGATES_RE.search(c)]
+    out.extend(_clause_case_gap_question(own, n_cases))
 
-    if n_cases and not any(w in cases_low for w in CLARIFY_FAILURE_WORDS):
+    # a need is one story with one Scenario, so it has no failure path to name
+    if (n_cases and r["meta"].get("layer") != "need"
+            and not any(w in cases_low for w in CLARIFY_FAILURE_WORDS)):
         out.append(_clarify_item(
             "no-failure-case", "advisory", "Cases", "",
             "What happens on the failure path -- missing input, "
@@ -276,13 +284,15 @@ def _clarify_questions(rid, r, reqs=None, domain=None):
 
     out.extend(_monoculture_question(body, reqs, domain))
 
-    if len(clauses) > cfg.LINT_AC_MAX:
+    # lint's own predicate, so clarify never asks a split lint does not raise
+    # implements: REQ-CLARIFY-1102
+    if _over_scoped(body) and len(own) > cfg.LINT_CONTRACT_MAX:
         out.append(_clarify_item(
             "over-scoped", "advisory", "Description", "",
-            "This requirement carries {} clauses (advisory limit {}). "
-            "Which of "
-            "them is a separate requirement?".format(
-                len(clauses), cfg.LINT_AC_MAX),
+            "This requirement carries {} clauses and {} cases (advisory "
+            "limits {} and {}). Which of them is a separate "
+            "requirement?".format(len(own), n_cases,
+                                  cfg.LINT_CONTRACT_MAX, cfg.LINT_AC_MAX),
             "Split the ones that could change for a different reason."))
     return out
 
@@ -321,7 +331,8 @@ def cmd_clarify(reqs, cap_id, as_json=False):
     if not items:
         print("{}: nothing unclear that this check can see.".format(
             cap_id or "corpus"))
-        print("  next: reqmap.py gate --show {}".format(cap_id or "<ID>"))
+        print("  next: reqmap.py " + ("gate --show " + cap_id if cap_id
+                                      else "gate --risk"))
         return 0
     for it in items:
         blocking = [q for q in it["questions"]
@@ -338,7 +349,8 @@ def cmd_clarify(reqs, cap_id, as_json=False):
             print("\n{}".format(sev.upper()))
             for q in group:
                 n += 1
-                print(" {:>2}. [{}] {}".format(n, q["rule"], q["where"]))
+                print(" {:>2}. [{} · {}] {}".format(
+                    n, q["rule"], q["basis"], q["where"]))
                 if q["quote"]:
                     print("     \"{}\"".format(_ellipsis(q["quote"], 92)))
                 print("     {}".format(q["question"]))

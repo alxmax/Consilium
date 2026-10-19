@@ -44,6 +44,63 @@ def save_lock(reqs_dir, lock):
         json.dump(lock, f, indent=2, sort_keys=True)
 
 
+def _read_json(path):
+    # implements: REQ-DRIFT-1103  # implements: REQ-DRIFT-1104
+    """(parsed value, None), (None, None) for a file that is not there, or
+    (None, why) for one that is there and cannot be used as JSON."""
+    if not os.path.exists(path):
+        return None, None
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f), None
+    except (ValueError, OSError):
+        return None, "is not readable JSON"
+
+
+def baseline_problems(reqs_dir):
+    # implements: ARCH-DRIFT-003  # implements: REQ-DRIFT-1103
+    """What makes an existing baseline unusable, as messages. A baseline
+    that is not there is first use, not a problem; one that is there and
+    yields nothing would switch a drift signal off with nothing saying so.
+
+    `_reqlock.json` must map each id to a hash (text), and `_memberlock.json`
+    must carry this engine's schema and `{id: {file: hash}}`. Reading both
+    still fails open; this only names why."""
+    out = []
+    data, why = _read_json(lock_path(reqs_dir))
+    if why or (data is not None and not isinstance(data, dict)):
+        out.append("_reqlock.json present but unreadable (corrupt/merge-"
+                   "conflicted) — drift detection skipped this run; restore "
+                   "it or run `reqmap.py sync`")
+    elif data:
+        bad = sorted(k for k, v in data.items()
+                     if not isinstance(v, str) or not v)
+        if bad:
+            out.append("_reqlock.json holds no hash for {} — {} drift is not "
+                       "detected; run `reqmap.py sync` to re-baseline".format(
+                           ", ".join(bad[:5]) + (" …" if len(bad) > 5 else ""),
+                           "its" if len(bad) == 1 else "their"))
+    data, why = _read_json(_memberlock_path(reqs_dir))
+    if why or (data is not None and not isinstance(data, dict)):
+        out.append("_memberlock.json present but unreadable — member drift "
+                   "is not detected this run; run `reqmap.py sync`")
+    elif data is not None:
+        members = data.get("members")
+        if data.get("_schema") != MEMBERLOCK_SCHEMA:
+            out.append("_memberlock.json is schema {!r}, this engine reads "
+                       "{} — member drift is not detected this run; run "
+                       "`reqmap.py sync` with the current engine".format(
+                           data.get("_schema"), MEMBERLOCK_SCHEMA))
+        elif not isinstance(members, dict) or not all(
+                isinstance(v, dict) and all(
+                    isinstance(h, str) for h in v.values())
+                for v in members.values()):
+            out.append("_memberlock.json holds records this engine cannot "
+                       "use — member drift is not detected this run; run "
+                       "`reqmap.py sync`")
+    return out
+
+
 # ---------- member-hash drift (reverse direction) ----------
 # _reqlock.json keeps ONE hash per requirement = the contract; drift in
 # that file only fires prose-ahead-of-code. The reverse — a MEMBER's
@@ -116,6 +173,29 @@ def load_driftlog(reqs_dir):  # implements: REQ-DRIFT-988
     return got if isinstance(got, dict) else {}
 
 
+class DriftlogUnusable(Exception):
+    """The drift log is there and cannot be rewritten without losing it."""
+
+
+def driftlog_problem(reqs_dir):  # implements: REQ-DRIFT-1104
+    """Why `_driftlog.json` cannot be rewritten faithfully, or None. Reading
+    it fails open, which is right for a gate; writing it back from what that
+    read returned would drop every entry of a log this engine does not
+    understand. Absent is fine: nothing to lose."""
+    data, why = _read_json(_driftlog_path(reqs_dir))
+    if why or data is None:
+        return why
+    if not isinstance(data, dict):
+        return "is not a JSON object"
+    schema = data.get("_schema", 0)
+    if (not isinstance(schema, int) or isinstance(schema, bool)
+            or schema > DRIFTLOG_SCHEMA):
+        return "is schema {!r}, this engine writes {}".format(
+            schema, DRIFTLOG_SCHEMA)
+    return (None if isinstance(data.get("accepted", {}), dict)
+            else "has an `accepted` that is not an object")
+
+
 def save_driftlog(reqs_dir, accepted):  # implements: REQ-DRIFT-988
     """Write the accepted-drift record, versioned by `_schema` and kept
     OUT of `_reqlock.json` — that file is the byte-stable cross-repo
@@ -146,6 +226,10 @@ def record_accepted_drift(reqs_dir, accepted_ids, new_lock, reason,
     its own."""
     if not accepted_ids:
         return {}
+    why = driftlog_problem(reqs_dir)
+    if why:   # implements: REQ-DRIFT-1104
+        raise DriftlogUnusable("_driftlog.json {}: refusing to overwrite a "
+                               "record this engine cannot keep".format(why))
     log = {rid: e for rid, e in load_driftlog(reqs_dir).items()
            if rid in live_ids and isinstance(e, dict)}
     for rid in accepted_ids:

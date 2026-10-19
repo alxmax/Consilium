@@ -13,15 +13,17 @@ from .sections import binding_hash
 
 # Unambiguous test markers, trusted in ANY file: Python `def test…(`, JS/TS
 # `function test…(`, Go `func TestX/Benchmark/Example/Fuzz(`, Rust `#[test]` /
-# `#[tokio::test]`. Used only to confirm a tested-by file holds
-# tests — not to count.
+# `#[tokio::test]`, GoogleTest `TEST/TEST_F/TEST_P/TYPED_TEST(_P)(`. Used
+# only to confirm a tested-by file holds tests — not to count.
 # Case-insensitive for Python/JS/Rust idioms, but the Go branch stays
 # case-sensitive: `go test` only runs exported TestXxx/BenchmarkXxx/ExampleXxx/
 # FuzzXxx — a private `func testHelper(` is NOT a test and must not
-# satisfy a link.
+# satisfy a link. The GoogleTest branch is case-sensitive too, and leaves out
+# `MOCK_METHOD`: a mock-only header is a helper, not a test.
 _DEF_TEST_RE = re.compile(
     r"(?i:def\s+test\w*\s*\()|(?i:function\s+test\w*\s*\()|"
     r"func\s+(?:Test|Benchmark|Example|Fuzz)\w*\s*\(|"
+    r"\b(?:TYPED_TEST(?:_P)?|TEST(?:_[FP])?)\s*\(|"
     r"(?i:#\[\s*(?:[\w:]+::)?test\b)")
 # The bare Jest/Mocha `it(` / `test(` call is too common a word to
 # trust in prose or config (e.g. "it (the parser) returns None" in a
@@ -87,7 +89,7 @@ def _test_link_problem(path):
         if _SH_TEST_NAME_RE.search(stem) or _SH_TEST_RE.search(src):
             return ""
     return ("contains no test function "
-            "(def test.../func TestX.../#[test]/it()/bash test_x()/"
+            "(def test.../func TestX.../#[test]/it()/TEST()/bash test_x()/"
             "py run|main under __main__)")
 
 

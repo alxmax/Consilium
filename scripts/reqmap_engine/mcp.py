@@ -8,9 +8,10 @@ carry one call's state into the next; a subprocess starts clean every time,
 and the CLI stays the only code path.
 """
 # implements: ARCH-MCP-073
-import json, os, subprocess, sys
+import json, os, re, subprocess, sys
 
 from . import ENGINE_DIR, MAP_ENGINE_VERSION
+from .versions import semver3
 
 # The one protocol revision this server speaks. A client asking for another
 # is answered with this one, which the specification allows; the client
@@ -24,17 +25,23 @@ CALL_TIMEOUT = 600         # seconds; a full `sync` on a large repo stays
 _JSON = ("--json",)
 
 
-def _param(name, kind, help_text, flag=None, required=False, bare=False):
+def _param(name, kind, help_text, flag=None, required=False, bare=False,
+           check=None, expects=""):
     # implements: REQ-MCPTOOLS-1028
     """One tool parameter. `flag` is the CLI flag it becomes; None makes it
     the positional argument that follows the verb. `bare` passes the flag
     alone when the value is omitted, for a flag whose value is optional
-    (`--release [VERSION]`)."""
+    (`--release [VERSION]`). `check` is a predicate a value must satisfy,
+    and `expects` says in words what it asks for."""
     return {"name": name, "type": kind, "help": help_text, "flag": flag,
-            "required": required, "bare": bare}
+            "required": required, "bare": bare, "check": check,
+            "expects": expects}
 
 
 _ID = "A requirement id, e.g. ARCH-PARSE-001."
+_ID_ARGS = {"check": re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]*\Z").match,
+            "expects": "a requirement id"}
+_VERSION_ARGS = {"check": semver3, "expects": "a version such as v1.2.0"}
 
 # The tools, named for the question an agent asks rather than for the flag
 # that asks it: `gate` once had sixteen flags, most of them separate modes
@@ -66,7 +73,8 @@ MCP_TOOLS = (
      "description": "One requirement's dossier: contract, dependencies, "
                     "code members, open questions and risk signals, as "
                     "JSON with the requirement's frontmatter and body.",
-     "params": [_param("id", "str", _ID, "--show", required=True)]},
+     "params": [_param("id", "str", _ID, "--show", required=True,
+                       **_ID_ARGS)]},
     {"name": "reqmap_search", "argv": ["ask", *_JSON], "writes": False,
      "description": "Requirements ranked by relevance to a free-text "
                     "query, as JSON; an id in the query is matched first.",
@@ -100,11 +108,12 @@ MCP_TOOLS = (
      "description": "The review plan for one requirement, as JSON: "
                     "intent, contract, cases and code anchors, for "
                     "judging whether the code does what it says.",
-     "params": [_param("id", "str", _ID, "--review", required=True)]},
+     "params": [_param("id", "str", _ID, "--review", required=True,
+                       **_ID_ARGS)]},
     {"name": "reqmap_clarify", "argv": ["clarify", *_JSON], "writes": False,
      "description": "The questions a requirement has not answered, as "
                     "JSON; with no id, for the whole corpus.",
-     "params": [_param("id", "str", _ID)]},
+     "params": [_param("id", "str", _ID, **_ID_ARGS)]},
     {"name": "reqmap_release_plan", "argv": ["sync", *_JSON],
      "writes": False,
      "description": "The release `reqmap_release` would cut, as JSON: "
@@ -112,7 +121,7 @@ MCP_TOOLS = (
                     "and any problem. Writes nothing.",
      "params": [_param("version", "str",
                        "Release this vX.Y.Z instead of the planned one.",
-                       "--release", bare=True)]},
+                       "--release", bare=True, **_VERSION_ARGS)]},
     {"name": "reqmap_sync", "argv": ["sync"], "writes": True,
      "description": "Rebuild everything derived: the drift lock, the "
                     "map, the findings and the site regions. Refuses "
@@ -129,7 +138,7 @@ MCP_TOOLS = (
                     "2 means it refused and wrote nothing.",
      "params": [_param("version", "str",
                        "Release this vX.Y.Z instead of the planned one.",
-                       "--release", bare=True)]},
+                       "--release", bare=True, **_VERSION_ARGS)]},
 )
 
 _SCHEMA_TYPE = {"bool": "boolean", "str": "string", "int": "integer",
@@ -187,10 +196,15 @@ def tool_argv(tool, args):  # implements: REQ-MCPTOOLS-1028
                 p["name"], _SCHEMA_TYPE[p["type"]]))
         if p["type"] == "bool":
             argv += [p["flag"]] if value else []
-        elif p["flag"] is None:
+            continue
+        if p["check"] and not p["check"](value):
+            raise ValueError("{} must be {}".format(p["name"], p["expects"]))
+        if p["flag"] is None:
             argv.insert(1, str(value))
         else:
-            argv += [p["flag"], str(value)]
+            # one element, so a value that looks like an option (`--apply`)
+            # is still only the value of this flag
+            argv.append("{}={}".format(p["flag"], value))
     return argv
 
 
@@ -217,6 +231,8 @@ def run_tool(argv, workspace):  # implements: REQ-MCPTOOLS-1028
 def call_tool(name, args, server):  # implements: REQ-MCPTOOLS-1028
     """The `tools/call` result, or ValueError for a call the protocol
     should reject."""
+    if args is not None and not isinstance(args, dict):
+        raise ValueError("arguments must be an object")
     tool = next((t for t in MCP_TOOLS if t["name"] == name), None)
     if tool is None or (tool["writes"] and not server["allow_writes"]):
         raise ValueError("unknown tool: {}{}".format(
@@ -346,8 +362,14 @@ def handle(msg, server):
                       -32600, "invalid request")
     if "id" not in msg:
         return None
-    method, params, msg_id = (msg["method"], msg.get("params") or {},
-                              msg["id"])
+    method, params, msg_id = msg["method"], msg.get("params"), msg["id"]
+    if not isinstance(method, str):
+        return _error(msg_id, -32600, "invalid request: method must be a "
+                                      "string")
+    if params is None:
+        params = {}
+    if not isinstance(params, dict):
+        return _error(msg_id, -32602, "params must be an object")
     route = _ROUTES.get(method)
     if route is None:
         return _error(msg_id, -32601,
@@ -359,6 +381,8 @@ def handle(msg, server):
         return _error(msg_id, -32002, str(e))
     except ValueError as e:
         return _error(msg_id, -32602, str(e))
+    except Exception as e:  # a failed run must not end the server
+        return _error(msg_id, -32603, "internal error: {}".format(e))
 
 
 def _workspace_flags(a, env=None):  # implements: REQ-MCPPROTOCOL-1027
