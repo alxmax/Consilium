@@ -9,7 +9,7 @@
       "consilium/scripts/audit_feedback.py": "92bfa7c58ea7a4b473d072df3e7ff935a394a997aa195243659efef88340758e"
     },
     "CONSILIUM-BUILD-REPORT-001": {
-      "consilium/scripts/build_report.py": "684adfb06ec1672eb6cb4abec06c3f75e4b2efdff348f9906a41b5e2edba8956"
+      "consilium/scripts/build_report.py": "3a5d3c4aad19d5017b4ff081e736619d6bcef35e393a6a764c323140e2fa9bd4"
     },
     "CONSILIUM-CHECK-PUBLIC-LEAK-001": {
       "scripts/check_public_leak.py": "75cdc1dd424dc3844351e97abd7cd2f56c8bcddce6ec1ab6bbd9230bdb52429b"

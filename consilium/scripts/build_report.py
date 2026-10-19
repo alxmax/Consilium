@@ -60,6 +60,29 @@ def _err(msg: str) -> None:
     print(msg, file=sys.stderr)
 
 
+def _telemetry_gaps(telemetry: object) -> list[str]:
+    """What a cost analysis would be missing from this telemetry block:
+    ``dispatch_count`` (an int) and at least one measured (> 0) latency, at
+    the top level or on a voice. Latency 0 is the "not measured" placeholder."""
+    tele = telemetry if isinstance(telemetry, dict) else {}
+    gaps: list[str] = []
+    dc = tele.get("dispatch_count")
+    if not (isinstance(dc, int) and not isinstance(dc, bool)):
+        gaps.append("dispatch_count")
+    voices = tele.get("voices")
+    latencies = [tele.get("latency_ms")] + [
+        v.get("latency_ms")
+        for v in (voices.values() if isinstance(voices, dict) else [])
+        if isinstance(v, dict)
+    ]
+    if not any(
+        isinstance(x, (int, float)) and not isinstance(x, bool) and x > 0
+        for x in latencies
+    ):
+        gaps.append("latency_ms")
+    return gaps
+
+
 def _stamp_provenance(report: dict) -> dict:
     """Stamp repo version provenance into every report's telemetry block.
 
@@ -284,6 +307,12 @@ def build(bundle: dict) -> dict:
         ),
     }
     _attach_optional_fields(report, bundle, control, aggregate)
+    gaps = _telemetry_gaps(report.get("telemetry"))
+    if gaps:
+        # Marked, not rejected: older runs and hand-built bundles stay
+        # readable, but a cost rollup can see which reports to distrust.
+        report["telemetry_incomplete"] = True
+        report["telemetry_gaps"] = gaps
     return _stamp_provenance(report)
 
 

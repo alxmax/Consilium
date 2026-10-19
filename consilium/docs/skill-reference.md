@@ -4,11 +4,11 @@ Reference material moved out of `SKILL.md` to keep the per-run contract small. `
 
 ## Calibration caveats (Steps 3, 5, 5b)
 
-**Categorical flip caveat:** Conservator `magnitude`/`reversibility` labels have a ~40% inter-run flip rate on ambiguous inputs (experiment 2026-05-17). If the deliberation is sensitive to the magnitude/reversibility boundary, consider double-sampling.
+**Categorical flip caveat:** in the 2026-05-17 experiment, Conservator `magnitude`/`reversibility` labels flipped in 2 of 5 paired runs on ambiguous inputs (n=5 pairs — an observation, not an estimated rate). If the deliberation is sensitive to the magnitude/reversibility boundary, consider double-sampling.
 
 **Aggregator veto threshold.** The 0.8 boundary has not been empirically validated in the [0.7, 0.9] region — boundary cases may fire non-deterministically until a follow-up stability experiment closes that gap (see `experiments/voice-score-stability-2026-05-17.md` F4).
 
-> **Calibration (R2 audit 2026-05-17):** `agreement` measures divergence between roles within ONE run — not inter-run stability. Conservator scores are anchored by categorical formula (see `conservator.md`); Generator/Control scores are unanchored self-assigned floats. A second run with the same input may produce different scores (pstdev estimated 0.12–0.18 on `risk_score`). The `confidence` value is not a calibrated probability — it is an internal-consistency signal.
+> **Calibration (R2 audit 2026-05-17):** `agreement` measures divergence between roles within ONE run — not inter-run stability. Conservator scores are anchored by categorical formula (see `conservator.md`); Generator/Control scores are unanchored self-assigned floats. A second run with the same input may produce different scores (a pstdev of 0.12–0.18 on `risk_score` was predicted; the 2026-05-17 stability run then measured a mean 0.038, max 0.10, over only 5 paired runs, in a region that did not include the 0.7–0.9 veto band — so the spread near the veto is untested, not shown to be small). The `confidence` value is not a calibrated probability — it is an internal-consistency signal.
 
 ## Step 6 — interception contract
 

@@ -1,7 +1,7 @@
 ---
 milestone: v1.0
 id: CONSILIUM-BUILD-REPORT-001
-status: confirmed
+status: draft
 level: code
 layer: feature
 owner: alxmax
@@ -26,6 +26,7 @@ Every line in this section is binding.
 - `build_report.py` derives a `why_not` summary for each non-chosen alternative from Control issues and Conservator risk: an invalid control verdict lists its issue categories; a valid verdict with issues uses the first issue's detail; a Conservator `net_concern >= 0.5` appends `risk=N.NN`.
 - When neither source yields text, `why_not` falls back to `"ranked below chosen"`, or to `"all candidates vetoed"` when `chosen` is null.
 - `build_report.py` stamps `consilium_version` and `consilium_ref` from the version module into the telemetry block of every non-skipped report it emits.
+- A non-skipped report whose telemetry lacks an integer `dispatch_count`, or has no measured latency (a `latency_ms` above 0 at the top level or on any voice), is marked `telemetry_incomplete: true` with `telemetry_gaps` naming what is missing (`dispatch_count`, `latency_ms`). It is marked, not rejected, so older runs and hand-built bundles stay readable.
 - Skipped reports (trivial-direct, prior-deliberation passthrough) go through a separate code path that requires only `skip_reason` and `signals`.
 - `pipeline_executed` is absent on skipped reports; `validate_report.py` skips that field check entirely when `skipped: true`. Full-pipeline reports always set `pipeline_executed: true`.
 - `validate_report.py` gates every report before the orchestrator writes it to `.consilium/runs/`.
@@ -43,6 +44,7 @@ Every line in this section is binding.
 - **CASE-3** — Given a bundle where the chosen candidate's control verdict has `valid=false` with issues, when `build_report.py` runs, then `voice_scores.control` is below 1.0 and the alternatives list a `why_not` string derived from those issues.
 - **CASE-4** — Given any valid bundle, when `build_report.py` runs, then the telemetry block contains a non-empty `consilium_version` and a `consilium_ref` that is either the committed HEAD sha or `""` on a dirty/unknown tree (the version-module contract — see CONSILIUM-VERSION-001), both stamped by the version module.
 - **CASE-5** — Given a bundle missing `success_criterion`, when `build_report.py` runs, then it exits with code 1 and prints an error to stderr without writing any JSON to stdout.
+- **CASE-5** — Given a full bundle whose telemetry has no `dispatch_count` and no measured latency, when `build_report.py` runs, then the report carries `telemetry_incomplete: true` and `telemetry_gaps: ["dispatch_count", "latency_ms"]`; with both present the keys are absent.
 
 ## Context (non-binding)
 

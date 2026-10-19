@@ -542,7 +542,7 @@
       "id": "CONSILIUM-BUILD-REPORT-001",
       "layer": "feature",
       "level": "code",
-      "status": "confirmed",
+      "status": "draft",
       "area": "CONSILIUM",
       "title": "build_report",
       "intent": "Assembles the canonical deliberation report shape from intermediate voice/aggregation outputs.",
@@ -555,6 +555,7 @@
         "`build_report.py` derives a `why_not` summary for each non-chosen alternative from Control issues and Conservator risk: an invalid control verdict lists its issue categories; a valid verdict with issues uses the first issue's detail; a Conservator `net_concern >= 0.5` appends `risk=N.NN`.",
         "When neither source yields text, `why_not` falls back to `\"ranked below chosen\"`, or to `\"all candidates vetoed\"` when `chosen` is null.",
         "`build_report.py` stamps `consilium_version` and `consilium_ref` from the version module into the telemetry block of every non-skipped report it emits.",
+        "A non-skipped report whose telemetry lacks an integer `dispatch_count`, or has no measured latency (a `latency_ms` above 0 at the top level or on any voice), is marked `telemetry_incomplete: true` with `telemetry_gaps` naming what is missing (`dispatch_count`, `latency_ms`). It is marked, not rejected, so older runs and hand-built bundles stay readable.",
         "Skipped reports (trivial-direct, prior-deliberation passthrough) go through a separate code path that requires only `skip_reason` and `signals`.",
         "`pipeline_executed` is absent on skipped reports; `validate_report.py` skips that field check entirely when `skipped: true`. Full-pipeline reports always set `pipeline_executed: true`.",
         "`validate_report.py` gates every report before the orchestrator writes it to `.consilium/runs/`.",
@@ -566,7 +567,7 @@
       ],
       "notes": [],
       "current_impl": [],
-      "accept": "- **CASE-1** — Given a well-formed full bundle, when `build_report.py` runs, then the output contains `pipeline_executed: true` and a `deliberation_log` array with entries for the `generator`, `control`, `conservator`, and `aggregate` steps.\n- **CASE-2** — Given a skipped bundle (`skipped: true`) with a valid `skip_reason`, when `build_report.py` runs, then the output contains `chosen_approach: skipped`, `pipeline_executed` absent or false, and `deliberation_log: []`.\n- **CASE-3** — Given a bundle where the chosen candidate's control verdict has `valid=false` with issues, when `build_report.py` runs, then `voice_scores.control` is below 1.0 and the alternatives list a `why_not` string derived from those issues.\n- **CASE-4** — Given any valid bundle, when `build_report.py` runs, then the telemetry block contains a non-empty `consilium_version` and a `consilium_ref` that is either the committed HEAD sha or `\"\"` on a dirty/unknown tree (the version-module contract — see CONSILIUM-VERSION-001), both stamped by the version module.\n- **CASE-5** — Given a bundle missing `success_criterion`, when `build_report.py` runs, then it exits with code 1 and prints an error to stderr without writing any JSON to stdout.",
+      "accept": "- **CASE-1** — Given a well-formed full bundle, when `build_report.py` runs, then the output contains `pipeline_executed: true` and a `deliberation_log` array with entries for the `generator`, `control`, `conservator`, and `aggregate` steps.\n- **CASE-2** — Given a skipped bundle (`skipped: true`) with a valid `skip_reason`, when `build_report.py` runs, then the output contains `chosen_approach: skipped`, `pipeline_executed` absent or false, and `deliberation_log: []`.\n- **CASE-3** — Given a bundle where the chosen candidate's control verdict has `valid=false` with issues, when `build_report.py` runs, then `voice_scores.control` is below 1.0 and the alternatives list a `why_not` string derived from those issues.\n- **CASE-4** — Given any valid bundle, when `build_report.py` runs, then the telemetry block contains a non-empty `consilium_version` and a `consilium_ref` that is either the committed HEAD sha or `\"\"` on a dirty/unknown tree (the version-module contract — see CONSILIUM-VERSION-001), both stamped by the version module.\n- **CASE-5** — Given a bundle missing `success_criterion`, when `build_report.py` runs, then it exits with code 1 and prints an error to stderr without writing any JSON to stdout.\n- **CASE-5** — Given a full bundle whose telemetry has no `dispatch_count` and no measured latency, when `build_report.py` runs, then the report carries `telemetry_incomplete: true` and `telemetry_gaps: [\"dispatch_count\", \"latency_ms\"]`; with both present the keys are absent.",
       "input": "",
       "output": "",
       "desc": "",
@@ -597,7 +598,12 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [
+        {
+          "signal": "unreviewed",
+          "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-CHECK-DOC-DRIFT-001",
@@ -4135,7 +4141,7 @@
     },
     {
       "month": "2026-10",
-      "count": 12,
+      "count": 13,
       "first": "2026-10-13",
       "last": "2026-10-18",
       "versions": [
@@ -4150,18 +4156,27 @@
         "v1.15.5",
         "v1.15.6",
         "v1.15.7",
-        "v1.15.8"
+        "v1.15.8",
+        "v1.15.9"
       ],
       "landmark": "v1.15.0",
       "headline": "",
       "entries": [
         {
+          "version": "v1.15.9",
+          "date": "2026-10-18",
+          "headline": "",
+          "body": "### Fixed\n- `build_report.py` now marks a non-skipped report `telemetry_incomplete: true` (with `telemetry_gaps`) when its telemetry has no integer `dispatch_count` or no measured latency, so a cost rollup can tell which reports to distrust. Marked, not rejected: older runs stay readable.\n- Published cost and variance figures overstated what was measured. The README mode table's \"Cost\" column is a nominal sub-agent ratio, not token or dollar cost, and Trias can reach 7 dispatches on a deadlock retry. The skill reference described a 40% categorical flip rate and a 0.12–0.18 score spread as findings; the experiment saw 2 flips in 5 paired runs and a 0.038 mean spread, in a region that excluded the 0.7–0.9 veto band.",
+          "first_commit": "2026-10-18",
+          "last_commit": "2026-10-18"
+        },
+        {
           "version": "v1.15.8",
           "date": "2026-10-18",
           "headline": "",
           "body": "### Fixed\n- The confidence-calibration gate scored every OK/BAD/OVR row, including OK rows assigned at log time from confidence itself, and counted a user override (OVR) as a failure. It now uses only `[confirmed]` OK and BAD rows, never scores OVR, reports what it left out (`excluded`: unconfirmed, overridden, untagged, unresolved), and a corpus with no confirmed rows gives `INSUFFICIENT_DATA` with zero resolved.\n- `feedback.py`'s success rate counted the same unconfirmed rows; it is now computed over confirmed OK/BAD only and states how many were excluded.\n- The prior-deliberation match ignored later evidence: a confirmed BAD or OVR after the OK did not stop `priors.py --label` from offering the old approach, and an OK with no run on disk could still match. A newer confirmed BAD/OVR now retires the match and is reported as `prior_contradiction`; when runs are consulted, the OK row needs a run on disk with the same date and `chosen_approach`.",
-          "first_commit": "2026-10-18",
-          "last_commit": "2026-10-18"
+          "first_commit": "2026-10-19",
+          "last_commit": "2026-10-19"
         },
         {
           "version": "v1.15.7",
@@ -4663,16 +4678,16 @@
     }
   },
   "health": {
-    "score": 82,
+    "score": 80,
     "total": 57,
     "scored": 56,
-    "healthy": 46,
+    "healthy": 45,
     "exempt": 17,
     "deprecated": 1,
-    "confirmed": 46,
+    "confirmed": 45,
     "implemented": 47,
     "tested": 32,
-    "drafts": 10,
+    "drafts": 11,
     "orphans": 0,
     "untested": 0,
     "open_intent": 0,
@@ -4680,7 +4695,7 @@
     "gate_errors": 0,
     "gate_link_sync_clean": true,
     "reviewed_score": 100,
-    "reviewed_total": 46,
+    "reviewed_total": 45,
     "unhealthy": [
       {
         "id": "CONSILIUM-AGGREGATOR-001",
@@ -4691,6 +4706,13 @@
       },
       {
         "id": "CONSILIUM-AUDIT-FEEDBACK-001",
+        "status": "draft",
+        "why": [
+          "not confirmed"
+        ]
+      },
+      {
+        "id": "CONSILIUM-BUILD-REPORT-001",
         "status": "draft",
         "why": [
           "not confirmed"

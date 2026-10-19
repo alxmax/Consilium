@@ -5,6 +5,12 @@ All notable changes to Consilium are recorded here, following
 Apache License 2.0 (see `LICENSE`); versions up to 1.14.0 were published under the
 Business Source License 1.1.
 
+## [1.15.9] — 2026-10-18
+
+### Fixed
+- `build_report.py` now marks a non-skipped report `telemetry_incomplete: true` (with `telemetry_gaps`) when its telemetry has no integer `dispatch_count` or no measured latency, so a cost rollup can tell which reports to distrust. Marked, not rejected: older runs stay readable.
+- Published cost and variance figures overstated what was measured. The README mode table's "Cost" column is a nominal sub-agent ratio, not token or dollar cost, and Trias can reach 7 dispatches on a deadlock retry. The skill reference described a 40% categorical flip rate and a 0.12–0.18 score spread as findings; the experiment saw 2 flips in 5 paired runs and a 0.038 mean spread, in a region that excluded the 0.7–0.9 veto band.
+
 ## [1.15.8] — 2026-10-18
 
 ### Fixed

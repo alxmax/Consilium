@@ -1,6 +1,6 @@
 {
   "name": "consilium",
-  "version": "1.15.8",
+  "version": "1.15.9",
   "owner": {
     "name": "Schipor Alexandru"
   },
@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "consilium",
-      "version": "1.15.8",
+      "version": "1.15.9",
       "source": "./consilium",
       "description": "Multi-voice deliberation for code changes (Generator/Control/Conservator) \u2014 confidence scoring, Sequential/Dialectic/Trias modes, and a post-deliberation implement pipeline. Stdlib-only."
     }
