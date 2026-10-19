@@ -337,6 +337,206 @@ class TestConservativeOverride(unittest.TestCase):
         self.assertNotIn("retry_suggested", result)
 
 
+class TestAdmissibility(unittest.TestCase):
+    """A candidate that is invalid, not evaluated by Control, or vetoed by the
+    Conservator must not become a normal recommendation — in either the
+    sequential cascade or conservative_override (the Step 5 default)."""
+
+    @staticmethod
+    def _gen(preferred="A"):
+        return {
+            "candidates": [{"id": "A"}, {"id": "B"}, {"id": "do_nothing"}],
+            "preferred": preferred,
+            "abstain": {"triggered": False, "reason": None},
+        }
+
+    @staticmethod
+    def _ctl(verdicts):
+        return {
+            "glossary": {"t": "d"}, "glossary_fail": False,
+            "glossary_attempts": [], "disagreements": [], "verdicts": verdicts,
+        }
+
+    @staticmethod
+    def _cons(concerns):
+        return {"scores": [
+            {"id": cid, "regression_risk": {
+                "reversibility": "complete", "magnitude": "trivial",
+                "net_concern": nc},
+             "meta_recommendation": None, "irreversibility_flag": False}
+            for cid, nc in concerns.items()
+        ]}
+
+    @staticmethod
+    def _ok(cid):
+        return {"id": cid, "valid": True, "issues": [], "tests_to_write": []}
+
+    def _seq(self, verdicts, concerns=None, waiver=None):
+        return aggregator.aggregate_sequential(
+            self._gen(), self._ctl(verdicts),
+            self._cons(concerns or {"A": 0.05, "B": 0.1, "do_nothing": 0.05}),
+            waiver=waiver,
+        )
+
+    # --- sequential cascade -------------------------------------------------
+    def test_valid_evaluated_preferred_is_aggregated(self):
+        r = self._seq([self._ok("A"), self._ok("B")])
+        self.assertEqual(r["result"], "AGGREGATE")
+        self.assertEqual(r["chosen"], "A")
+        self.assertTrue(r["admissibility"]["checked"])
+
+    def test_invalid_preferred_is_not_chosen(self):
+        bad = {"id": "A", "valid": False, "issues": [], "tests_to_write": []}
+        r = self._seq([bad, self._ok("B")])
+        self.assertEqual(r["result"], "REWORK")
+        self.assertIsNone(r["chosen"])
+        self.assertEqual(r["reason"], "preferred_inadmissible")
+        self.assertIn("invalid", r["inadmissible_reasons"])
+        self.assertEqual(r["admissible_alternatives"], ["B"])
+
+    def test_control_absent_is_not_a_normal_recommendation(self):
+        for verdicts in ([], [self._ok("B")]):  # no verdicts / none for A
+            r = self._seq(verdicts)
+            self.assertEqual(r["result"], "REWORK", verdicts)
+            self.assertIn("not_evaluated", r["inadmissible_reasons"])
+
+    def test_vetoed_preferred_is_not_chosen(self):
+        for concern in (0.81, 0.95, 0.99):
+            r = self._seq([self._ok("A"), self._ok("B")],
+                          {"A": concern, "B": 0.1, "do_nothing": 0.05})
+            self.assertEqual(r["result"], "REWORK", concern)
+            self.assertIn("vetoed", r["inadmissible_reasons"])
+
+    def test_veto_boundary_is_strict_in_sequential(self):
+        r = self._seq([self._ok("A")], {"A": 0.80})
+        self.assertEqual(r["result"], "AGGREGATE")
+
+    def test_explicit_waiver_is_recorded_and_allows_the_pick(self):
+        bad = {"id": "A", "valid": False, "issues": [], "tests_to_write": []}
+        r = self._seq([bad], waiver={"id": "A", "reason": "user accepted the risk"})
+        self.assertEqual(r["result"], "AGGREGATE")
+        self.assertEqual(r["chosen"], "A")
+        w = r["admissibility"]["waived"]
+        self.assertEqual((w["id"], w["reason"]), ("A", "user accepted the risk"))
+        self.assertIn("invalid", w["reasons"])
+
+    def test_waiver_without_reason_or_for_another_id_is_ignored(self):
+        bad = {"id": "A", "valid": False, "issues": [], "tests_to_write": []}
+        for waiver in ({"id": "A", "reason": "  "}, {"id": "B", "reason": "x"},
+                       {"id": "A"}, "yes"):
+            r = self._seq([bad], waiver=waiver)
+            self.assertEqual(r["result"], "REWORK", waiver)
+
+    # --- conservative_override (Step 5 default) -------------------------------
+    @staticmethod
+    def _cand(cid, gen, ctrl, cons, **extra):
+        return {"id": cid, "scores": {
+            "generator": gen, "control": ctrl, "conservator": cons}, **extra}
+
+    def test_control_rejected_candidate_cannot_win_on_other_voices(self):
+        r = aggregator.aggregate_conservative_override([
+            self._cand("invalid_best", 1.0, 0.0, 0.05),
+            self._cand("valid_ok", 0.6, 0.6, 0.3),
+        ])
+        self.assertEqual(r["chosen"], "valid_ok")
+        v = {x["id"]: x for x in r["vetoed"]}
+        self.assertEqual(v["invalid_best"]["reason"], "control_invalid")
+
+    def test_explicit_valid_false_is_rejected(self):
+        r = aggregator.aggregate_conservative_override([
+            self._cand("flagged", 1.0, 0.9, 0.05, valid=False),
+            self._cand("ok", 0.5, 0.5, 0.3),
+        ])
+        self.assertEqual(r["chosen"], "ok")
+
+    def test_all_control_rejected_yields_no_choice_and_no_relax_hint(self):
+        r = aggregator.aggregate_conservative_override([
+            self._cand("a", 0.9, 0.0, 0.1),
+            self._cand("b", 0.8, 0.0, 0.2),
+        ])
+        self.assertIsNone(r["chosen"])
+        self.assertNotIn("retry_suggested", r)
+        self.assertTrue(r.get("escalation_required"))
+
+    def test_relax_hint_ignores_control_rejected_candidates(self):
+        r = aggregator.aggregate_conservative_override([
+            self._cand("invalid_low_risk", 0.9, 0.0, 0.05),
+            self._cand("valid_high_risk", 0.8, 0.8, 0.84),
+        ])
+        self.assertIsNone(r["chosen"])
+        rs = r["retry_suggested"]
+        self.assertEqual(rs["lowest_risk_candidate"]["id"], "valid_high_risk")
+
+    # --- report validation ----------------------------------------------------
+    @staticmethod
+    def _report(verdicts, concerns, waived=None, chosen="A"):
+        agg = {"scheme": "sequential", "result": "AGGREGATE", "chosen": chosen,
+               "admissibility": {"checked": True}}
+        if waived:
+            agg["admissibility"]["waived"] = waived
+        return {
+            "chosen_approach": chosen, "pipeline_executed": True,
+            "deliberation_log": [
+                {"step": "generator", "candidates": [{"id": "A"}]},
+                {"step": "control", "verdicts": verdicts},
+                {"step": "conservator", "scores": [
+                    {"id": cid, "regression_risk": {"net_concern": nc}}
+                    for cid, nc in concerns.items()]},
+                {"step": "aggregate", "scheme": "sequential", "result": agg},
+            ],
+        }
+
+    def test_validator_accepts_an_admissible_choice(self):
+        rep = self._report([self._ok("A")], {"A": 0.1})
+        self.assertEqual(validate_report._validate_admissibility(rep), [])
+
+    def test_validator_rejects_invalid_unevaluated_and_vetoed_choices(self):
+        bad = {"id": "A", "valid": False, "issues": []}
+        for label, rep in (
+            ("invalid", self._report([bad], {"A": 0.1})),
+            ("not evaluated", self._report([], {"A": 0.1})),
+            ("vetoed", self._report([self._ok("A")], {"A": 0.95})),
+        ):
+            problems = validate_report._validate_admissibility(rep)
+            self.assertTrue(any("admissib" in p for p in problems), label)
+            self.assertTrue(
+                any("admissib" in p for p in validate_report.validate(rep)
+                    if "admissib" in p) or problems, label)
+
+    def test_validator_accepts_a_recorded_waiver_only(self):
+        bad = {"id": "A", "valid": False, "issues": []}
+        waived = {"id": "A", "reasons": ["invalid"], "reason": "user accepted"}
+        self.assertEqual(validate_report._validate_admissibility(
+            self._report([bad], {"A": 0.1}, waived=waived)), [])
+        for w in ({"id": "A", "reasons": ["invalid"], "reason": ""},
+                  {"id": "B", "reasons": ["invalid"], "reason": "x"}):
+            self.assertTrue(validate_report._validate_admissibility(
+                self._report([bad], {"A": 0.1}, waived=w)), w)
+
+    def test_validator_leaves_legacy_reports_without_the_block_readable(self):
+        bad = {"id": "A", "valid": False, "issues": []}
+        rep = self._report([bad], {"A": 0.95})
+        del rep["deliberation_log"][3]["result"]["admissibility"]
+        self.assertEqual(validate_report._validate_admissibility(rep), [])
+
+    def test_validator_does_not_apply_the_net_concern_veto_to_other_schemes(self):
+        rep = self._report([self._ok("A")], {"A": 0.95})
+        rep["deliberation_log"][3]["scheme"] = "conservative_override"
+        rep["deliberation_log"][3]["result"]["scheme"] = "conservative_override"
+        self.assertEqual(validate_report._validate_admissibility(rep), [])
+        bad = {"id": "A", "valid": False, "issues": []}
+        rep2 = self._report([bad], {"A": 0.1})
+        rep2["deliberation_log"][3]["scheme"] = "conservative_override"
+        self.assertTrue(validate_report._validate_admissibility(rep2))
+
+    def test_validator_skips_reports_it_cannot_judge(self):
+        self.assertEqual(validate_report._validate_admissibility(
+            {"chosen_approach": "skipped", "skipped": True}), [])
+        self.assertEqual(validate_report._validate_admissibility(
+            {"chosen_approach": None, "pipeline_executed": True,
+             "deliberation_log": []}), [])
+
+
 class TestTeamVote(unittest.TestCase):
     # verifies: CONSILIUM-AGGREGATOR-001#CASE-3
     def test_two_one_vote_picks_majority_and_records_dissent(self):

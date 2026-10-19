@@ -5,6 +5,11 @@ All notable changes to Consilium are recorded here, following
 Apache License 2.0 (see `LICENSE`); versions up to 1.14.0 were published under the
 Business Source License 1.1.
 
+## [1.15.6] — 2026-10-18
+
+### Fixed
+- An invalid, never-evaluated or vetoed candidate could become the normal recommendation. `conservative_override` (the Step 5 default) ranked a candidate Control had rejected (`valid: false` / control score 0) on its generator and safety scores alone; the `sequential` cascade aggregated the Generator's `preferred` without looking at Control's verdict or the Conservator's `net_concern`. Now `conservative_override` vetoes Control-rejected candidates (`reason: control_invalid`), and `sequential` returns REWORK (`preferred_inadmissible`) for an inadmissible `preferred` unless an explicit `waiver` `{id, reason}` is supplied, which is recorded in `admissibility.waived`. `validate_report.py` rejects a report whose chosen candidate its own log shows to be inadmissible, absent a recorded waiver; older runs without the `admissibility` block stay readable.
+
 ## [1.15.5] — 2026-10-18
 
 ### Fixed

@@ -379,7 +379,7 @@
       "id": "CONSILIUM-AGGREGATOR-001",
       "layer": "feature",
       "level": "code",
-      "status": "confirmed",
+      "status": "draft",
       "area": "CONSILIUM",
       "title": "aggregator",
       "intent": "Merges scored Generator/Control/Conservator outputs into a chosen candidate via one of five aggregation schemes.",
@@ -393,7 +393,9 @@
         "`aggregator.py` reads input from stdin, or from the file named by `--input` (default: stdin), as a JSON object with a `candidates` array and optional `weights`, `veto_threshold`, `personalities` keys; the exact schema varies by scheme.",
         "`aggregator.py` writes a JSON object to stdout with `scheme`, `chosen`, and `ranking`, plus scheme-specific fields drawn from `vetoed`, `vote_pattern`, `dissent`, `retry_suggested`, `low_separation`, `veto_uncertain`.",
         "`aggregator.py` exits 0 on success and exits non-zero (a raised `ValueError`) on invalid input.",
-        "`conservative_override` with `auto_relax=False`, when all candidates are vetoed, returns `{\"chosen\": null, \"reason\": \"all candidates vetoed by conservator\", \"vetoed\": [...]}` with no `retry_suggested` field.",
+        "`conservative_override` with `auto_relax=False`, when all candidates are vetoed, returns `{\"chosen\": null, \"reason\": \"all candidates vetoed by conservator or rejected by Control\", \"vetoed\": [...]}` with no `retry_suggested` field.",
+        "`conservative_override` also excludes a candidate Control did not clear — `valid: false`, or a `control` score of 0 or less (the encoding `build_report.py` gives an invalid or never-evaluated candidate) — and lists it in `vetoed` with `reason: \"control_invalid\"`. When no candidate passed Control the result sets `escalation_required` and no `retry_suggested`, since relaxing the risk threshold cannot help.",
+        "The `sequential` scheme runs an admissibility check on the Generator's `preferred` before AGGREGATE: no Control verdict (`not_evaluated`), a verdict that is not `valid: true` (`invalid`), or `net_concern` above `0.8` (`vetoed`, strict) yields `REWORK` with `reason: \"preferred_inadmissible\"`, `chosen: null`, `inadmissible_reasons` and the `admissible_alternatives`. An optional `waiver` `{id, reason}` (non-empty reason, naming the preferred id) lets the pick proceed and is recorded in `admissibility.waived`. `scale_down` skips Control by design and is exempt. Every successful `sequential` and `conservative_override` result carries `admissibility: {checked: true}`.",
         "The `sequential` scheme's input schema is three top-level keys — `generator`, `control`, `conservator` — holding raw voice output dicts; the function reads only the raw-dict keys (`glossary_fail`, `disagreements`, `scores[]`, `preferred`, `abstain`). No mixed numeric-score input is defined; passing numeric scores alongside raw dicts is undefined behavior.",
         "All seven sequential routing outcomes (BLOCK/glossary_fail, BLOCK/irreversibility_no_consent, ESCALATE, REWORK, ADAPT_SHORT, ADAPT_EXTENDED, AGGREGATE) are tested in `scripts/test_round2.py`."
       ],
@@ -402,7 +404,7 @@
       ],
       "notes": [],
       "current_impl": [],
-      "accept": "- **CASE-1** — Given a candidates list where every candidate's Conservator score exceeds `veto_threshold` and `auto_relax=True`, when `conservative_override` runs, then the output contains `chosen: null` and a non-empty `retry_suggested` block.\n- **CASE-2** — Given two candidates with identical generator and control scores but different Conservator risk, when `conservative_override` ranks them, then the candidate with lower risk ranks first.\n- **CASE-3** — Given `vote_pattern='2-1'` with three personalities where two of them choose the same candidate, when `team_vote` runs, then `chosen` equals the majority candidate and `dissent` is non-empty.\n- **CASE-4** — Given sequential input where `control_out['glossary_fail']` is `True`, when the `sequential` scheme runs, then the output has `result: BLOCK` and `reason: glossary_fail`, regardless of other signals.\n- **CASE-5** — Given three or more simultaneous triggers, when the `sequential` scheme runs, then the output has `result: ESCALATE` with a `triggers` list of length >= 3.",
+      "accept": "- **CASE-1** — Given a candidates list where every candidate's Conservator score exceeds `veto_threshold` and `auto_relax=True`, when `conservative_override` runs, then the output contains `chosen: null` and a non-empty `retry_suggested` block.\n- **CASE-2** — Given two candidates with identical generator and control scores but different Conservator risk, when `conservative_override` ranks them, then the candidate with lower risk ranks first.\n- **CASE-3** — Given `vote_pattern='2-1'` with three personalities where two of them choose the same candidate, when `team_vote` runs, then `chosen` equals the majority candidate and `dissent` is non-empty.\n- **CASE-4** — Given sequential input where `control_out['glossary_fail']` is `True`, when the `sequential` scheme runs, then the output has `result: BLOCK` and `reason: glossary_fail`, regardless of other signals.\n- **CASE-5** — Given three or more simultaneous triggers, when the `sequential` scheme runs, then the output has `result: ESCALATE` with a `triggers` list of length >= 3.\n- **CASE-6** — Given a sequential input whose preferred candidate has `valid: false`, no Control verdict, or `net_concern` above 0.8, when `sequential` runs, then the result is `REWORK` with `chosen: null`; with a matching `waiver` the result is `AGGREGATE` and `admissibility.waived` records the reason.\n- **CASE-7** — Given a candidate with the best generator and safety scores but a `control` score of 0, when `conservative_override` runs, then it is not chosen and appears in `vetoed` with `reason: \"control_invalid\"`.",
       "input": "",
       "output": "",
       "desc": "",
@@ -421,7 +423,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "consilium/modes/aggregator_schemes.md:55"
+          "loc": "consilium/modes/aggregator_schemes.md:56"
         },
         {
           "role": "implements",
@@ -435,7 +437,12 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [
+        {
+          "signal": "unreviewed",
+          "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-AUDIT-COUNTER-001",
@@ -1754,7 +1761,7 @@
         },
         {
           "role": "implements",
-          "loc": "consilium/modes/sequential.md:89"
+          "loc": "consilium/modes/sequential.md:90"
         },
         {
           "role": "implements",
@@ -1762,7 +1769,7 @@
         },
         {
           "role": "implements",
-          "loc": "consilium/scripts/validate_report.py:808"
+          "loc": "consilium/scripts/validate_report.py:871"
         },
         {
           "role": "tested-by",
@@ -1828,7 +1835,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "consilium/modes/sequential.md:86"
+          "loc": "consilium/modes/sequential.md:87"
         }
       ],
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
@@ -2618,7 +2625,7 @@
       "id": "CONSILIUM-VALIDATE-REPORT-001",
       "layer": "bus",
       "level": "code",
-      "status": "confirmed",
+      "status": "draft",
       "area": "CONSILIUM",
       "title": "validate_report",
       "intent": "Describes observed behavior, verified against consilium/scripts/validate_report.py source.",
@@ -2633,6 +2640,7 @@
         "`deliberation_log` contains an aggregate step whose `result` is a dict, not a string narrative.",
         "For non-bypassed reports, `deliberation_log` also requires the `generator` and `control` steps to be present.",
         "`deliberation_log`'s `conservator` step presence is not enforced, except when `--strict-round2` is set.",
+        "For a pipeline-executed, non-Trias, non-passthrough report whose aggregate result carries an `admissibility` block, the chosen candidate must be admissible by the report's own log: a `valid: true` Control verdict and (for the `sequential` scheme) `net_concern` not above 0.8. A chosen candidate that is not is an error unless the aggregate result's `admissibility.waived` names it with a non-empty `reason`. Reports without the block (older runs) are not judged.",
         "`telemetry` is present for non-skipped reports and carries a non-empty `mode` string.",
         "Telemetry count fields (`tokens_in`, `tokens_out`, `latency_ms`) are non-negative ints, checked strictly via `isinstance(v, int)`; a float value such as `1500.0` is rejected.",
         "Each telemetry count field is optional per voice.",
@@ -2674,7 +2682,12 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [
+        {
+          "signal": "unreviewed",
+          "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-VALIDATE-SKEPTIC-001",
@@ -4110,7 +4123,7 @@
     },
     {
       "month": "2026-10",
-      "count": 9,
+      "count": 10,
       "first": "2026-10-13",
       "last": "2026-10-18",
       "versions": [
@@ -4122,18 +4135,27 @@
         "v1.15.2",
         "v1.15.3",
         "v1.15.4",
-        "v1.15.5"
+        "v1.15.5",
+        "v1.15.6"
       ],
       "landmark": "v1.15.0",
       "headline": "",
       "entries": [
         {
+          "version": "v1.15.6",
+          "date": "2026-10-18",
+          "headline": "",
+          "body": "### Fixed\n- An invalid, never-evaluated or vetoed candidate could become the normal recommendation. `conservative_override` (the Step 5 default) ranked a candidate Control had rejected (`valid: false` / control score 0) on its generator and safety scores alone; the `sequential` cascade aggregated the Generator's `preferred` without looking at Control's verdict or the Conservator's `net_concern`. Now `conservative_override` vetoes Control-rejected candidates (`reason: control_invalid`), and `sequential` returns REWORK (`preferred_inadmissible`) for an inadmissible `preferred` unless an explicit `waiver` `{id, reason}` is supplied, which is recorded in `admissibility.waived`. `validate_report.py` rejects a report whose chosen candidate its own log shows to be inadmissible, absent a recorded waiver; older runs without the `admissibility` block stay readable.",
+          "first_commit": "2026-10-18",
+          "last_commit": "2026-10-18"
+        },
+        {
           "version": "v1.15.5",
           "date": "2026-10-18",
           "headline": "",
           "body": "### Fixed\n- `FEEDBACK.html` and its `runs/.run_path_map.json` sidecar were updated by read-modify-write cycles with no mutual exclusion: concurrent `log_feedback.py` appends, an outcome upgrade, `mark_outcome.py` and `audit_feedback.py --backfill` overwrote each other (9 concurrent writers kept 3 rows in a reproduction). All writers now run their whole parse -> write sequence under a new cross-process `feedback_lock`.\n- `log_feedback.py` saved the sidecar entry before the row, so a failure in between left a sidecar entry vouching for a row that did not exist, and `priors.py` then reported nothing missing. The row is now written first, a retry adopts a row left without its sidecar entry, and `priors.py` counts a sidecar entry only when a FEEDBACK row with that fingerprint exists.",
-          "first_commit": "2026-10-18",
-          "last_commit": "2026-10-18"
+          "first_commit": "2026-10-19",
+          "last_commit": "2026-10-19"
         },
         {
           "version": "v1.15.4",
@@ -4437,7 +4459,7 @@
       "abstraction": 4,
       "inheritance": 0,
       "polymorphism": 0,
-      "standards": 11
+      "standards": 12
     },
     "findings": [
       {
@@ -4454,7 +4476,7 @@
         "file": "consilium/scripts/aggregator.py",
         "line": 1,
         "name": "aggregator.py",
-        "detail": "765 lines (over 500)"
+        "detail": "889 lines (over 500)"
       },
       {
         "pillar": "encapsulation",
@@ -4526,7 +4548,7 @@
         "file": "consilium/scripts/validate_report.py",
         "line": 1,
         "name": "validate_report.py",
-        "detail": "809 lines (over 500)"
+        "detail": "872 lines (over 500)"
       },
       {
         "pillar": "abstraction",
@@ -4534,7 +4556,15 @@
         "file": "consilium/scripts/validate_report.py",
         "line": 90,
         "name": "validate",
-        "detail": "7 top-level functions start with `validate`: _validate_deliberation_log, _validate_pipeline_executed, _validate_regression_risk, _validate_sequential_fields, _validate_telemetry, _validate_telemetry_required"
+        "detail": "8 top-level functions start with `validate`: _validate_admissibility, _validate_deliberation_log, _validate_pipeline_executed, _validate_regression_risk, _validate_sequential_fields, _validate_telemetry"
+      },
+      {
+        "pillar": "standards",
+        "kind": "line-too-long",
+        "file": "consilium/scripts/validate_report.py",
+        "line": 316,
+        "name": "validate_report.py",
+        "detail": "3 line(s) wider than 80 columns, first at line 316"
       },
       {
         "pillar": "standards",
@@ -4586,16 +4616,16 @@
     }
   },
   "health": {
-    "score": 89,
+    "score": 86,
     "total": 57,
     "scored": 56,
-    "healthy": 50,
+    "healthy": 48,
     "exempt": 17,
     "deprecated": 1,
-    "confirmed": 50,
+    "confirmed": 48,
     "implemented": 47,
     "tested": 32,
-    "drafts": 6,
+    "drafts": 8,
     "orphans": 0,
     "untested": 0,
     "open_intent": 0,
@@ -4603,8 +4633,15 @@
     "gate_errors": 0,
     "gate_link_sync_clean": true,
     "reviewed_score": 100,
-    "reviewed_total": 50,
+    "reviewed_total": 48,
     "unhealthy": [
+      {
+        "id": "CONSILIUM-AGGREGATOR-001",
+        "status": "draft",
+        "why": [
+          "not confirmed"
+        ]
+      },
       {
         "id": "CONSILIUM-AUDIT-FEEDBACK-001",
         "status": "draft",
@@ -4642,6 +4679,13 @@
       },
       {
         "id": "CONSILIUM-UTILS-001",
+        "status": "draft",
+        "why": [
+          "not confirmed"
+        ]
+      },
+      {
+        "id": "CONSILIUM-VALIDATE-REPORT-001",
         "status": "draft",
         "why": [
           "not confirmed"
