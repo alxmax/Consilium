@@ -270,6 +270,16 @@ def load_config(reqs_dir, problems=None):
         return {}
 
 
+def _band_ok(band):  # implements: REQ-CONFIG-949
+    """A fan-out band is `[low, high]`: `high` a whole number, `low` one or
+    null, and no more than `high`. The lint compares a child count with
+    both, so anything else is a traceback there or a band nothing fits."""
+    count = lambda x: isinstance(x, int) and not isinstance(x, bool) and x >= 0
+    return (isinstance(band, (list, tuple)) and len(band) == 2
+            and count(band[1])
+            and (band[0] is None or (count(band[0]) and band[0] <= band[1])))
+
+
 def apply_config(cfg, out=None, problems=None):
     # implements: ARCH-CONFIG-060  # implements: REQ-CONFIG-949
     """Apply `cfg` to the module constants. Returns the names applied. A
@@ -334,6 +344,11 @@ def apply_config(cfg, out=None, problems=None):
                 continue
             merged = dict(default)
             for k, v in value.items():
+                if key == "LINT_FANOUT_BANDS" and not _band_ok(v):
+                    reject("config: ignoring {}[{!r}] (expected [low, high], "
+                           "high a whole number, low one or null, low <= "
+                           "high)".format(key, k))
+                    continue
                 merged[k] = tuple(v) if isinstance(v, list) else v
             g[key] = merged
         elif (isinstance(default, bool)

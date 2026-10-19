@@ -5,6 +5,7 @@ import os, re
 
 from .acceptance import _acc_blocks, _acc_items
 from .author import NOT_MILESTONE_RE, _parse_todos_from_text
+from .clarify import _clarify_questions, _domain_heads
 from .model import RISK_ADVICE, _area_of, _as_list, _satisfied_by
 from .risk import _risk_signals
 from .sections import ACCEPTANCE_LABELS, CONTRACT_LABELS, _from_any, _has_any
@@ -114,7 +115,7 @@ def _build_map_node(rid, r, used_by, satisfied_by, members, ac_cover):
 
 def _build_map_data(reqs, members, ac_cover=None):
     # implements: ARCH-MAP-007  # implements: REQ-MAP-870
-    # implements: REQ-TRACE-935
+    # implements: REQ-TRACE-935  # implements: REQ-CLARIFY-1100
     """Assemble the {nodes, edges} registry graph that drives every
     rendered surface (HTML map, Mermaid blocks, and the JSON export).
     Pure: no IO.
@@ -131,9 +132,13 @@ def _build_map_data(reqs, members, ac_cover=None):
     # reverse upstream edges  # implements: ARCH-TRACE-020
     satisfied_by = _satisfied_by(reqs)
     data = {"nodes": [], "edges": [], "upstream_edges": []}
+    # the viewer's Questions page reads what `clarify` asks, unfiltered
+    domain = _domain_heads(reqs)  # implements: REQ-CLARIFY-1100
     for rid, r in reqs.items():
-        data["nodes"].append(_build_map_node(
-            rid, r, used_by, satisfied_by, members, ac_cover))
+        node = _build_map_node(
+            rid, r, used_by, satisfied_by, members, ac_cover)
+        node["clarify"] = _clarify_questions(rid, r, reqs, domain)
+        data["nodes"].append(node)
     for rid, r in reqs.items():
         for dep in _as_list(r["meta"].get("depends_on")):
             if dep in reqs:          # skip dangling targets — no phantom node

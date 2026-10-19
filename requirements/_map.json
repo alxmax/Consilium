@@ -1,5 +1,5 @@
 {
-  "engine_version": "2026-10-13.1",
+  "engine_version": "2026-10-18",
   "repo": "alxmax/Consilium",
   "nodes": [
     {
@@ -58,7 +58,8 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": []
     },
     {
       "id": "ARCH-CONSILIUM-LEARNING-001",
@@ -121,7 +122,8 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": []
     },
     {
       "id": "ARCH-CONSILIUM-MODES-001",
@@ -185,7 +187,8 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": []
     },
     {
       "id": "ARCH-CONSILIUM-REPO-GATES-001",
@@ -244,7 +247,18 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "no-failure-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "What happens on the failure path -- missing input, invalid value, nothing to do?",
+          "suggest": "Add one case for the way this can go wrong; it is the case implementations skip."
+        }
+      ]
     },
     {
       "id": "ARCH-CONSILIUM-REPORT-001",
@@ -311,7 +325,8 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": []
     },
     {
       "id": "ARCH-CONSILIUM-VOICES-001",
@@ -373,7 +388,8 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": []
     },
     {
       "id": "CONSILIUM-AGGREGATOR-001",
@@ -442,6 +458,26 @@
           "signal": "unreviewed",
           "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
         }
+      ],
+      "clarify": [
+        {
+          "rule": "vague-term",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "clause 4",
+          "quote": "The `risk_adjusted_utility` scheme applies a smooth sigmoid penalty instead of a hard veto, so candidates clustered near the threshold rank gracefully.",
+          "question": "What is the measurable threshold behind \"gracefully\"?",
+          "suggest": "Replace it with a number and a unit, or with the observable condition it stands for."
+        },
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "7 clause(s) have no case: there are 14 clauses and 7 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
       ]
     },
     {
@@ -482,7 +518,8 @@
       "test_exempt": null,
       "milestone": null,
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": []
     },
     {
       "id": "CONSILIUM-AUDIT-FEEDBACK-001",
@@ -535,6 +572,17 @@
         {
           "signal": "unreviewed",
           "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "3 clause(s) have no case: there are 6 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
         }
       ]
     },
@@ -602,6 +650,17 @@
         {
           "signal": "unreviewed",
           "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "8 clause(s) have no case: there are 14 clauses and 6 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
         }
       ]
     },
@@ -679,7 +738,18 @@
       "test_exempt": "reads live source files and runs git — integration-only gate",
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "28 clause(s) have no case: there are 33 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-CHECK-DOC-DRIFT-EXPLAINER-001",
@@ -736,7 +806,18 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "3 clause(s) have no case: there are 7 clauses and 4 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-CHECK-PUBLIC-LEAK-001",
@@ -791,7 +872,18 @@
       "test_exempt": null,
       "milestone": "v1.2",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "8 clause(s) have no case: there are 13 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-CHECK-VERSIONS-001",
@@ -845,7 +937,18 @@
       "test_exempt": null,
       "milestone": "v1.4.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "5 clause(s) have no case: there are 12 clauses and 7 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-CONFIDENCE-001",
@@ -914,7 +1017,18 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "15 clause(s) have no case: there are 20 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-CONFIDENCE-CALIBRATION-001",
@@ -970,6 +1084,17 @@
         {
           "signal": "unreviewed",
           "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "4 clause(s) have no case: there are 8 clauses and 4 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
         }
       ]
     },
@@ -1034,6 +1159,17 @@
           "signal": "unreviewed",
           "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
         }
+      ],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "3 clause(s) have no case: there are 8 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
       ]
     },
     {
@@ -1096,7 +1232,18 @@
       "priority": "",
       "risks": [],
       "clauses": 3,
-      "covered": 3
+      "covered": 3,
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "2 clause(s) have no case: there are 5 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-IMPLEMENT-PIPELINE-001",
@@ -1168,6 +1315,17 @@
           "signal": "unreviewed",
           "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
         }
+      ],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "10 clause(s) have no case: there are 15 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
       ]
     },
     {
@@ -1219,7 +1377,27 @@
       "test_exempt": "agent spec document — behavioral contract validated by Step 7 auto-dispatch integration and implement-subagent smoke tests",
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "ambiguous-actor",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "clause 1",
+          "quote": "The system provides a `consilium-implement-subagent` agent that, given a GO Consilium deliberation report, executes the Coder → (Test Writer ∥ Reviewer) pipeline and returns a JSON file manifest — NOT a `.consilium/runs/` deliberation report.",
+          "question": "Who performs this -- which command or component?",
+          "suggest": "Name the subject the title names, so the clause reads on its own."
+        },
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "5 clause(s) have no case: there are 8 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-IMPLEMENT-TEST-WRITER-001",
@@ -1280,7 +1458,18 @@
       "priority": "",
       "risks": [],
       "clauses": 2,
-      "covered": 2
+      "covered": 2,
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "1 clause(s) have no case: there are 4 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-INFER-PIPELINE-001",
@@ -1334,7 +1523,18 @@
       "test_exempt": null,
       "milestone": null,
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "2 clause(s) have no case: there are 7 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-LENS-ESSENTIALIST-001",
@@ -1383,7 +1583,27 @@
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "2 clause(s) have no case: there are 5 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        },
+        {
+          "rule": "no-failure-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "What happens on the failure path -- missing input, invalid value, nothing to do?",
+          "suggest": "Add one case for the way this can go wrong; it is the case implementations skip."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-LENS-SENTINEL-001",
@@ -1431,7 +1651,18 @@
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "2 clause(s) have no case: there are 5 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-LENS-VERIFIER-001",
@@ -1480,7 +1711,27 @@
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "2 clause(s) have no case: there are 5 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        },
+        {
+          "rule": "no-failure-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "What happens on the failure path -- missing input, invalid value, nothing to do?",
+          "suggest": "Add one case for the way this can go wrong; it is the case implementations skip."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-LOG-FEEDBACK-001",
@@ -1545,6 +1796,26 @@
         {
           "signal": "unreviewed",
           "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "6 clause(s) have no case: there are 15 clauses and 9 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        },
+        {
+          "rule": "over-scoped",
+          "severity": "advisory",
+          "basis": "count",
+          "where": "Description",
+          "quote": "",
+          "question": "This requirement carries 15 clauses and 9 cases (advisory limits 10 and 7). Which of them is a separate requirement?",
+          "suggest": "Split the ones that could change for a different reason."
         }
       ]
     },
@@ -1612,6 +1883,17 @@
           "signal": "unreviewed",
           "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
         }
+      ],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "10 clause(s) have no case: there are 15 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
       ]
     },
     {
@@ -1669,7 +1951,27 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "7 clause(s) have no case: there are 12 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        },
+        {
+          "rule": "no-failure-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "What happens on the failure path -- missing input, invalid value, nothing to do?",
+          "suggest": "Add one case for the way this can go wrong; it is the case implementations skip."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-MODE-DIALECTIC-001",
@@ -1724,7 +2026,27 @@
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "6 clause(s) have no case: there are 9 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        },
+        {
+          "rule": "no-failure-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "What happens on the failure path -- missing input, invalid value, nothing to do?",
+          "suggest": "Add one case for the way this can go wrong; it is the case implementations skip."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-MODE-LENS-001",
@@ -1799,7 +2121,27 @@
       "priority": "",
       "risks": [],
       "clauses": 3,
-      "covered": 3
+      "covered": 3,
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "4 clause(s) have no case: there are 7 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        },
+        {
+          "rule": "no-failure-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "What happens on the failure path -- missing input, invalid value, nothing to do?",
+          "suggest": "Add one case for the way this can go wrong; it is the case implementations skip."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-MODE-SEQUENTIAL-001",
@@ -1859,7 +2201,18 @@
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "1 clause(s) have no case: there are 6 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-MODE-SKEPTIC-ON-CHOSEN-001",
@@ -1911,7 +2264,18 @@
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "3 clause(s) have no case: there are 6 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-MODE-TRIAS-001",
@@ -1985,7 +2349,18 @@
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "15 clause(s) have no case: there are 18 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-PERSONALITIES-001",
@@ -2044,7 +2419,18 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "6 clause(s) have no case: there are 11 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-PLUGIN-FOLDER-001",
@@ -2093,7 +2479,18 @@
       "test_exempt": null,
       "milestone": "v1.14.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "2 clause(s) have no case: there are 9 clauses and 7 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-PRIORS-001",
@@ -2156,6 +2553,17 @@
         {
           "signal": "unreviewed",
           "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
+        }
+      ],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "10 clause(s) have no case: there are 14 clauses and 4 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
         }
       ]
     },
@@ -2221,7 +2629,18 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "11 clause(s) have no case: there are 16 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-RENDER-IMPL-PREVIEW-001",
@@ -2284,7 +2703,18 @@
       "test_exempt": null,
       "milestone": "v1.2",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "13 clause(s) have no case: there are 18 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-RUN-EVALS-001",
@@ -2334,7 +2764,18 @@
       "test_exempt": "subprocess-based eval harness — acceptance gated by run_evals.py itself in CI",
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "7 clause(s) have no case: there are 12 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-SCOPE-GATE-001",
@@ -2406,7 +2847,27 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "vague-term",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "clause 1",
+          "quote": "`scope_gate.py` decides whether a change is small enough to bypass full deliberation.",
+          "question": "What is the measurable threshold behind \"small\"?",
+          "suggest": "Replace it with a number and a unit, or with the observable condition it stands for."
+        },
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "12 clause(s) have no case: there are 18 clauses and 6 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-STRIP-CONTEXT-001",
@@ -2461,7 +2922,18 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "6 clause(s) have no case: there are 11 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-SUBAGENT-001",
@@ -2509,7 +2981,36 @@
       "test_exempt": "agent spec document — behavioral contract validated by consilium-subagent smoke tests and Trias/Dialectic integration runs",
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "ambiguous-actor",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "clause 1",
+          "quote": "The system provides a `consilium-subagent` agent that runs the full Sequential deliberation workflow (Steps 0–6 from SKILL.md) in an isolated context and returns a canonical `.consilium/runs/<ts>_<slug>.json` report as its final assistant message (no prose, no fences — raw JSON only).",
+          "question": "Who performs this -- which command or component?",
+          "suggest": "Name the subject the title names, so the clause reads on its own."
+        },
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "2 clause(s) have no case: there are 5 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        },
+        {
+          "rule": "no-failure-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "What happens on the failure path -- missing input, invalid value, nothing to do?",
+          "suggest": "Add one case for the way this can go wrong; it is the case implementations skip."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-TRIAS-MODEL-SCHEMA-001",
@@ -2558,7 +3059,8 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": []
     },
     {
       "id": "CONSILIUM-UTILS-001",
@@ -2637,6 +3139,17 @@
           "signal": "unreviewed",
           "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
         }
+      ],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "10 clause(s) have no case: there are 15 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
       ]
     },
     {
@@ -2705,6 +3218,17 @@
           "signal": "unreviewed",
           "advice": "Draft/baseline, not yet validated: review the contract, wire its `tested-by` tests, then promote to `confirmed`. Until then it is tracked, not enforced."
         }
+      ],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "11 clause(s) have no case: there are 16 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
       ]
     },
     {
@@ -2761,7 +3285,18 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "4 clause(s) have no case: there are 11 clauses and 7 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-VERSION-001",
@@ -2812,7 +3347,18 @@
       "test_exempt": null,
       "milestone": "v1.2",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "5 clause(s) have no case: there are 9 clauses and 4 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-VOCABULARY-MAP-001",
@@ -2864,7 +3410,18 @@
       "test_exempt": null,
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "5 clause(s) have no case: there are 10 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-VOICE-CONSERVATOR-001",
@@ -2914,7 +3471,18 @@
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "4 clause(s) have no case: there are 7 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-VOICE-CONTROL-001",
@@ -2966,7 +3534,18 @@
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "4 clause(s) have no case: there are 7 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-VOICE-GENERATOR-001",
@@ -3019,7 +3598,27 @@
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "7 clause(s) have no case: there are 10 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        },
+        {
+          "rule": "case-monoculture",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "Every case starts from the same kind of input (\"proposed\"). What is the other kind a caller would supply?",
+          "suggest": "Add one case written from the caller's side, not the implementation's."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-VOICE-SKEPTIC-001",
@@ -3071,7 +3670,18 @@
       "test_exempt": "prompt/mode document — acceptance validated by deliberation integration runs, not unit tests",
       "milestone": "v1.0",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "4 clause(s) have no case: there are 7 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "CONSILIUM-VOTE-DEGENERACY-001",
@@ -3122,7 +3732,27 @@
       "test_exempt": null,
       "milestone": null,
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "2 clause(s) have no case: there are 7 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        },
+        {
+          "rule": "no-failure-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "What happens on the failure path -- missing input, invalid value, nothing to do?",
+          "suggest": "Add one case for the way this can go wrong; it is the case implementations skip."
+        }
+      ]
     },
     {
       "id": "SKILL-RUN-CONSILIUM-001",
@@ -3174,7 +3804,18 @@
       "test_exempt": "integration harness — acceptance validated by run-consilium smoke + pipeline commands, not unit tests",
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "5 clause(s) have no case: there are 10 clauses and 5 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "SYS-CONSILIUM-IMPLEMENT-001",
@@ -3208,7 +3849,8 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": []
     },
     {
       "id": "SYS-CONSILIUM-INTEGRITY-001",
@@ -3243,7 +3885,18 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "1 clause(s) have no case: there are 4 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     },
     {
       "id": "SYS-CONSILIUM-VERDICT-001",
@@ -3290,7 +3943,27 @@
       "test_exempt": null,
       "milestone": "v1.1",
       "priority": "",
-      "risks": []
+      "risks": [],
+      "clarify": [
+        {
+          "rule": "vague-term",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "clause 3",
+          "quote": "A change small enough for the scope gate (the check that lets trivial diffs skip deliberation) gets a bypass verdict instead of a full deliberation.",
+          "question": "What is the measurable threshold behind \"small\"?",
+          "suggest": "Replace it with a number and a unit, or with the observable condition it stands for."
+        },
+        {
+          "rule": "clause-without-case",
+          "severity": "advisory",
+          "basis": "wording",
+          "where": "Cases",
+          "quote": "",
+          "question": "1 clause(s) have no case: there are 4 clauses and 3 cases. This check counts, it does not read, so it cannot say WHICH — that is the part only you can do.",
+          "suggest": "Walk the clauses and find the one no case proves. Add a case for it, fold it into an existing case, or move it out of the binding list if another requirement already carries its cases."
+        }
+      ]
     }
   ],
   "edges": [
@@ -4461,7 +5134,7 @@
     {
       "name": "clarify",
       "group": "author",
-      "summary": "Ask what a requirement has not answered yet: vague terms with no threshold, numbers with no unit, unbounded quantities, clauses with no case, a missing failure path. Read-only, always exit 0, never a gate rule. --decompose is the write half of the same question: it splits a requirement into code-rung children along the bold group labels in its Description (--apply writes), or scaffolds one draft per over-long clause when it has none. Run it before implementing, so the ambiguity is resolved in the requirement instead of guessed in code.",
+      "summary": "Ask what a requirement has not answered yet: vague terms with no threshold, numbers with no unit, clauses with no case, a missing failure path. Read-only, always exit 0, never a gate rule. --decompose is the write half of the same question: it splits a requirement into code-rung children along the bold group labels in its Description (--apply writes), or scaffolds one draft per over-long clause when it has none. Run it before implementing, so the ambiguity is resolved in the requirement instead of guessed in code.",
       "arg": "AREA-NAME-NNN",
       "flags": [
         {

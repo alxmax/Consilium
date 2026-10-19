@@ -18,9 +18,9 @@ import re
 from . import docclaims  # noqa: F401 — RM036 registers after RM035
 from .model import gate_rule
 from .sections import CONTRACT_LABELS, _section_lines
+from .tags import _ID_PAT
 
-_ID_LINK_RE = re.compile(r"\[\[([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+)\]\]")
-_CODE_SPAN_RE = re.compile(r"`[^`]*`")
+_ID_LINK_RE = re.compile(r"\[\[(" + _ID_PAT + r")\]\]")
 
 
 def dangling_links(body, known):  # implements: REQ-CHECK-1035
@@ -28,7 +28,7 @@ def dangling_links(body, known):  # implements: REQ-CHECK-1035
     in `known`, in order of first appearance."""
     out = []
     for raw in _section_lines(body, CONTRACT_LABELS, raw=True):
-        for target in _ID_LINK_RE.findall(_CODE_SPAN_RE.sub("", raw)):
+        for target in _ID_LINK_RE.findall(re.sub(r"`[^`]*`", "", raw)):
             if target not in known and target not in out:
                 out.append(target)
     return out

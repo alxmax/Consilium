@@ -1,11 +1,11 @@
 """The repository-wide gate rules: the lock, drift, the scan's leftovers
 and the map. Registered after every rule in `rules` (RM016 onward); RM030
 sits here only because its place in GATE_RULES is between RM016 and RM018."""
-import json, os
-
 from . import config as cfg
 from . import rules  # noqa: F401 — RM001-RM015 register first
-from .locks import load_memberlock, lock_path, member_drift, untracked_locks
+from .locks import (
+    baseline_problems, load_memberlock, member_drift, untracked_locks
+)
 from .mapcmd import _absent_tracked_artifacts, _stale_artifacts
 from .model import _as_list, _dependency_cycles, gate_rule
 from .orphans import (
@@ -18,20 +18,12 @@ from .similar import EXEMPTION_FIELDS, _exemption_reason_recorded
 
 @gate_rule("RM016", "warn", strict=True)
 def _corrupt_lock_rule(ctx):
-    # load_lock fails open ({}) on an absent OR corrupt lock; surface the
-    # corrupt case so a silently-disabled drift signal is visible.
-    lp = lock_path(ctx.reqs_dir)
-    if os.path.exists(lp):
-        try:
-            with open(lp, encoding="utf-8") as f:
-                if not isinstance(json.load(f), dict):
-                    # `[]`/`null`: load_lock swallows it too
-                    raise ValueError("not a JSON object")
-        except (ValueError, OSError):
-            yield None, (
-                "_reqlock.json present but unreadable "
-                "(corrupt/merge-conflicted) — drift detection skipped "
-                "this run; restore it or run `reqmap.py sync`")
+    # implements: ARCH-DRIFT-003  # implements: REQ-DRIFT-1103
+    # load_lock and load_memberlock fail open ({}) on an absent OR unusable
+    # baseline; surface the unusable case so a silently-disabled drift signal
+    # is visible. An absent baseline is first use and says nothing.
+    for message in baseline_problems(ctx.reqs_dir):
+        yield None, message
 
 
 # RM017 compared the viewer's demo fixture with the corpus. The fixture is gone and

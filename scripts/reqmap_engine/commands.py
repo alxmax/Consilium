@@ -325,7 +325,7 @@ COMMANDS = {
     "clarify": {
         "summary": (
             "Ask what a requirement has not answered yet: vague terms with no "
-            "threshold, numbers with no unit, unbounded quantities, clauses "
+            "threshold, numbers with no unit, clauses "
             "with no case, a missing failure path. Read-only, always exit 0, "
             "never a gate rule. --decompose is the write half of the same "
             "question: it splits a requirement into code-rung children along "

@@ -193,6 +193,7 @@ def _write_prose_draft(dest, cap, rel, fn, src, arch_id):
 def _write_code_draft(dest, cap, rel, fp, src, arch_id):
     # implements: ARCH-EXTRACT-008  # implements: ARCH-PROSE-024
     # implements: REQ-EXTRACT-849  # implements: REQ-EXTRACT-850
+    # implements: REQ-EXTRACT-1099
     """Write one DRAFT .md for a code file; returns the review label. `fp`
     is the file's full path (dirpath + fn folded into one, to keep the
     parameter count down)."""
@@ -200,6 +201,9 @@ def _write_code_draft(dest, cap, rel, fp, src, arch_id):
     risk = _risk(src)
     review = "REVIEW" if risk >= 2 else "auto-baseline"
     surface = _observed_surface(_file_facts(fp, rel))
+    # only `init` drafts code; `sync` loads this module for the placeholder
+    from .draftquestions import verify_section
+    asks, more = verify_section(rel, src)
     with open(dest, "w", encoding="utf-8") as f:
         # emission schema matches REQUIREMENT_TEMPLATE so a promoted draft
         # needs no reshaping
@@ -220,14 +224,12 @@ def _write_code_draft(dest, cap, rel, fp, src, arch_id):
                 f"- TODO: the observed behavior (characterization — "
                 f"correctness UNVERIFIED).\n\n"
                 f"## Verify intent (open questions for the human)\n"
-                f"- TODO: anything that looks like an accident (swallowed "
-                f"error, magic "
-                f"constant, dead branch) — intended, or a bug to fix?\n\n"
+                f"{asks}\n"
                 f"## Cases (= tests)\n"
                 f"- characterization: current behavior captured, "
                 f"correctness UNVERIFIED\n\n"
                 f"## Context (non-binding)\n**Current implementation**\n"
-                f"- {rel}\n{surface}")
+                f"- {rel}\n{surface}{more}")
     return review
 
 
