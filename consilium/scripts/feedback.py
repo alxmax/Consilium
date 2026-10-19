@@ -149,10 +149,20 @@ def report(entries: list[dict], runs: list[dict] | None = None) -> str:
     for k in OUTCOMES:
         out.append(f"  {k}: {outcomes.get(k, 0)}")
 
-    rated = sum(outcomes.get(k, 0) for k in ("OK", "BAD", "OVR"))
-    if rated:
-        success = outcomes.get("OK", 0) / rated
-        out.append(f"Success rate (excluding PEND): {success:.0%}")
+    confirmed = [e for e in entries if "[confirmed]" in (e.get("note") or "")]
+    c_ok = sum(1 for e in confirmed if e["outcome"] == "OK")
+    c_bad = sum(1 for e in confirmed if e["outcome"] == "BAD")
+    if c_ok + c_bad:
+        out.append(
+            f"Success rate (confirmed OK/BAD only, n={c_ok + c_bad}): "
+            f"{c_ok / (c_ok + c_bad):.0%}"
+        )
+    unconfirmed = sum(
+        1 for e in entries
+        if e["outcome"] in ("OK", "BAD") and e not in confirmed
+    )
+    if unconfirmed:
+        out.append(f"Excluded as unconfirmed OK/BAD: {unconfirmed}")
 
     overrides = [e for e in entries if e["outcome"] == "OVR"]
     if overrides:

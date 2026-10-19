@@ -638,19 +638,23 @@ def test_parse_feedback_drops_unknown_outcome():
 def test_feedback_cli_recent_and_success_rate():
     # verifies: CONSILIUM-FEEDBACK-001#CASE-4
     with tempfile.TemporaryDirectory() as td:
-        rows = [_tr("+", f"d{i}", "c", f"k{i}", o, "tok", "n")
-                for i, o in enumerate(
-                    ["OK", "BAD", "PEND", "PEND_HEADLESS", "OK"])]
+        rows = [_tr("+", f"d{i}", "c", f"k{i}", o, "tok", note)
+                for i, (o, note) in enumerate([
+                    ("OK", "n [confirmed]"), ("BAD", "n [confirmed]"),
+                    ("PEND", "n"), ("PEND_HEADLESS", "n"),
+                    ("OK", "n [confirmed]"), ("OK", "auto-assigned")])]
         p = _write_fb(td, *rows)
         runs = Path(td) / "runs"
         everything = _feedback_cli(p, runs)
-        recent = _feedback_cli(p, runs, "--recent", "3")
-    # PEND / PEND_HEADLESS are outside the denominator: OK 2 / (2 OK + 1 BAD)
-    assert "Total logged uses: 5" in everything, everything
-    assert "Success rate (excluding PEND): 67%" in everything, everything
-    # last 3 = PEND, PEND_HEADLESS, OK -> only OK is rated
-    assert "Total logged uses: 3" in recent, recent
-    assert "Success rate (excluding PEND): 100%" in recent, recent
+        recent = _feedback_cli(p, runs, "--recent", "4")
+    # Only confirmed OK/BAD are rated: 2 OK / (2 OK + 1 BAD); the
+    # auto-assigned OK is reported as excluded, not counted as a success.
+    assert "Total logged uses: 6" in everything, everything
+    assert "Success rate (confirmed OK/BAD only, n=3): 67%" in everything, everything
+    assert "Excluded as unconfirmed OK/BAD: 1" in everything, everything
+    # last 4 = PEND, PEND_HEADLESS, confirmed OK, unconfirmed OK
+    assert "Total logged uses: 4" in recent, recent
+    assert "Success rate (confirmed OK/BAD only, n=1): 100%" in recent, recent
 
 
 def test_feedback_cli_runs_breakdown_both_scheme_shapes():

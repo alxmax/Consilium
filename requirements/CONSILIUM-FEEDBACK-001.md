@@ -1,7 +1,7 @@
 ---
 milestone: v1.0
 id: CONSILIUM-FEEDBACK-001
-status: confirmed
+status: draft
 level: code
 layer: bus
 owner: alxmax
@@ -24,7 +24,7 @@ Every line in this section is binding.
 - `parse_feedback` returns an empty list without error when `.consilium/FEEDBACK.html` does not exist.
 - The success-rate denominator is `OK + BAD + OVR` only; `PEND` and `PEND_HEADLESS` are excluded from the rate calculation.
 - `parse_feedback` is a shared utility imported by `priors.py`, `log_feedback.py`, `efficiency.py`, and deprecated scripts.
-- As a CLI tool, `feedback.py` prints to stdout: total logged uses, per-outcome counts, overall success rate excluding pending entries, recent overrides, and (with `--runs`) a breakdown of runs-on-disk by aggregation scheme.
+- As a CLI tool, `feedback.py` prints to stdout: total logged uses, per-outcome counts, the success rate over `[confirmed]` OK/BAD rows only (with how many unconfirmed OK/BAD rows were excluded), recent overrides, and (with `--runs`) a breakdown of runs-on-disk by aggregation scheme.
 - Exit code is 0 always.
 
 ## Verify intent

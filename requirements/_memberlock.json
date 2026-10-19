@@ -22,10 +22,10 @@
       "consilium/scripts/confidence.py": "5e3242f56752ee22e4edfbc6e8e3974e69e89b52f0b364344222c6102b03d9e7"
     },
     "CONSILIUM-CONFIDENCE-CALIBRATION-001": {
-      "consilium/scripts/confidence_calibration.py": "aee25644846808d611467d9622f6e0c392dfac0e1650d8da3d3ee48f1f476cae"
+      "consilium/scripts/confidence_calibration.py": "e5884efe3d7da0f15e0bac7e260def67e07b57c6a199a2fa3e6cdace50683af9"
     },
     "CONSILIUM-FEEDBACK-001": {
-      "consilium/scripts/feedback.py": "52c8cdf7cc4a1ab42e8240551ce17ba8da4b87237f449ef2b509138bc423c4fc"
+      "consilium/scripts/feedback.py": "ead8e5028f3ed33362daa942fd7fe64cef8e8c5e4d60e1e1d138ca98c062c2b6"
     },
     "CONSILIUM-IMPLEMENT-CODER-001": {
       "consilium/prompts/implement/coder.md": "c038feb961f0d5c071d700facbb5356d4a1bc99018dc8d8eaac55c19f45b0369"
@@ -68,7 +68,7 @@
       "scripts/plugin_paths.py": "18b9bae7249c9868058a12a9d9b87c6857d3dbd92f1abaf97cdbb0f5983b0f74"
     },
     "CONSILIUM-PRIORS-001": {
-      "consilium/scripts/priors.py": "3847c36138ae14366288bf620e65f8b45466dd7daaa40d42db66118fb6d1a578"
+      "consilium/scripts/priors.py": "5d3bbe1b1a39b443331602818672a76c5f698aba27ffa8ed31acea614a60bfb4"
     },
     "CONSILIUM-RENDER-FEEDBACK-HTML-001": {
       "consilium/scripts/render_feedback_html.py": "c9eeb95f7fa18d8c432821823a714dba2c131cda38a3a50ab645bc3433909f41"
