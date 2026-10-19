@@ -1,8 +1,8 @@
 # Consilium
 
-**A second opinion, structured.** Consilium is a [Claude Code](https://docs.claude.com/en/docs/claude-code) skill that evaluates a risky code change through three independent voices that don't trust each other — a creative, an analyst, and a skeptic — then aggregates their verdicts under a veto cascade into one canonical decision, with the disagreement preserved on disk.
+**A second opinion, structured.** Consilium is a [Claude Code](https://docs.claude.com/en/docs/claude-code) skill that evaluates a risky code change through three distinct roles that don't trust each other — a creative, an analyst, and a skeptic — then aggregates their verdicts under a veto cascade into one canonical decision, with the disagreement preserved on disk.
 
-One LLM reviewing its own proposal has predictable blind spots: it generates an idea and validates it from the same perspective. Consilium splits that into separate roles with disjoint mandates so a change is cross-examined before it ships.
+One LLM reviewing its own proposal has predictable blind spots: it generates an idea and validates it from the same perspective. Consilium splits that into separate roles with disjoint mandates so a change is cross-examined before it ships. In the default mode the roles share one context (the Generator is blind to risk framing only because it speaks first); isolation comes from dispatch — Trias runs three personality passes as separate sub-agents that never see each other.
 
 The three core voices:
 
@@ -164,7 +164,7 @@ What this project concretely shows, in Agentic-AI / LLMOps terms. Rated **Full**
 
 | Capability | Status | Where / honest caveat |
 |---|---|---|
-| Multi-agent orchestration | Full | 3 voices + 3 Trias personalities + Skeptic, dispatched as isolated sub-agents (`consilium/agents/`, `consilium/scripts/personalities.py`) |
+| Multi-agent orchestration | Full | Sequential's 3 voices run in one dispatched sub-agent; the 3 Trias personalities and the Skeptic are separate, isolated sub-agents (`consilium/agents/`, `consilium/scripts/personalities.py`) |
 | Planner / executor split | Full | orchestrator selects the mode and scope-gates, then dispatches voice executors |
 | Deterministic orchestration | Full | `scope_gate → voices → aggregator → validate_report → implementation pipeline`, all stdlib scripts |
 | Retry / reflection / self-healing | Full | Step 5d low-confidence retry (the orchestrator gathers discriminating evidence and re-runs the voices once), sub-agent-crash fallback, malformed-JSON retry, red→green test gate |

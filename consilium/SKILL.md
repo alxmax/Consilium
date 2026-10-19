@@ -5,7 +5,7 @@ description: Evaluate code changes through Generator/Control/Conservator deliber
 
 # Consilium — Code Deliberation Skill
 
-Multi-perspective deliberation pattern for any code change. Three independent voices collaborate to evaluate a change:
+Multi-perspective deliberation pattern for any code change. Three distinct voices evaluate a change — in Sequential, the default, as roles in one shared context; Trias isolates its personality passes in separate sub-agents:
 
 - **Generator** (creative) — proposes alternatives, divergent thinking
 - **Control** (analytical) — verifies technical correctness
@@ -193,7 +193,7 @@ Returns `{confidence, agreement, separation}`; `confidence` is `null` when `chos
 import sys; sys.path.insert(0, "scripts")  # scripts/ is not a package; confidence.py uses flat sibling imports
 from confidence import check_mode_floor
 result = check_mode_floor(telemetry_mode, confidence_value, vote_pattern)  # vote_pattern only for trias; omit/None otherwise
-# result["below_floor"] == True → log with --outcome WEAK in FEEDBACK.html
+# result["below_floor"] == True → log with `log_feedback.py --weak` (outcome stays PEND; [weak] is quality metadata, not an observed outcome)
 ```
 Floors: `sequential=0.70`, `dialectic=0.75`, `trias=0.80`. **Trias exemption:** decisive vote patterns (`3-0`/`2-1`/`2-0`) are exempt from WEAK — `2-1` (0.75) and `2-0` (0.70) sit structurally below 0.80; pass `vote_pattern`.
 

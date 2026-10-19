@@ -1479,6 +1479,7 @@
         "Before appending, it checks for duplicates using a 16-character SHA-256 fingerprint keyed on `date|chosen|context|run_id`.",
         "If the existing row has the same `run_path` but a different outcome (e.g., PEND->OK), the row is upgraded in place rather than duplicated.",
         "The sidecar `.run_path_map.json` is updated on every real write so `efficiency.py` and `audit_feedback.py` can later join outcomes to telemetry by run path.",
+        "`--weak` adds the `[weak]` marker to the note for a run below its mode confidence floor; the row's outcome is unchanged (`PEND`), because WEAK is advisory quality metadata, not an observed outcome. `--outcome WEAK` is rejected.",
         "`--outcome OK` requires `--confirmed` (the verification passed or the user confirmed the result), which adds the `[confirmed]` marker; it also enforces a 0.70 confidence threshold gate, requiring `--force-override` to bypass.",
         "stdout is a `date | context | chosen | outcome | note` summary line (or `skipped (duplicate): ...` on exit 3).",
         "`.consilium/FEEDBACK.html` is updated atomically with the new or upgraded row; `.consilium/runs/.run_path_map.json` is updated with the new fingerprint->run_path entry.",
@@ -1494,7 +1495,7 @@
       ],
       "notes": [],
       "current_impl": [],
-      "accept": "- **CASE-1** — Given a report with a valid `success_criterion` and `chosen_approach`, when `log_feedback.py` runs, then it produces a new `<tr>` row in FEEDBACK.html with the correct date, truncated context, and derived note.\n- **CASE-2** — Given the same report is appended twice with the same `--run-path` and the same `--outcome`, when the second call runs, then it exits 3 and does not add a duplicate row.\n- **CASE-3** — Given the same report is appended twice with the same `--run-path` but a different outcome (e.g. PEND then OK), when the second call runs, then it upgrades the existing row in place and exits 0.\n- **CASE-4** — Given `--outcome OK` with a report whose `confidence` is below 0.70, when the script runs without `--force-override`, then it exits 1 with an error message.\n- **CASE-4b** — Given `--outcome OK` without `--confirmed`, when the script runs, then it exits 1 and writes nothing.\n- **CASE-5** — Given `--outcome OVR` without `--override-target`, when the script runs, then it exits 2 with an error message to stderr.\n- **CASE-6** — Given several `log_feedback.py` processes run at once (distinct appends plus an outcome upgrade of an existing row), when they all finish, then every appended row is present and the upgrade is applied.\n- **CASE-7** — Given the sidecar write fails after the row was written, when the same call is retried, then FEEDBACK.html still holds exactly one such row and the sidecar maps the run path.",
+      "accept": "- **CASE-1** — Given a report with a valid `success_criterion` and `chosen_approach`, when `log_feedback.py` runs, then it produces a new `<tr>` row in FEEDBACK.html with the correct date, truncated context, and derived note.\n- **CASE-2** — Given the same report is appended twice with the same `--run-path` and the same `--outcome`, when the second call runs, then it exits 3 and does not add a duplicate row.\n- **CASE-3** — Given the same report is appended twice with the same `--run-path` but a different outcome (e.g. PEND then OK), when the second call runs, then it upgrades the existing row in place and exits 0.\n- **CASE-4** — Given `--outcome OK` with a report whose `confidence` is below 0.70, when the script runs without `--force-override`, then it exits 1 with an error message.\n- **CASE-4b** — Given `--outcome OK` without `--confirmed`, when the script runs, then it exits 1 and writes nothing.\n- **CASE-5** — Given `--outcome OVR` without `--override-target`, when the script runs, then it exits 2 with an error message to stderr.\n- **CASE-6** — Given several `log_feedback.py` processes run at once (distinct appends plus an outcome upgrade of an existing row), when they all finish, then every appended row is present and the upgrade is applied.\n- **CASE-7** — Given the sidecar write fails after the row was written, when the same call is retried, then FEEDBACK.html still holds exactly one such row and the sidecar maps the run path.\n- **CASE-8** — Given a below-floor result from `check_mode_floor`, when `log_feedback.py --weak` runs, then FEEDBACK.html holds one row with outcome `PEND` and a `[weak]` note marker, and `feedback.py` reads it back.",
       "input": "",
       "output": "",
       "desc": "",
@@ -1513,7 +1514,7 @@
       "members": [
         {
           "role": "implements",
-          "loc": "consilium/scripts/log_feedback.py:47"
+          "loc": "consilium/scripts/log_feedback.py:48"
         },
         {
           "role": "tested-by",
@@ -4123,7 +4124,7 @@
     },
     {
       "month": "2026-10",
-      "count": 10,
+      "count": 11,
       "first": "2026-10-13",
       "last": "2026-10-18",
       "versions": [
@@ -4136,18 +4137,27 @@
         "v1.15.3",
         "v1.15.4",
         "v1.15.5",
-        "v1.15.6"
+        "v1.15.6",
+        "v1.15.7"
       ],
       "landmark": "v1.15.0",
       "headline": "",
       "entries": [
         {
+          "version": "v1.15.7",
+          "date": "2026-10-18",
+          "headline": "",
+          "body": "### Fixed\n- `SKILL.md` and `modes/confidence.md` told the caller to log a below-floor run with `--outcome WEAK`, which `log_feedback.py` rejects, so the documented step failed with a CLI error. Added `log_feedback.py --weak`: it adds a `[weak]` note marker and leaves the row `PEND`, since WEAK is advisory quality metadata, not an observed outcome.\n- The README and `SKILL.md` called the three voices \"independent\". In Sequential they are roles in one shared context; only Trias isolates its passes in separate sub-agents. The wording now says so.",
+          "first_commit": "2026-10-18",
+          "last_commit": "2026-10-18"
+        },
+        {
           "version": "v1.15.6",
           "date": "2026-10-18",
           "headline": "",
           "body": "### Fixed\n- An invalid, never-evaluated or vetoed candidate could become the normal recommendation. `conservative_override` (the Step 5 default) ranked a candidate Control had rejected (`valid: false` / control score 0) on its generator and safety scores alone; the `sequential` cascade aggregated the Generator's `preferred` without looking at Control's verdict or the Conservator's `net_concern`. Now `conservative_override` vetoes Control-rejected candidates (`reason: control_invalid`), and `sequential` returns REWORK (`preferred_inadmissible`) for an inadmissible `preferred` unless an explicit `waiver` `{id, reason}` is supplied, which is recorded in `admissibility.waived`. `validate_report.py` rejects a report whose chosen candidate its own log shows to be inadmissible, absent a recorded waiver; older runs without the `admissibility` block stay readable.",
-          "first_commit": "2026-10-18",
-          "last_commit": "2026-10-18"
+          "first_commit": "2026-10-19",
+          "last_commit": "2026-10-19"
         },
         {
           "version": "v1.15.5",
@@ -4524,13 +4534,13 @@
         "file": "consilium/scripts/log_feedback.py",
         "line": 1,
         "name": "log_feedback.py",
-        "detail": "566 lines (over 500)"
+        "detail": "580 lines (over 500)"
       },
       {
         "pillar": "abstraction",
         "kind": "long-function",
         "file": "consilium/scripts/log_feedback.py",
-        "line": 322,
+        "line": 327,
         "name": "_append_entry_locked",
         "detail": "`_append_entry_locked` is 84 lines (over 80)"
       },

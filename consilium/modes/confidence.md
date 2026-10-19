@@ -44,7 +44,7 @@ If `chosen` is `null` (all vetoed), returns `{"confidence": null}` — confidenc
 
 ## Mode confidence floor (E1)
 
-After deriving confidence, `check_mode_floor(mode, confidence)` compares against the per-mode floor. Below floor → log `--outcome WEAK` in FEEDBACK.html (the mode did not deliver value for its cost). Floors are loaded at import time from each `modes/*.md` frontmatter `confidence_floor` field, with a hardcoded fallback when `modes/` is absent (older installs):
+After deriving confidence, `check_mode_floor(mode, confidence)` compares against the per-mode floor. Below floor → log with `log_feedback.py --weak` (the mode did not deliver value for its cost). WEAK is a `[weak]` note marker on a row that stays `PEND` — advisory quality metadata, not an observed outcome. Floors are loaded at import time from each `modes/*.md` frontmatter `confidence_floor` field, with a hardcoded fallback when `modes/` is absent (older installs):
 
 | Mode | Floor |
 |---|---|

@@ -38,6 +38,7 @@ CLI:
     cat runs/<file>.json | python scripts/log_feedback.py
     cat runs/<file>.json | python scripts/log_feedback.py
         --outcome OK --confirmed
+    cat runs/<file>.json | python scripts/log_feedback.py --weak
     cat runs/<file>.json | python scripts/log_feedback.py --outcome OVR \\
         --override-target alt_b --user-note "preferred safer rollback"
     python scripts/log_feedback.py --feedback path/to/FEEDBACK.html
@@ -69,6 +70,7 @@ CONTEXT_MAX = 60
 NOTE_MAX = 80
 HEADER_LINES = ()  # legacy MD header no longer used
 RUN_PATH_MAP = ".run_path_map.json"
+WEAK_MARKER = "[weak]"  # below-floor quality flag; the row stays PEND
 CONFIRMED_MARKER = "[confirmed]"  # same marker mark_outcome.py writes;
 # priors.py rates only these rows
 
@@ -181,6 +183,7 @@ def build_entry(
     override_target: str | None = None,
     user_note: str | None = None,
     confirmed: bool = False,
+    weak: bool = False,
 ) -> dict:
     sc = report.get("success_criterion")
     if not isinstance(sc, str) or not sc.strip():
@@ -207,6 +210,8 @@ def build_entry(
         extras.append(_clean(user_note))
     if confirmed:
         extras.append(CONFIRMED_MARKER)
+    if weak:
+        extras.append(WEAK_MARKER)
     note = "; ".join([auto_note] + extras) if extras else auto_note
 
     return {
@@ -458,6 +463,14 @@ def _build_parser() -> argparse.ArgumentParser:
         ),
     )
     ap.add_argument(
+        "--weak", action="store_true",
+        help=(
+            "the run fell below its mode confidence floor "
+            "(check_mode_floor); adds the [weak] note marker. Advisory "
+            "quality metadata, not an outcome — the row stays PEND"
+        ),
+    )
+    ap.add_argument(
         "--confirmed", action="store_true",
         help=(
             "the outcome was verified (the verification command "
@@ -537,6 +550,7 @@ def main(argv: list[str] | None = None) -> int:
             override_target=args.override_target,
             user_note=args.user_note,
             confirmed=args.confirmed,
+            weak=args.weak,
         )
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
